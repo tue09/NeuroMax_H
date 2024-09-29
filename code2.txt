@@ -1,0 +1,81 @@
+git clone https://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@github.com/tue09/NeuroMax_H.git
+git pull https://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@github.com/tue09/NeuroMax_H.git
+
+python -c "import wandb; wandb.login(key='7bdb437a6da5fc40c5f832043fc9c81cba227b92')"
+
+python -c "import torch; print(torch.__version__)"
+python -c "import torchvision; print(torchvision.__version__)"
+
+conda install pytorch==2.4.0 : OK
+pip install torchvision==0.19.0 : OK
+pip install torchaudio==2.4.0 : OK
+pip install sentence_transformers==2.2.2 : OK
+pip install torch_kmeans : OK
+pip install matplotlib : OK
+pip install wandb : OK
+pip install gensim : OK
+conda install -c conda-forge openjdk -y : OK
+conda install -c conda-forge hdbscan -y : OK
+pip install bertopic : OK
+pip install cvxpy : OK
+
+#weight_ECR, weight_DCR, weight_TCR, 250 40 200
+
+python main.py \
+    --dataset 20NG \
+    --model NeuroMax \
+    --num_topics 50 \
+    --num_groups 20 \
+    --dropout 0.2 \
+    --seed 0 \
+    --beta_temp 0.2 \
+    --epochs 500 \
+    --device cuda \
+    --lr 0.002 \
+    --lr_scheduler StepLR \
+    --batch_size 128 \
+    --lr_step_size 125 \
+    --use_pretrainWE \
+    --weight_ECR 40 \
+    --alpha_ECR 20 \
+    --weight_GR 1 \
+    --alpha_GR 5 \
+    --weight_CTR 100 \
+    --weight_InfoNCE 50 \
+    --weight_CL 0 \
+    --threshold 0
+
+
+python main.py \
+    --dataset YahooAnswers\
+    --model NeuroMax \
+    --num_topics 50 \
+    --num_groups 20 \
+    --dropout 0.2 \
+    --seed 0 \
+    --beta_temp 0.2 \
+    --epochs 500 \
+    --device cuda \
+    --lr 0.002 \
+    --lmbda 0.9 \
+    --sigma 1 \
+    --acc_step 8 \
+    --lr_scheduler StepLR \
+    --batch_size 128 \
+    --lr_step_size 125 \
+    --use_pretrainWE \
+    --weight_ECR 80 \
+    --weight_GR 1.0 \
+    --alpha_ECR 20.0 \
+    --alpha_GR 5.0 \
+    --weight_CTR 5.0 \
+    --weight_CL 0 \
+    --threshold 0.0 \
+    --weight_InfoNCE 30.0
+
+
+
+#Wandb API key: 7bdb437a6da5fc40c5f832043fc9c81cba227b92
+#Wandb logout: ssssssssssssssssssssssssssssssssssssssss
+    
+    

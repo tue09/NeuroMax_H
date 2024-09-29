@@ -112,9 +112,9 @@ if __name__ == "__main__":
         print(f'Purity: ', clustering_results['Purity'])
 
 
-    '''TC_15_list, TC_15 = evaluations.topic_coherence.TC_on_wikipedia(
+    TC_15_list, TC_15 = evaluations.topic_coherence.TC_on_wikipedia(
         os.path.join(current_run_dir, 'top_words_15.txt'))
-    print(f"TC_15: {TC_15:.5f}")'''
+    print(f"TC_15: {TC_15:.5f}")
 
     filename = f"results_{args.dataset}_topics{args.num_topics}_epochs{args.epochs}_batch_size{args.batch_size}\
                 _weight_ECR{args.weight_ECR}_weight_GR{args.weight_GR}_weight_CTR{args.weight_CTR}_weight_InfoNCE{args.weight_InfoNCE}_weight_CL{args.weight_CL}.txt"
@@ -128,7 +128,7 @@ if __name__ == "__main__":
             f.write("NMI: N/A\n")
             f.write("Purity: N/A\n")
         f.write(f"TD_15: {TD_15:.5f}\n")
-        #f.write(f"TC_15: {TC_15:.5f}\n")
+        f.write(f"TC_15: {TC_15:.5f}\n")
 
     print(f"Done in {filepath}")
 

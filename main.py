@@ -26,7 +26,7 @@ if __name__ == "__main__":
     seed.seedEverything(args.seed)
     print(args)
 
-    if args.dataset in ['YahooAnswers', '20NG']:
+    if args.dataset in ['YahooAnswers', '20NG', 'AGNews']:
         read_labels = True
     else:
         read_labels = False

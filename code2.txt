@@ -1,5 +1,7 @@
 git clone https://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@github.com/tue09/NeuroMax_H.git
 git pull https://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@github.com/tue09/NeuroMax_H.git
+git fetch https://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@github.com/tue09/NeuroMax_H.git
+git checkout origin/master -- main.py
 
 python -c "import wandb; wandb.login(key='7bdb437a6da5fc40c5f832043fc9c81cba227b92')"
 
@@ -77,5 +79,6 @@ python main.py \
 
 #Wandb API key: 7bdb437a6da5fc40c5f832043fc9c81cba227b92
 #Wandb logout: ssssssssssssssssssssssssssssssssssssssss
+
     
     

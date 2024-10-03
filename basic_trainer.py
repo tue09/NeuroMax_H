@@ -98,6 +98,7 @@ class BasicTrainer:
                 batch_data = inputs
                 # rst_dict = self.model(indices, is_CTR, batch_data, epoch_id=epoch)
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
+                print("xx")
                 batch_loss = rst_dict['loss']
                 batch_loss.backward()
 

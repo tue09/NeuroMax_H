@@ -1,55 +1,60 @@
 import torch
 from torch import nn
-import torch.nn.functional as F
 from ._model_utils import pairwise_euclidean_distance
 
-
-class ETP(nn.Module):
-    def __init__(self, sinkhorn_alpha, init_a_dist=None, init_b_dist=None, OT_max_iter=5000, stopThr=.5e-2):
+class CTR(nn.Module):
+    def __init__(self, weight_loss_CTR, sinkhorn_alpha, OT_max_iter=1000, stopThr=.5e-2):
         super().__init__()
+
         self.sinkhorn_alpha = sinkhorn_alpha
         self.OT_max_iter = OT_max_iter
+        self.weight_loss_CTR = weight_loss_CTR
         self.stopThr = stopThr
         self.epsilon = 1e-16
-        self.init_a_dist = init_a_dist
-        self.init_b_dist = init_b_dist
 
-        if init_a_dist is not None:
-            self.a_dist = init_a_dist
+    def forward(self, a, b):
+        M = pairwise_euclidean_distance(a, b)
+        # a: B x K
+        # b: B x V
+        # M: K x V
 
-        if init_b_dist is not None:
-            self.b_dist = init_b_dist
+        if self.weight_loss_CTR <= 1e-6:
+            return 0.0
 
-    def forward(self, x, y):
-        # Sinkhorn's algorithm
-        M = pairwise_euclidean_distance(x, y)
+        B, K = a.size()
+        _, V = b.size()
+        M = M.unsqueeze(0).expand(B, -1, -1)  
+        M = M.transpose(1, 2) # Shape: (B, K, V)
         device = M.device
 
-        if self.init_a_dist is None:
-            a = (torch.ones(M.shape[0]) / M.shape[0]).unsqueeze(1).to(device)
-        else:
-            a = F.softmax(self.a_dist, dim=0).to(device)
+        # Initialize u and v
+        u = torch.ones(B, K, device=device) / K  # Shape: (B, K)
+        v = torch.ones(B, V, device=device) / V  # Shape: (B, V)
 
-        if self.init_b_dist is None:
-            b = (torch.ones(M.shape[1]) / M.shape[1]).unsqueeze(1).to(device)
-        else:
-            b = F.softmax(self.b_dist, dim=0).to(device)
-
-        u = (torch.ones_like(a) / a.size()[0]).to(device) # Kx1
-
-        K = torch.exp(-M * self.sinkhorn_alpha)
-        err = 1
+        # Compute the kernel matrix
+        K_mat = torch.exp(-M * self.sinkhorn_alpha)  # Shape: (B, K, V)
+        err = float('inf')
         cpt = 0
+
         while err > self.stopThr and cpt < self.OT_max_iter:
-            v = torch.div(b, torch.matmul(K.t(), u) + self.epsilon)
-            u = torch.div(a, torch.matmul(K, v) + self.epsilon)
+            # Update v: v = b / (K^T u)
+            KTu = torch.bmm(K_mat.transpose(1, 2), u.unsqueeze(2)).squeeze(2)  # Shape: (B, V)
+            v = b / (KTu + self.epsilon)  # Shape: (B, V)
+
+            # Update u: u = a / (K v)
+            Kv = torch.bmm(K_mat, v.unsqueeze(2)).squeeze(2)  # Shape: (B, K)
+            u = a / (Kv + self.epsilon)  # Shape: (B, K)
+
             cpt += 1
             if cpt % 50 == 1:
-                bb = torch.mul(v, torch.matmul(K.t(), u))
-                err = torch.norm(torch.sum(torch.abs(bb - b), dim=0), p=float('inf'))
+                # Compute the marginal constraint error
+                err_u = torch.max(torch.abs(torch.sum(u * Kv, dim=1) - a.sum(dim=1)))
+                err_v = torch.max(torch.abs(torch.sum(v * KTu, dim=1) - b.sum(dim=1)))
+                err = max(err_u.item(), err_v.item())
 
-        transp = u * (K * v.T)
+        # Transport matrix for the batch
+        transp = u.unsqueeze(2) * K_mat * v.unsqueeze(1)  # Shape: (B, K, V)
 
-        loss_ETP = torch.sum(transp * M)
-
-        return loss_ETP, transp
+        # Compute the loss
+        loss_CTR = torch.mean(torch.sum(transp * M, dim=(1, 2)))  # Scalar
+        return loss_CTR, transp

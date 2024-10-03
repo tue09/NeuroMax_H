@@ -115,7 +115,7 @@ class FASTopic(nn.Module):
 
         #CTR
         if self.weight_loss_CTR != 0:
-             loss_CTR = self.get_loss_CTR(theta, indices)
+             loss_CTR = self.get_loss_CTR(input, indices)
         else:
              loss_CTR = 0.0
 

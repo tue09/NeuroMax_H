@@ -9,13 +9,14 @@ import os
 import scipy
 
 from SAM_function.TRAM import TRAM
-
+from SAM_function.FSAM import FSAM
 
 class BasicTrainer:
-    def __init__(self, model, model_name='NeuroMax',  epochs=200, learning_rate=0.002, batch_size=200, lr_scheduler=None, lr_step_size=125, log_interval=5, 
+    def __init__(self, model, model_name='NeuroMax', SAM_name='TRAM', epochs=200, learning_rate=0.002, batch_size=200, lr_scheduler=None, lr_step_size=125, log_interval=5, 
                     threshold=10, device='cuda', sigma=0.1, lmbda=0.9, acc_step=8):
         self.model = model
         self.model_name = model_name
+        self.SAM_name = SAM_name
         self.epochs = epochs
         self.learning_rate = learning_rate
         self.batch_size = batch_size
@@ -53,12 +54,22 @@ class BasicTrainer:
 
     def make_sam_optimizer(self,):
         base_optimizer = torch.optim.SGD
-        optimizer = TRAM(
-            self.model.parameters(),
-            base_optimizer, device=self.device,
-            lr=self.learning_rate,
-            sigma=self.sigma, lmbda=self.lmbda
-            )
+        if self.SAM_name == 'FSAM':
+            optimizer = FSAM(
+                self.model.parameters(),
+                base_optimizer, device=self.device,
+                lr=self.learning_rate,
+                sigma=self.sigma, lmbda=self.lmbda
+                )
+        elif self.SAM_name == 'TRAM':
+            optimizer = TRAM(
+                self.model.parameters(),
+                base_optimizer, device=self.device,
+                lr=self.learning_rate,
+                sigma=self.sigma, lmbda=self.lmbda
+                )
+        else:
+            print("WRONG!!")
         return optimizer
 
     def make_lr_scheduler(self, optimizer):
@@ -72,10 +83,11 @@ class BasicTrainer:
     def fit_transform(self, dataset_handler, num_top_words=15, verbose=False):
         self.train(dataset_handler, verbose)
         top_words = self.export_top_words(dataset_handler.vocab, num_top_words)
-        if self.model_name != 'FASTopic':
-            train_theta = self.test(dataset_handler.train_data)
-        else:
+    
+        if self.model_name == 'FASTopic':
             train_theta = self.test(dataset_handler.train_contextual_embed, dataset_handler.train_contextual_embed)
+        else:
+            train_theta = self.test(dataset_handler.train_data)
 
         return top_words, train_theta
 
@@ -156,10 +168,11 @@ class BasicTrainer:
             self.model.eval()
             for idx in all_idx:
                 batch_input = input_data[idx]
-                if self.model_name != 'FASTopic':
-                    batch_theta = self.model.get_theta(batch_input)
-                else:
+            
+                if self.model_name == 'FASTopic':
                     batch_theta = self.model.get_theta(batch_input, train_data)
+                else:
+                    batch_theta = self.model.get_theta(batch_input)
                 theta.extend(batch_theta.cpu().tolist())
 
         theta = np.asarray(theta)
@@ -175,12 +188,12 @@ class BasicTrainer:
         return top_words
 
     def export_theta(self, dataset_handler):
-        if self.model_name != 'FASTopic':
-            train_theta = self.test(dataset_handler.train_data)
-            test_theta = self.test(dataset_handler.test_data)
-        else:
+        if self.model_name == 'FASTopic':
             train_theta = self.test(dataset_handler.train_contextual_embed, dataset_handler.train_contextual_embed)
             test_theta = self.test(dataset_handler.test_contextual_embed, dataset_handler.train_contextual_embed)
+        else:
+            train_theta = self.test(dataset_handler.train_data)
+            test_theta = self.test(dataset_handler.test_data)
         return train_theta, test_theta
 
     def save_beta(self, dir_path):

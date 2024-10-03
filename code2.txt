@@ -50,7 +50,8 @@ python main.py \
 
 python main.py \
     --dataset YahooAnswers\
-    --model NeuroMax \
+    --model FASTopic \
+    --SAM_name TRAM \
     --num_topics 50 \
     --num_groups 20 \
     --dropout 0.2 \

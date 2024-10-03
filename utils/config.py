@@ -13,6 +13,7 @@ def add_dataset_argument(parser):
 
 def add_model_argument(parser):
     parser.add_argument('--model', type=str, help='model name')
+    parser.add_argument('--SAM_name', type=str, help='SAM Variant')
     parser.add_argument('--num_topics', type=int, default=50)
     parser.add_argument('--num_groups', type=int, default=20)
     parser.add_argument('--dropout', type=float, default=0.2)

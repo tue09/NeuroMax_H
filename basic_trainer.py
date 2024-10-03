@@ -12,9 +12,10 @@ from SAM_function.TRAM import TRAM
 
 
 class BasicTrainer:
-    def __init__(self, model,  epochs=200, learning_rate=0.002, batch_size=200, lr_scheduler=None, lr_step_size=125, log_interval=5, 
+    def __init__(self, model, model_name='NeuroMax',  epochs=200, learning_rate=0.002, batch_size=200, lr_scheduler=None, lr_step_size=125, log_interval=5, 
                     threshold=10, device='cuda', sigma=0.1, lmbda=0.9, acc_step=8):
         self.model = model
+        self.model_name = model_name
         self.epochs = epochs
         self.learning_rate = learning_rate
         self.batch_size = batch_size
@@ -71,7 +72,10 @@ class BasicTrainer:
     def fit_transform(self, dataset_handler, num_top_words=15, verbose=False):
         self.train(dataset_handler, verbose)
         top_words = self.export_top_words(dataset_handler.vocab, num_top_words)
-        train_theta = self.test(dataset_handler.train_data)
+        if self.model_name != 'FASTopic':
+            train_theta = self.test(dataset_handler.train_data)
+        else:
+            train_theta = self.test(dataset_handler.train_contextual_embed, dataset_handler.train_contextual_embed)
 
         return top_words, train_theta
 
@@ -143,7 +147,7 @@ class BasicTrainer:
                 print(output_log)
                 self.logger.info(output_log)
 
-    def test(self, input_data):
+    def test(self, input_data, train_data=None):
         data_size = input_data.shape[0]
         theta = list()
         all_idx = torch.split(torch.arange(data_size), self.batch_size)
@@ -152,7 +156,10 @@ class BasicTrainer:
             self.model.eval()
             for idx in all_idx:
                 batch_input = input_data[idx]
-                batch_theta = self.model.get_theta(batch_input)
+                if self.model_name != 'FASTopic':
+                    batch_theta = self.model.get_theta(batch_input)
+                else:
+                    batch_theta = self.model.get_theta(batch_input, train_data)
                 theta.extend(batch_theta.cpu().tolist())
 
         theta = np.asarray(theta)
@@ -168,8 +175,12 @@ class BasicTrainer:
         return top_words
 
     def export_theta(self, dataset_handler):
-        train_theta = self.test(dataset_handler.train_data)
-        test_theta = self.test(dataset_handler.test_data)
+        if self.model_name != 'FASTopic':
+            train_theta = self.test(dataset_handler.train_data)
+            test_theta = self.test(dataset_handler.test_data)
+        else:
+            train_theta = self.test(dataset_handler.train_contextual_embed, dataset_handler.train_contextual_embed)
+            test_theta = self.test(dataset_handler.test_contextual_embed, dataset_handler.train_contextual_embed)
         return train_theta, test_theta
 
     def save_beta(self, dir_path):

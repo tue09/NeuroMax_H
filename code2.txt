@@ -84,6 +84,8 @@ git checkout origin/master -- main.py
 git checkout origin/master -- utils
 git checkout origin/master -- basic_trainer.py
 git checkout origin/master -- FASTopic
+git checkout origin/master -- NeuroMax
+
 
 
     

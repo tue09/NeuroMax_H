@@ -24,7 +24,7 @@ class FASTopic(nn.Module):
         self.TW_alpha = TW_alpha
         self.theta_temp = theta_temp
         self.num_topics = num_topics
-        
+
         self.epsilon = 1e-12
         
         self.word_embeddings = nn.init.trunc_normal_(torch.empty(vocab_size, embed_size))
@@ -86,10 +86,14 @@ class FASTopic(nn.Module):
         theta = theta / theta.sum(1, keepdim=True)
 
         return theta
-
+    """ #bow = input["data"]
+        #contextual_emb = input["contextual_embed"]"""
+    """def forward(self, train_bow, doc_embeddings):
+        loss_DT, transp_DT = self.(doc_embeddings, self.topic_embeddings)
+        loss_TW, transp_TW = self.TW_ETP(self.topic_embeddings, self.word_embeddings)"""
     def forward(self, indices, input, epoch_id=None):
         train_bow = input[0]
-        doc_embeddings = input[1]
+        doc_embeddings = input[1].t()
         loss_DT, transp_DT = self.DT_ETP(doc_embeddings, self.topic_embeddings)
         loss_TW, transp_TW = self.TW_ETP(self.topic_embeddings, self.word_embeddings)
 

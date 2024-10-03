@@ -86,18 +86,17 @@ class FASTopic(nn.Module):
         theta = theta / theta.sum(1, keepdim=True)
 
         return theta
-    """ #bow = input["data"]
-        #contextual_emb = input["contextual_embed"]"""
-    """def forward(self, train_bow, doc_embeddings):
-        loss_DT, transp_DT = self.(doc_embeddings, self.topic_embeddings)
-        loss_TW, transp_TW = self.TW_ETP(self.topic_embeddings, self.word_embeddings)"""
+    
+    def get_loss_CTR(self, theta, indices):
+        cd_batch = self.cluster_distribution[indices]  
+        cost = self.pairwise_euclidean_distance(self.cluster_mean, self.map_t2c(self.topic_embeddings))  
+        loss_CTR = self.weight_loss_CTR * self.CTR(theta, cd_batch, cost)  
+        return loss_CTR
+
     def forward(self, indices, input, epoch_id=None):
         train_bow = input[0]
         doc_embeddings = input[1]
-        '''print(f"train_bow shape = {train_bow.shape}")
-        print(f"doc_embeddings shape = {doc_embeddings.shape}")
-        print(f"self.topic_embeddings shape = {self.topic_embeddings.shape}")
-        print(f"self.word_embeddings shape = {self.word_embeddings.shape}")'''
+
         loss_DT, transp_DT = self.DT_ETP(doc_embeddings, self.topic_embeddings)
         loss_TW, transp_TW = self.TW_ETP(self.topic_embeddings, self.word_embeddings)
 

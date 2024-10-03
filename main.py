@@ -50,7 +50,6 @@ if __name__ == "__main__":
     
     if args.model == 'NeuroMax':
         model = NeuroMax(vocab_size=dataset.vocab_size,
-                        embed_size=args.embed_size,
                         num_topics=args.num_topics,
                         num_groups=args.num_groups,
                         dropout=args.dropout,
@@ -68,7 +67,7 @@ if __name__ == "__main__":
                         beta_temp=args.beta_temp)
     elif args.model == 'FASTopic':
         model = FASTopic(vocab_size=dataset.vocab_size,
-                        embed_size=args.embed_size,
+                        embed_size=dataset.contextual_embed_size,
                         num_topics=args.num_topics,
                         cluster_distribution=cluster_distribution,
                         cluster_mean=cluster_mean,
@@ -76,16 +75,6 @@ if __name__ == "__main__":
                         weight_loss_CTR=args.weight_CTR)
     else:
         print(f"Wrong model")
-    '''    def __init__(self,
-                 vocab_size: int, num_topics: int, embed_size: int,
-                 cluster_distribution=None,
-                 cluster_mean=None,
-                 cluster_label=None,
-                 theta_temp: float=1.0,
-                 DT_alpha: float=3.0,
-                 TW_alpha: float=2.0,
-                 weight_loss_CTR=100.0, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000,
-                ):'''
     
     model.weight_loss_GR = args.weight_GR
     model.weight_loss_ECR = args.weight_ECR

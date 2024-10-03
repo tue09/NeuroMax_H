@@ -94,10 +94,10 @@ class FASTopic(nn.Module):
     def forward(self, indices, input, epoch_id=None):
         train_bow = input[0]
         doc_embeddings = input[1]
-        print(f"train_bow shape = {train_bow.shape}")
+        '''print(f"train_bow shape = {train_bow.shape}")
         print(f"doc_embeddings shape = {doc_embeddings.shape}")
         print(f"self.topic_embeddings shape = {self.topic_embeddings.shape}")
-        print(f"self.word_embeddings shape = {self.word_embeddings.shape}")
+        print(f"self.word_embeddings shape = {self.word_embeddings.shape}")'''
         loss_DT, transp_DT = self.DT_ETP(doc_embeddings, self.topic_embeddings)
         loss_TW, transp_TW = self.TW_ETP(self.topic_embeddings, self.word_embeddings)
 

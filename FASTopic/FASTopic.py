@@ -23,7 +23,8 @@ class FASTopic(nn.Module):
         self.DT_alpha = DT_alpha
         self.TW_alpha = TW_alpha
         self.theta_temp = theta_temp
-
+        self.num_topics = num_topics
+        
         self.epsilon = 1e-12
         
         self.word_embeddings = nn.init.trunc_normal_(torch.empty(vocab_size, embed_size))

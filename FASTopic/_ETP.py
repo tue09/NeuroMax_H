@@ -2,7 +2,7 @@ import torch
 from torch import nn
 from ._model_utils import pairwise_euclidean_distance
 
-class CTR(nn.Module):
+class ETP(nn.Module):
     def __init__(self, weight_loss_CTR, sinkhorn_alpha, OT_max_iter=1000, stopThr=.5e-2):
         super().__init__()
 

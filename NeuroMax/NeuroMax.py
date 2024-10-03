@@ -190,40 +190,11 @@ class NeuroMax(nn.Module):
         loss_GR = self.GR(cost, self.group_connection_regularizer)
         return loss_GR
     
-    """def get_loss_CTR(self, theta, indices):
-        loss_list = []
-        cost = self.pairwise_euclidean_distance(self.cluster_mean, self.map_t2c(self.topic_embeddings))
-        for idx in indices:
-            cd = self.cluster_distribution[idx]
-            loss_CTR = self.CTR(theta, cd, cost)
-            loss_list.append(loss_CTR)
-        average_loss_CTR = torch.mean(torch.stack(loss_list))
-        return average_loss_CTR"""
-    
     def get_loss_CTR(self, theta, indices):
         cd_batch = self.cluster_distribution[indices]  
         cost = self.pairwise_euclidean_distance(self.cluster_mean, self.map_t2c(self.topic_embeddings))  
         loss_CTR = self.weight_loss_CTR * self.CTR(theta, cd_batch, cost)  
         return loss_CTR
-
-    """def create_pairs(self, batch_data, indices):
-        batch_size = batch_data.size(0)
-        data1 = []
-        data2 = []
-        labels = []
-        
-        for i in range(batch_size):
-            for j in range(i + 1, batch_size):
-                data1.append(batch_data[i])
-                data2.append(batch_data[j])
-                label = 1.0 if self.cluster_label[i] != self.cluster_label[j] else 0.0
-                labels.append(label)
-        
-        data1 = torch.stack(data1)
-        data2 = torch.stack(data2)
-        labels = torch.tensor(labels, dtype=torch.float32)
-        
-        return data1, data2, labels"""
     
     def create_pairs(self, batch_data, indices):
         data = batch_data  
@@ -244,7 +215,6 @@ class NeuroMax(nn.Module):
 
         return data1, data2, labels
 
-    
     def get_loss_CL(self, theta_1, theta_2, label, margin=1.0):
         euclidean_distance = nn.functional.pairwise_distance(theta_1, theta_2)
         contrastive_loss = torch.mean(

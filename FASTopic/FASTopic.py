@@ -87,7 +87,10 @@ class FASTopic(nn.Module):
 
         return theta
     
-    def get_loss_CTR(self, theta, indices):
+    def get_loss_CTR(self, input, indices):
+        doc_embeddings = input[1]
+        _, transp_DT = self.DT_ETP(doc_embeddings, self.topic_embeddings)
+        theta = transp_DT * transp_DT.shape[0]
         cd_batch = self.cluster_distribution[indices]  
         cost = pairwise_euclidean_distance(self.cluster_mean, self.map_t2c(self.topic_embeddings))  
         loss_CTR = self.weight_loss_CTR * self.CTR(theta, cd_batch, cost)  

@@ -69,6 +69,7 @@ if __name__ == "__main__":
     elif args.model == 'FASTopic':
         model = FASTopic(vocab_size=dataset.vocab_size,
                         embed_size=args.embed_size,
+                        num_topics=args.num_topics,
                         cluster_distribution=cluster_distribution,
                         cluster_mean=cluster_mean,
                         cluster_label=cluster_label,

@@ -9,7 +9,7 @@ from .CTR import CTR
 
 class FASTopic(nn.Module):
     def __init__(self,
-                 vocab_size: int, embed_size: int,
+                 vocab_size: int, embed_size: int, num_topics: int,
                  cluster_distribution=None,
                  cluster_mean=None,
                  cluster_label=None,

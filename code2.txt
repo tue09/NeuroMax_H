@@ -80,5 +80,10 @@ python main.py \
 #Wandb API key: 7bdb437a6da5fc40c5f832043fc9c81cba227b92
 #Wandb logout: ssssssssssssssssssssssssssssssssssssssss
 
-    
+git checkout origin/master -- main.py
+git checkout origin/master -- utils
+git checkout origin/master -- basic_trainer.py
+git checkout origin/master -- FASTopic
+
+
     

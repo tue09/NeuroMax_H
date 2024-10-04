@@ -172,7 +172,9 @@ class BasicTrainer:
                 if self.model_name == 'FASTopic':
                     *inputs, indices = batch_input
                     batch_data = inputs[1]
-                    batch_theta = self.model.get_theta(batch_data, train_data)
+                    *inputs_train, indices_train = train_data
+                    train_batch_data = inputs_train[1]
+                    batch_theta = self.model.get_theta(batch_data, train_batch_data)
                 else:
                     *inputs, indices = batch_input
                     batch_data = inputs

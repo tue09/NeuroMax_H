@@ -85,7 +85,7 @@ class BasicTrainer:
         top_words = self.export_top_words(dataset_handler.vocab, num_top_words)
     
         if self.model_name == 'FASTopic':
-            train_theta = self.test(dataset_handler.train_data, dataset_handler.train_data)
+            train_theta = self.test(dataset_handler.train_contextual_embed, dataset_handler.train_contextual_embed)
         else:
             train_theta = self.test(dataset_handler.train_data)
 
@@ -168,17 +168,11 @@ class BasicTrainer:
             self.model.eval()
             for idx in all_idx:
                 batch_input = input_data[idx]
-                
+            
                 if self.model_name == 'FASTopic':
-                    *inputs, indices = batch_input
-                    batch_data = inputs[1]
-                    *inputs_train, indices_train = train_data
-                    train_batch_data = inputs_train[1]
-                    batch_theta = self.model.get_theta(batch_data, train_batch_data)
+                    batch_theta = self.model.get_theta(batch_input, train_data)
                 else:
-                    *inputs, indices = batch_input
-                    batch_data = inputs
-                    batch_theta = self.model.get_theta(batch_data)
+                    batch_theta = self.model.get_theta(batch_input)
                 theta.extend(batch_theta.cpu().tolist())
 
         theta = np.asarray(theta)
@@ -195,8 +189,8 @@ class BasicTrainer:
 
     def export_theta(self, dataset_handler):
         if self.model_name == 'FASTopic':
-            train_theta = self.test(dataset_handler.train_data, dataset_handler.train_data)
-            test_theta = self.test(dataset_handler.test_data, dataset_handler.train_data)
+            train_theta = self.test(dataset_handler.train_contextual_embed, dataset_handler.train_contextual_embed)
+            test_theta = self.test(dataset_handler.test_contextual_embed, dataset_handler.train_contextual_embed)
         else:
             train_theta = self.test(dataset_handler.train_data)
             test_theta = self.test(dataset_handler.test_data)

@@ -170,7 +170,8 @@ class BasicTrainer:
                 batch_input = input_data[idx]
             
                 if self.model_name == 'FASTopic':
-                    batch_theta = self.model.get_theta(batch_input, train_data)
+                    #batch_theta = self.model.get_theta(batch_input, train_data)
+                    batch_theta = self.model.get_theta(batch_input)
                 else:
                     batch_theta = self.model.get_theta(batch_input)
                 theta.extend(batch_theta.cpu().tolist())

@@ -71,7 +71,18 @@ class FASTopic(nn.Module):
         return beta
 
     # only for testing
-    def get_theta(self,
+    def get_theta(self, doc_embeddings):
+        dist = pairwise_euclidean_distance(doc_embeddings, self.topic_embeddings)
+        train_dist = pairwise_euclidean_distance(self.doc_embeddings, self.topic_embeddings)
+
+        exp_dist = torch.exp(-dist / self.theta_temp)
+        exp_train_dist = torch.exp(-train_dist / self.theta_temp)
+
+        theta = exp_dist / (exp_train_dist.sum(0))
+        theta = theta / theta.sum(1, keepdim=True)
+
+        return theta
+    '''def get_theta(self,
                   doc_embeddings,
                   train_doc_embeddings
                 ):
@@ -85,7 +96,7 @@ class FASTopic(nn.Module):
         theta = exp_dist / (exp_train_dist.sum(0))
         theta = theta / theta.sum(1, keepdim=True)
 
-        return theta
+        return theta'''
     
     def get_loss_CTR(self, input, indices):
         doc_embeddings = input[1]

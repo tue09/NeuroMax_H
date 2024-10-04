@@ -85,7 +85,7 @@ class BasicTrainer:
         top_words = self.export_top_words(dataset_handler.vocab, num_top_words)
     
         if self.model_name == 'FASTopic':
-            train_theta = self.test(dataset_handler.train_contextual_embed, dataset_handler.train_contextual_embed)
+            train_theta = self.test(dataset_handler.train_contextual_embed)
         else:
             train_theta = self.test(dataset_handler.train_data)
 
@@ -189,8 +189,8 @@ class BasicTrainer:
 
     def export_theta(self, dataset_handler):
         if self.model_name == 'FASTopic':
-            train_theta = self.test(dataset_handler.train_contextual_embed, dataset_handler.train_contextual_embed)
-            test_theta = self.test(dataset_handler.test_contextual_embed, dataset_handler.train_contextual_embed)
+            train_theta = self.test(dataset_handler.train_contextual_embed)
+            test_theta = self.test(dataset_handler.test_contextual_embed)
         else:
             train_theta = self.test(dataset_handler.train_data)
             test_theta = self.test(dataset_handler.test_data)

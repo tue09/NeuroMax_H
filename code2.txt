@@ -4,7 +4,7 @@ git fetch https://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@github.com/tue09/Neur
 git checkout origin/master -- main.py
 
 python -c "import wandb; wandb.login(key='7bdb437a6da5fc40c5f832043fc9c81cba227b92')"
-
+python -c "import torch; print('Using device: ', torch.cuda.current_device())"
 python -c "import torch; print(torch.__version__)"
 python -c "import torchvision; print(torchvision.__version__)"
 
@@ -48,14 +48,15 @@ python main.py \
     --threshold 0
 
 
+
 python main.py \
-    --dataset YahooAnswers\
+    --dataset 20NG \
     --model FASTopic \
-    --SAM_name TRAM \
+    --SAM_name FSAM \
     --num_topics 50 \
     --num_groups 20 \
     --dropout 0.2 \
-    --seed 0 \
+    --seed 6 \
     --beta_temp 0.2 \
     --epochs 500 \
     --device cuda \
@@ -71,7 +72,7 @@ python main.py \
     --weight_GR 1.0 \
     --alpha_ECR 20.0 \
     --alpha_GR 5.0 \
-    --weight_CTR 5.0 \
+    --weight_CTR 2.0 \
     --weight_CL 0 \
     --threshold 0.0 \
     --weight_InfoNCE 30.0
@@ -87,6 +88,8 @@ git checkout origin/master -- basic_trainer.py
 git checkout origin/master -- FASTopic
 git checkout origin/master -- NeuroMax
 
-
+export CUDA_VISIBLE_DEVICES=1
+echo $CUDA_VISIBLE_DEVICES
+unset CUDA_VISIBLE_DEVICES
 
     

@@ -124,9 +124,12 @@ class BasicTrainer:
                 if (batch_id + 1) % accumulation_steps == 0 or (batch_id + 1) == len(dataset_handler.train_dataloader):
                     #theta, _ = self.model.encode(batch_data[0].to('cuda'))
                     #loss_ctr_ = self.model.get_loss_CTR(theta, indices)
-                    loss_ctr_ = self.model.get_loss_CTR(batch_data, indices)
-                    sam_optimizer.first_step(loss_ctr_,
-                                            zero_grad=True)
+                    if self.SAM_name == 'TRAM':
+                        loss_ctr_ = self.model.get_loss_CTR(batch_data, indices)
+                        sam_optimizer.first_step(loss_ctr_,
+                                                zero_grad=True)
+                    else:
+                        sam_optimizer.first_step(zero_grad=True)
 
                     # rst_dict_adv = self.model(indices, is_CTR, batch_data, epoch_id=epoch)
                     rst_dict_adv = self.model(indices, batch_data, epoch_id=epoch)

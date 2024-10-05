@@ -109,6 +109,8 @@ if __name__ == "__main__":
         dataset.vocab, 25, current_run_dir)
 
     # argmax of train and test theta
+    print(f"train_theta: {train_theta}")
+    print(f"test_theta: {test_theta}")
     train_theta_argmax = train_theta.argmax(axis=1)
     test_theta_argmax = test_theta.argmax(axis=1)        
 

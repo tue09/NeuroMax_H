@@ -13,7 +13,6 @@ class FASTopic(nn.Module):
                  cluster_distribution=None,
                  cluster_mean=None,
                  cluster_label=None,
-                 doc_embeddings=None,
                  theta_temp: float=1.0,
                  DT_alpha: float=3.0,
                  TW_alpha: float=2.0,
@@ -28,7 +27,6 @@ class FASTopic(nn.Module):
 
         self.epsilon = 1e-12
         
-        self.doc_embeddings = nn.Parameter(doc_embeddings, requires_grad=False)
         self.word_embeddings = nn.init.trunc_normal_(torch.empty(vocab_size, embed_size))
         self.word_embeddings = nn.Parameter(F.normalize(self.word_embeddings))
 
@@ -100,9 +98,9 @@ class FASTopic(nn.Module):
 
     def forward(self, indices, input, epoch_id=None):
         train_bow = input[0]
-        #doc_embeddings = input[1]
+        doc_embeddings = input[1]
 
-        loss_DT, transp_DT = self.DT_ETP(self.doc_embeddings, self.topic_embeddings)
+        loss_DT, transp_DT = self.DT_ETP(doc_embeddings, self.topic_embeddings)
         loss_TW, transp_TW = self.TW_ETP(self.topic_embeddings, self.word_embeddings)
 
         loss_ETP = loss_DT + loss_TW
@@ -111,9 +109,8 @@ class FASTopic(nn.Module):
         beta = transp_TW * transp_TW.shape[0]
 
         # Dual Semantic-relation Reconstruction
-        recon = torch.matmul(theta, beta).transpose(0, 1)
-        print(f"train bow shape = {train_bow.shape}")
-        print(f"recon shape = {recon.shape}")
+        recon = torch.matmul(theta, beta)
+
         loss_DSR = -(train_bow * (recon + self.epsilon).log()).sum(axis=1).mean()
 
         #CTR

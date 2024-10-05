@@ -69,6 +69,7 @@ if __name__ == "__main__":
         model = FASTopic(vocab_size=dataset.vocab_size,
                         embed_size=dataset.contextual_embed_size,
                         num_topics=args.num_topics,
+                        doc_embeddings=dataset.train_contextual_embed,
                         cluster_distribution=cluster_distribution,
                         cluster_mean=cluster_mean,
                         cluster_label=cluster_label,

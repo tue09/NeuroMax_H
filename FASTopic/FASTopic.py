@@ -112,7 +112,8 @@ class FASTopic(nn.Module):
 
         # Dual Semantic-relation Reconstruction
         recon = torch.matmul(theta, beta).transpose(0, 1)
-
+        print(f"train bow shape = {train_bow.shape}")
+        print(f"recon shape = {recon.shape}")
         loss_DSR = -(train_bow * (recon + self.epsilon).log()).sum(axis=1).mean()
 
         #CTR

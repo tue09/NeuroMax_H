@@ -103,6 +103,8 @@ class BasicTrainer:
             lr_scheduler = self.make_lr_scheduler(adam_optimizer)
 
         data_size = len(dataset_handler.train_dataloader.dataset)
+        if self.use_SAM == 0:
+        print(f"Donot use SAM")
 
         for epoch in tqdm(range(1, self.epochs + 1)):
             self.model.train()
@@ -122,7 +124,8 @@ class BasicTrainer:
                 # batch_data_tensor = torch.tensor(batch_data, dtype=torch.float32)
                 # theta = self.model.get_theta(batch_data_tensor)
 
-                if self.use_SAM == 1:
+                if self.use_SAM == 0:
+                    print(f"Donot use SAM")
                     adam_optimizer.step()
                     adam_optimizer.zero_grad()
                 else:

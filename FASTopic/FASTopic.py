@@ -28,7 +28,7 @@ class FASTopic(nn.Module):
 
         self.epsilon = 1e-12
         
-        self.doc_embeddings = nn.Parameter(torch.from_numpy(doc_embeddings), requires_grad=False)
+        self.doc_embeddings = nn.Parameter(doc_embeddings, requires_grad=False)
         self.word_embeddings = nn.init.trunc_normal_(torch.empty(vocab_size, embed_size))
         self.word_embeddings = nn.Parameter(F.normalize(self.word_embeddings))
 

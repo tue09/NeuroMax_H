@@ -118,13 +118,13 @@ class BasicTrainer:
                 # rst_dict = self.model(indices, is_CTR, batch_data, epoch_id=epoch)
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
                 batch_loss = rst_dict['loss']
-                
+                batch_loss.backward()
+
                 # batch_data_tensor = torch.tensor(batch_data, dtype=torch.float32)
                 # theta = self.model.get_theta(batch_data_tensor)
 
                 if self.use_SAM == 0:
                     adam_optimizer.zero_grad()
-                    batch_loss.backward()
                     adam_optimizer.step()
                 else:
                     if (batch_id + 1) % accumulation_steps == 0 or (batch_id + 1) == len(dataset_handler.train_dataloader):
@@ -145,9 +145,8 @@ class BasicTrainer:
                         sam_optimizer.second_step(zero_grad=True)
                     
                     else:
-                        adam_optimizer.zero_grad()
-                        batch_loss.backward()
                         adam_optimizer.step()
+                        adam_optimizer.zero_grad()
                     
 
                 for key in rst_dict:

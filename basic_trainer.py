@@ -104,7 +104,7 @@ class BasicTrainer:
 
         data_size = len(dataset_handler.train_dataloader.dataset)
         if self.use_SAM == 0:
-        print(f"Donot use SAM")
+            print("Donot use SAM")
 
         for epoch in tqdm(range(1, self.epochs + 1)):
             self.model.train()

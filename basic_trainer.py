@@ -12,7 +12,7 @@ from SAM_function.TRAM import TRAM
 from SAM_function.FSAM import FSAM
 
 class BasicTrainer:
-    def __init__(self, model, model_name='NeuroMax', SAM_name='TRAM', epochs=200, learning_rate=0.002, batch_size=200, lr_scheduler=None, lr_step_size=125, log_interval=5, 
+    def __init__(self, model, model_name='NeuroMax', use_SAM=1, SAM_name='TRAM', epochs=200, learning_rate=0.002, batch_size=200, lr_scheduler=None, lr_step_size=125, log_interval=5, 
                     threshold=10, device='cuda', sigma=0.1, lmbda=0.9, acc_step=8):
         self.model = model
         self.model_name = model_name
@@ -24,6 +24,7 @@ class BasicTrainer:
         self.lr_step_size = lr_step_size
         self.log_interval = log_interval
         self.threshold = threshold
+        self.use_SAM = use_SAM
 
         # self.rho = rho 
         self.device = device
@@ -121,27 +122,30 @@ class BasicTrainer:
                 # batch_data_tensor = torch.tensor(batch_data, dtype=torch.float32)
                 # theta = self.model.get_theta(batch_data_tensor)
 
-
-                if (batch_id + 1) % accumulation_steps == 0 or (batch_id + 1) == len(dataset_handler.train_dataloader):
-                    #theta, _ = self.model.encode(batch_data[0].to('cuda'))
-                    #loss_ctr_ = self.model.get_loss_CTR(theta, indices)
-                    if self.SAM_name == 'TRAM':
-                        loss_ctr_ = self.model.get_loss_CTR(batch_data, indices)
-                        sam_optimizer.first_step(loss_ctr_,
-                                                zero_grad=True)
-                    else:
-                        sam_optimizer.first_step(zero_grad=True)
-
-                    # rst_dict_adv = self.model(indices, is_CTR, batch_data, epoch_id=epoch)
-                    rst_dict_adv = self.model(indices, batch_data, epoch_id=epoch)
-                    batch_loss_adv = rst_dict_adv['loss'] / accumulation_steps
-                    batch_loss_adv.backward()
-
-                    sam_optimizer.second_step(zero_grad=True)
-                
-                else:
+                if self.use_SAM == 1:
                     adam_optimizer.step()
                     adam_optimizer.zero_grad()
+                else:
+                    if (batch_id + 1) % accumulation_steps == 0 or (batch_id + 1) == len(dataset_handler.train_dataloader):
+                        #theta, _ = self.model.encode(batch_data[0].to('cuda'))
+                        #loss_ctr_ = self.model.get_loss_CTR(theta, indices)
+                        if self.SAM_name == 'TRAM':
+                            loss_ctr_ = self.model.get_loss_CTR(batch_data, indices)
+                            sam_optimizer.first_step(loss_ctr_,
+                                                    zero_grad=True)
+                        else:
+                            sam_optimizer.first_step(zero_grad=True)
+
+                        # rst_dict_adv = self.model(indices, is_CTR, batch_data, epoch_id=epoch)
+                        rst_dict_adv = self.model(indices, batch_data, epoch_id=epoch)
+                        batch_loss_adv = rst_dict_adv['loss'] / accumulation_steps
+                        batch_loss_adv.backward()
+
+                        sam_optimizer.second_step(zero_grad=True)
+                    
+                    else:
+                        adam_optimizer.step()
+                        adam_optimizer.zero_grad()
                     
 
                 for key in rst_dict:

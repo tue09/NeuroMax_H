@@ -121,10 +121,8 @@ class BasicTrainer:
                 # batch_data_tensor = torch.tensor(batch_data, dtype=torch.float32)
                 # theta = self.model.get_theta(batch_data_tensor)
 
-                adam_optimizer.step()
-                adam_optimizer.zero_grad()
 
-                '''if (batch_id + 1) % accumulation_steps == 0 or (batch_id + 1) == len(dataset_handler.train_dataloader):
+                if (batch_id + 1) % accumulation_steps == 0 or (batch_id + 1) == len(dataset_handler.train_dataloader):
                     #theta, _ = self.model.encode(batch_data[0].to('cuda'))
                     #loss_ctr_ = self.model.get_loss_CTR(theta, indices)
                     if self.SAM_name == 'TRAM':
@@ -143,7 +141,7 @@ class BasicTrainer:
                 
                 else:
                     adam_optimizer.step()
-                    adam_optimizer.zero_grad()'''
+                    adam_optimizer.zero_grad()
                     
 
                 for key in rst_dict:
@@ -166,9 +164,6 @@ class BasicTrainer:
                 self.logger.info(output_log)
 
     def test(self, input_data, train_data=None):
-        print(f"batch_size = {self.batch_size}")
-        print(f"input data size = {input_data.shape}")
-        print(f"train data size = {train_data.shape}")
         data_size = input_data.shape[0]
         theta = list()
         all_idx = torch.split(torch.arange(data_size), self.batch_size)

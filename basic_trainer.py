@@ -125,7 +125,6 @@ class BasicTrainer:
                 # theta = self.model.get_theta(batch_data_tensor)
 
                 if self.use_SAM == 0:
-                    print(f"Donot use SAM")
                     adam_optimizer.step()
                     adam_optimizer.zero_grad()
                 else:

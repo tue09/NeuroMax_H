@@ -117,3 +117,10 @@ AGNews 100: TD_15: 0.76933
             NMI:  0.3395641884869693
             Purity:  0.846
             TC_15: 0.37731
+
+
+git checkout origin/master -- datasets/20NG
+git checkout origin/master -- datasets/AGNews
+git checkout origin/master -- datasets/IMDB
+git checkout origin/master -- datasets/YahooAnswers
+

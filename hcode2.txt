@@ -92,27 +92,6 @@ export CUDA_VISIBLE_DEVICES=1
 echo $CUDA_VISIBLE_DEVICES
 unset CUDA_VISIBLE_DEVICES
 
-YahooAnswers - 100: !python main.py \
-    --dataset YahooAnswers \
-    --model FASTopic \
-	--SAM_name TRAM \
-    --num_topics 100 \
-    --num_groups 20 \
-    --dropout 0.2 \
-    --seed 6 \
-    --beta_temp 0.2 \
-    --epochs 500 \
-    --device cuda \
-    --lr 0.002 \
-    --lmbda 0.9 \
-    --sigma 1 \
-    --acc_step 8 \
-    --lr_scheduler StepLR \
-    --batch_size 128 \
-    --lr_step_size 125 \
-    --use_pretrainWE \
-    --weight_CTR 1
-
 AGNews 100: TD_15: 0.76933
             NMI:  0.3395641884869693
             Purity:  0.846

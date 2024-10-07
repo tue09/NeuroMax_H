@@ -169,9 +169,6 @@ class BasicTrainer:
                 self.logger.info(output_log)
 
     def test(self, input_data, train_data=None):
-        print(f"input data shape = {input_data.shape}")
-        print(f"train_data shape = {train_data.shape}")
-        print(f"batch size = {self.batch_size}")
         data_size = input_data.shape[0]
         theta = list()
         all_idx = torch.split(torch.arange(data_size), self.batch_size)

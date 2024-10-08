@@ -128,7 +128,7 @@ class BasicTrainer:
                     adam_optimizer.zero_grad()
                 else:
                     #if (batch_id + 1) % accumulation_steps == 0 or (batch_id + 1) == len(dataset_handler.train_dataloader):
-                    if epoch_id > 200:
+                    if epoch_id > 180:
                         #theta, _ = self.model.encode(batch_data[0].to('cuda'))
                         #loss_ctr_ = self.model.get_loss_CTR(theta, indices)
                         if self.SAM_name == 'TRAM':

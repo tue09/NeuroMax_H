@@ -106,7 +106,7 @@ class BasicTrainer:
         if self.use_SAM == 0:
             print("Donot use SAM")
 
-        for epoch in tqdm(range(1, self.epochs + 1)):
+        for epoch_id, epoch in enumerate(tqdm(range(1, self.epochs + 1))):
             self.model.train()
             loss_rst_dict = defaultdict(float)
             # if epoch > self.threshold: is_CTR = True
@@ -127,7 +127,8 @@ class BasicTrainer:
                     adam_optimizer.step()
                     adam_optimizer.zero_grad()
                 else:
-                    if (batch_id + 1) % accumulation_steps == 0 or (batch_id + 1) == len(dataset_handler.train_dataloader):
+                    #if (batch_id + 1) % accumulation_steps == 0 or (batch_id + 1) == len(dataset_handler.train_dataloader):
+                    if epoch_id > 200:
                         #theta, _ = self.model.encode(batch_data[0].to('cuda'))
                         #loss_ctr_ = self.model.get_loss_CTR(theta, indices)
                         if self.SAM_name == 'TRAM':

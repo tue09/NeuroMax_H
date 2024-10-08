@@ -6,6 +6,7 @@ class FSAM(torch.optim.Optimizer):
         super(FSAM, self).__init__(params, defaults)
 
         # Thêm
+        self.rho = rho
         self.device = device
 
         self.sigma = sigma

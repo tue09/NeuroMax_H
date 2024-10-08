@@ -84,6 +84,7 @@ if __name__ == "__main__":
     trainer = basic_trainer.BasicTrainer(model, model_name=args.model, use_SAM = args.use_SAM,
                                             SAM_name=args.SAM_name, epochs=args.epochs,
                                             learning_rate=args.lr,
+                                            rho=args.rho,
                                             batch_size=args.batch_size,
                                             lr_scheduler=args.lr_scheduler,
                                             lr_step_size=args.lr_step_size,

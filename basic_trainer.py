@@ -13,7 +13,7 @@ from SAM_function.FSAM import FSAM
 
 class BasicTrainer:
     def __init__(self, model, model_name='NeuroMax', use_SAM=1, SAM_name='TRAM', epochs=200, learning_rate=0.002, batch_size=200, lr_scheduler=None, lr_step_size=125, log_interval=5, 
-                    threshold=10, device='cuda', sigma=0.1, lmbda=0.9, acc_step=8):
+                    rho = 0.005, threshold=10, device='cuda', sigma=0.1, lmbda=0.9, acc_step=8):
         self.model = model
         self.model_name = model_name
         self.SAM_name = SAM_name
@@ -26,7 +26,7 @@ class BasicTrainer:
         self.threshold = threshold
         self.use_SAM = use_SAM
 
-        # self.rho = rho 
+        self.rho = rho 
         self.device = device
         self.sigma = sigma
         self.lmbda = lmbda

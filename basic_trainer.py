@@ -12,9 +12,10 @@ from SAM_function.TRAM import TRAM
 from SAM_function.FSAM import FSAM
 
 class BasicTrainer:
-    def __init__(self, model, model_name='NeuroMax', use_SAM=1, SAM_name='TRAM', epochs=200, learning_rate=0.002, batch_size=200, lr_scheduler=None, lr_step_size=125, log_interval=5, 
+    def __init__(self, model, epoch_threshold = 150, model_name='NeuroMax', use_SAM=1, SAM_name='TRAM', epochs=200, learning_rate=0.002, batch_size=200, lr_scheduler=None, lr_step_size=125, log_interval=5, 
                     rho = 0.005, threshold=10, device='cuda', sigma=0.1, lmbda=0.9, acc_step=8):
         self.model = model
+        self.epoch_threshold = epoch_threshold
         self.model_name = model_name
         self.SAM_name = SAM_name
         self.epochs = epochs
@@ -128,7 +129,7 @@ class BasicTrainer:
                     adam_optimizer.zero_grad()
                 else:
                     #if (batch_id + 1) % accumulation_steps == 0 or (batch_id + 1) == len(dataset_handler.train_dataloader):
-                    if epoch_id > 180:
+                    if epoch_id > self.epoch_threshold:
                         #theta, _ = self.model.encode(batch_data[0].to('cuda'))
                         #loss_ctr_ = self.model.get_loss_CTR(theta, indices)
                         if self.SAM_name == 'TRAM':

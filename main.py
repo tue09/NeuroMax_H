@@ -81,7 +81,9 @@ if __name__ == "__main__":
     model = model.to(args.device)
 
     # create a trainer
-    trainer = basic_trainer.BasicTrainer(model, model_name=args.model, use_SAM = args.use_SAM,
+    trainer = basic_trainer.BasicTrainer(model, model_name=args.model,
+                                            epoch_threshold = args.epoch_threshold,
+                                            use_SAM = args.use_SAM,
                                             SAM_name=args.SAM_name, epochs=args.epochs,
                                             learning_rate=args.lr,
                                             rho=args.rho,

@@ -119,8 +119,6 @@ class BasicTrainer:
                 # rst_dict = self.model(indices, is_CTR, batch_data, epoch_id=epoch)
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
                 batch_loss = rst_dict['loss']
-                if batch_id == 0:
-                    print(f"Loss CTR = {self.model.get_loss_CTR(batch_data, indices)}")
                 batch_loss.backward()
 
                 # batch_data_tensor = torch.tensor(batch_data, dtype=torch.float32)

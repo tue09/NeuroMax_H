@@ -13,7 +13,7 @@ import sentence_transformers
 class NeuroMax(nn.Module):
     def __init__(self, vocab_size, num_topics=50, num_groups=10, en_units=200, dropout=0.,
                  cluster_distribution=None, cluster_mean=None, cluster_label=None,
-                 pretrained_WE=None, embed_size=200, beta_temp=0.2,
+                 pretrained_WE=None, embed_size=200, beta_temp=0.2, is_CTR=False,
                  weight_loss_ECR=250.0, weight_loss_GR=250.0,
                  alpha_GR=20.0, alpha_ECR=20.0, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000, weight_loss_CTR=100.0,
                  weight_loss_InfoNCE=10.0, weight_loss_CL=50.0):
@@ -23,7 +23,7 @@ class NeuroMax(nn.Module):
         self.num_topics = num_topics
         self.num_groups = num_groups
         self.beta_temp = beta_temp
-
+        self.is_CTR = is_CTR
         self.a = 1 * np.ones((1, num_topics)).astype(np.float32)
         self.mu2 = nn.Parameter(torch.as_tensor(
             (np.log(self.a).T - np.mean(np.log(self.a), 1)).T))
@@ -265,10 +265,10 @@ class NeuroMax(nn.Module):
             
         #CTR
 
-        # if is_CTR:
-        #     loss_CTR = self.get_loss_CTR(input, indices)
-        # else:
-        #     loss_CTR = 0.0
+        if self.is_CTR:
+            loss_CTR = self.get_loss_CTR(input, indices)
+        else:
+            loss_CTR = 0.0
         if epoch_id == 10 and self.group_connection_regularizer is None:
             self.create_group_connection_regularizer()
         if self.group_connection_regularizer is not None and epoch_id > 10:
@@ -279,11 +279,11 @@ class NeuroMax(nn.Module):
         #loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE
         #loss = loss_TM + loss_ECR + loss_GR + loss_CTR + loss_InfoNCE + loss_CL
         # loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_CL
-        # loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_CTR
-        loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE
+        loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_CTR
+        # loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE
         rst_dict = {
             'loss': loss,
-            #'loss_CTR': loss_CTR,
+            'loss_CTR': loss_CTR,
             'loss_TM': loss_TM,
             'loss_ECR': loss_ECR,
             'loss_GR': loss_GR,

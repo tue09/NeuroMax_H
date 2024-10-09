@@ -13,6 +13,7 @@ class FASTopic(nn.Module):
                  cluster_distribution=None,
                  cluster_mean=None,
                  cluster_label=None,
+                 is_CTR=False,
                  theta_temp: float=1.0,
                  DT_alpha: float=3.0,
                  TW_alpha: float=2.0,
@@ -24,7 +25,7 @@ class FASTopic(nn.Module):
         self.TW_alpha = TW_alpha
         self.theta_temp = theta_temp
         self.num_topics = num_topics
-
+        self.is_CTR = is_CTR
         self.epsilon = 1e-12
         
         self.word_embeddings = nn.init.trunc_normal_(torch.empty(vocab_size, embed_size))
@@ -113,10 +114,16 @@ class FASTopic(nn.Module):
 
         loss_DSR = -(train_bow * (recon + self.epsilon).log()).sum(axis=1).mean()
 
-        loss = loss_DSR + loss_ETP
+        if self.is_CTR:
+            loss_CTR = self.get_loss_CTR(input, indices)
+        else:
+            loss_CTR = 0.0
+
+        loss = loss_DSR + loss_ETP + loss_CTR
 
         rst_dict = {
             'loss': loss,
+            'loss_CTR': loss_CTR
         }
 
         return rst_dict

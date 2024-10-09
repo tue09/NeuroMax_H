@@ -55,5 +55,5 @@ class CTR(nn.Module):
         transp = u.unsqueeze(2) * K_mat * v.unsqueeze(1)  # Shape: (B, K, V)
 
         # Compute the loss
-        loss_CTR = 1 / torch.mean(torch.sum(transp * M, dim=(1, 2)))  # Scalar
+        loss_CTR = torch.mean(torch.sum(transp * M, dim=(1, 2)))  # Scalar
         return loss_CTR

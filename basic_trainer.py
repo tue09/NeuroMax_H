@@ -119,6 +119,8 @@ class BasicTrainer:
                 # rst_dict = self.model(indices, is_CTR, batch_data, epoch_id=epoch)
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
                 batch_loss = rst_dict['loss']
+                if batch_id == 0:
+                    print(f"Loss CTR = {rst_dict['loss_CTR'] }")
                 batch_loss.backward()
 
                 # batch_data_tensor = torch.tensor(batch_data, dtype=torch.float32)
@@ -142,8 +144,7 @@ class BasicTrainer:
 
                         # rst_dict_adv = self.model(indices, is_CTR, batch_data, epoch_id=epoch)
                         rst_dict_adv = self.model(indices, batch_data, epoch_id=epoch)
-                        if batch_id == 0:
-                            print(f"Loss CTR = {rst_dict_adv['loss_CTR'] }")
+
                         batch_loss_adv = rst_dict_adv['loss'] / accumulation_steps
                         batch_loss_adv.backward()
 

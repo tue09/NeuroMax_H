@@ -28,7 +28,6 @@ class KLDivergence:
 
 
 class TRAM(torch.optim.Optimizer):
-
     def __init__(self, params, base_optimizer, device, adaptive=True, lr=0.002, sigma=1, lmbda=0.9):
         defaults = dict(adaptive=adaptive, lr=lr)
         super(TRAM, self).__init__(params, defaults)

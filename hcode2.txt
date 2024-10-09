@@ -87,6 +87,8 @@ git checkout origin/master -- utils
 git checkout origin/master -- basic_trainer.py
 git checkout origin/master -- FASTopic
 git checkout origin/master -- NeuroMax
+git checkout origin/master -- SAM_function
+
 
 export CUDA_VISIBLE_DEVICES=1
 echo $CUDA_VISIBLE_DEVICES

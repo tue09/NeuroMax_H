@@ -132,8 +132,9 @@ class BasicTrainer:
                     if epoch_id > self.epoch_threshold:
                         #theta, _ = self.model.encode(batch_data[0].to('cuda'))
                         #loss_ctr_ = self.model.get_loss_CTR(theta, indices)
-                        self.model.is_CTR = False
+                        
                         if self.SAM_name == 'TRAM':
+                            self.model.is_CTR = False
                             loss_ctr_ = self.model.get_loss_CTR(batch_data, indices)
                             sam_optimizer.first_step(loss_ctr_,
                                                     zero_grad=True)
@@ -149,7 +150,8 @@ class BasicTrainer:
                         sam_optimizer.second_step(zero_grad=True)
                     
                     else:
-                        self.model.is_CTR = True
+                        if self.SAM_name == 'TRAM':
+                            self.model.is_CTR = True
                         adam_optimizer.step()
                         adam_optimizer.zero_grad()
                     

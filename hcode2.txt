@@ -58,7 +58,7 @@ python main.py \
     --dropout 0.2 \
     --seed 6 \
     --beta_temp 0.2 \
-    --epochs 500 \
+    --epochs 200 \
     --device cuda \
     --lr 0.002 \
     --lmbda 0.9 \

@@ -134,10 +134,12 @@ class ECRTM(nn.Module):
 
 
     # Thêm
-    def get_loss_CTR(self, theta, indices):
+    def get_loss_CTR(self, input, indices):
+        bow = input[0]
+        theta, _ = self.encode(bow)
         cd_batch = self.cluster_distribution[indices]  
         cost = self.pairwise_euclidean_distance(self.cluster_mean, self.map_t2c(self.topic_embeddings))  
-        loss_CTR = self.weight_CTR * self.CTR(theta, cd_batch, cost)  
+        loss_CTR = self.weight_loss_CTR * self.CTR(theta, cd_batch, cost)  
         return loss_CTR
 
 

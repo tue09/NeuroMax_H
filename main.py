@@ -77,7 +77,6 @@ if __name__ == "__main__":
     elif args.model == 'ECRTM':
         model = ECRTM(vocab_size=dataset.vocab_size,
                         num_topics=args.num_topics,
-                        num_groups=args.num_groups,
                         dropout=args.dropout,
                         cluster_distribution=cluster_distribution,
                         cluster_mean=cluster_mean,

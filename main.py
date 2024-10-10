@@ -84,6 +84,7 @@ if __name__ == "__main__":
                         pretrained_WE=pretrainWE if args.use_pretrainWE else None,
                         weight_loss_ECR=args.weight_ECR,
                         alpha_ECR=args.alpha_ECR,
+                        weight_CTR=args.weight_CTR,
                         beta_temp=args.beta_temp)
     else:
         print(f"Wrong model")

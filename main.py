@@ -4,6 +4,7 @@ import numpy as np
 import basic_trainer
 from NeuroMax.NeuroMax import NeuroMax
 from FASTopic.FASTopic import FASTopic
+from ECRTM.ECRTM import ECRTM
 import evaluations
 import datasethandler
 import scipy
@@ -73,6 +74,23 @@ if __name__ == "__main__":
                         cluster_mean=cluster_mean,
                         cluster_label=cluster_label,
                         weight_loss_CTR=args.weight_CTR)
+    elif args.model == 'ECRTM':
+        model = ECRTM(vocab_size=dataset.vocab_size,
+                        num_topics=args.num_topics,
+                        num_groups=args.num_groups,
+                        dropout=args.dropout,
+                        cluster_distribution=cluster_distribution,
+                        cluster_mean=cluster_mean,
+                        cluster_label=cluster_label,
+                        pretrained_WE=pretrainWE if args.use_pretrainWE else None,
+                        weight_loss_GR=args.weight_GR,
+                        weight_loss_ECR=args.weight_ECR,
+                        alpha_ECR=args.alpha_ECR,
+                        alpha_GR=args.alpha_GR,
+                        weight_loss_CTR=args.weight_CTR,
+                        weight_loss_InfoNCE=args.weight_InfoNCE,
+                        weight_loss_CL=args.weight_CL,
+                        beta_temp=args.beta_temp)
     else:
         print(f"Wrong model")
     

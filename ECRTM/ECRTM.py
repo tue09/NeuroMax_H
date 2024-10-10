@@ -143,12 +143,12 @@ class ECRTM(nn.Module):
 
     def forward(self, indices, input, epoch_id=None):
         # input = input['data']
-        input = input[0]
-        theta, loss_KL = self.encode(input)
+        bow = input[0]
+        theta, loss_KL = self.encode(bow)
         beta = self.get_beta()
 
         recon = F.softmax(self.decoder_bn(torch.matmul(theta, beta)), dim=-1)
-        recon_loss = -(input * recon.log()).sum(axis=1).mean()
+        recon_loss = -(bow * recon.log()).sum(axis=1).mean()
 
         loss_TM = recon_loss + loss_KL
 

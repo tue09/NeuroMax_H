@@ -5,6 +5,7 @@ import basic_trainer
 from NeuroMax.NeuroMax import NeuroMax
 from FASTopic.FASTopic import FASTopic
 from ECRTM.ECRTM import ECRTM
+from ETM.ETM import ETM
 import evaluations
 import datasethandler
 import scipy
@@ -87,6 +88,16 @@ if __name__ == "__main__":
                         weight_CTR=args.weight_CTR,
                         beta_temp=args.beta_temp)
     else:
+        model = ETM(vocab_size=dataset.vocab_size,
+                        num_topics=args.num_topics,
+                        dropout=args.dropout,
+                        cluster_distribution=cluster_distribution,
+                        cluster_mean=cluster_mean,
+                        cluster_label=cluster_label,
+                        pretrained_WE=pretrainWE if args.use_pretrainWE else None,
+                        weight_CTR=args.weight_CTR,
+                        beta_temp=args.beta_temp)
+        
         print(f"Wrong model")
     
     model.weight_loss_GR = args.weight_GR

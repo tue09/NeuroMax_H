@@ -21,6 +21,9 @@ conda install -c conda-forge hdbscan -y : OK
 pip install bertopic : OK
 pip install cvxpy : OK
 
+chmod +x bash4.sh
+./bash4.sh
+
 #weight_ECR, weight_DCR, weight_TCR, 250 40 200
 
 python main.py \

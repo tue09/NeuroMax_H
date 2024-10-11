@@ -1,0 +1,4 @@
+python main.py --dataset AGNews --epoch_threshold 140 --use_SAM 1 --SAM_name TRAM --model ECRTM --num_topics 100 --num_groups 20 --dropout 0.0 --seed 200 --beta_temp 0.2 --epochs 10 --device cuda --lr 0.00196 --lr_scheduler StepLR --batch_size 64 --lr_step_size 75 --use_pretrainWE --weight_ECR 50 --weight_GR 2 --weight_InfoNCE 30 --weight_CTR 0.1 --rho 0.005 --alpha_ECR 20 --alpha_GR 5 --weight_CL 0 --threshold 0
+
+python main.py --dataset AGNews --epoch_threshold 150 --use_SAM 1 --SAM_name TRAM --model ECRTM --num_topics 100 --num_groups 20 --dropout 0.1 --seed 300 --beta_temp 0.3 --epochs 20 --device cuda --lr 0.002 --lr_scheduler StepLR --batch_size 64 --lr_step_size 85 --use_pretrainWE --weight_ECR 60 --weight_GR 3 --weight_InfoNCE 35 --weight_CTR 0.2 --rho 0.01 --alpha_ECR 25 --alpha_GR 5 --weight_CL 0 --threshold 0
+

@@ -144,7 +144,7 @@ class BasicTrainer:
                         # rst_dict_adv = self.model(indices, is_CTR, batch_data, epoch_id=epoch)
                         rst_dict_adv = self.model(indices, batch_data, epoch_id=epoch)
 
-                        batch_loss_adv = rst_dict_adv['loss'] / accumulation_steps
+                        batch_loss_adv = rst_dict_adv['loss']
                         batch_loss_adv.backward()
 
                         sam_optimizer.second_step(zero_grad=True)

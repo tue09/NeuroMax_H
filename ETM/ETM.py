@@ -97,7 +97,7 @@ class ETM(nn.Module):
         
     def get_theta_ctr(self, input):
         norm_input = input / input.sum(1, keepdim=True)
-        with torch.no_grad():  # Prevent gradient computation
+        with torch.no_grad():
             mu, logvar = self.encode(norm_input)
             z = self.reparameterize(mu, logvar)
             theta = F.softmax(z, dim=-1)

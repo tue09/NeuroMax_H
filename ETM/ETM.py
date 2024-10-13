@@ -105,6 +105,7 @@ class ETM(nn.Module):
         beta = self.get_beta()
         recon_input = torch.matmul(theta, beta)
 
+        loss_CTR = 0
         if self.is_CTR:
              loss_CTR = self.get_loss_CTR(input, indices)
         else:

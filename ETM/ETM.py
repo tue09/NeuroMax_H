@@ -128,7 +128,6 @@ class ETM(nn.Module):
             loss = loss.mean()
         return loss
         
-
     def get_loss_CTR(self, input, indices):
         bow = input[0]
         theta, mu, logvar = self.get_theta(bow)

@@ -1,7 +1,6 @@
 import torch
 from torch import nn
 
-
 class CTR(nn.Module):
     def __init__(self, weight_loss_CTR, sinkhorn_alpha, OT_max_iter=1000, stopThr=.5e-2):
         super().__init__()

@@ -103,6 +103,8 @@ if __name__ == "__main__":
     model.weight_loss_GR = args.weight_GR
     model.weight_loss_ECR = args.weight_ECR
     model = model.to(args.device)
+    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print(f"Number of trainable parameters: {trainable_params}")
 
     # create a trainer
     trainer = basic_trainer.BasicTrainer(model, model_name=args.model,

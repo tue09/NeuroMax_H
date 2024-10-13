@@ -17,7 +17,7 @@ class ETM(nn.Module):
                     cluster_distribution=None, cluster_mean=None, cluster_label=None, weight_CTR=1, is_CTR=False,
                     pretrained_WE=None, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000, train_WE=False):
         super().__init__()
-
+        self.is_CTR = is_CTR
         if pretrained_WE is not None:
             self.word_embeddings = nn.Parameter(torch.from_numpy(pretrained_WE).float())
         else:

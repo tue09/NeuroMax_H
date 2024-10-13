@@ -94,6 +94,19 @@ class ETM(nn.Module):
             return theta, mu, logvar
         else:
             return theta
+        
+    def get_theta_ctr(self, input):
+        norm_input = input / input.sum(1, keepdim=True)
+        with torch.no_grad():  # Prevent gradient computation
+            mu, logvar = self.encode(norm_input)
+            z = self.reparameterize(mu, logvar)
+            theta = F.softmax(z, dim=-1)
+            
+        if self.training:
+            return theta, mu, logvar
+        else:
+            return theta
+
 
     def get_beta(self):
         beta = F.softmax(torch.matmul(self.topic_embeddings, self.word_embeddings.T), dim=1)
@@ -130,7 +143,7 @@ class ETM(nn.Module):
         
     def get_loss_CTR(self, input, indices):
         bow = input[0]
-        theta, mu, logvar = self.get_theta(bow)
+        theta, mu, logvar = self.get_theta_ctr(bow)
         cd_batch = self.cluster_distribution[indices]  
         cost = self.pairwise_euclidean_distance(self.cluster_mean, self.map_t2c(self.topic_embeddings))  
         loss_CTR = self.weight_CTR * self.CTR(theta, cd_batch, cost)  

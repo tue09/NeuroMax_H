@@ -29,7 +29,7 @@ if __name__ == "__main__":
     seed.seedEverything(args.seed)
     print(args)
 
-    if args.dataset in ['YahooAnswers', '20NG', 'AGNews', 'IMDB']:
+    if args.dataset in ['YahooAnswers', '20NG', 'AGNews', 'IMDB', 'SearchSnippets', 'StackOverflow']:
         read_labels = True
     else:
         read_labels = False

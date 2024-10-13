@@ -87,7 +87,7 @@ if __name__ == "__main__":
                         alpha_ECR=args.alpha_ECR,
                         weight_CTR=args.weight_CTR,
                         beta_temp=args.beta_temp)
-    else:
+    elif args.model == 'ETM':
         model = ETM(vocab_size=dataset.vocab_size,
                         num_topics=args.num_topics,
                         dropout=args.dropout,
@@ -97,7 +97,7 @@ if __name__ == "__main__":
                         pretrained_WE=pretrainWE if args.use_pretrainWE else None,
                         weight_CTR=args.weight_CTR,
                         beta_temp=args.beta_temp)
-        
+    else:
         print(f"Wrong model")
     
     model.weight_loss_GR = args.weight_GR

@@ -96,16 +96,16 @@ class ETM(nn.Module):
             return theta
         
     def get_theta_ctr(self, input):
-        norm_input = input / input.sum(1, keepdim=True)
         with torch.no_grad():
+            norm_input = input / input.sum(1, keepdim=True)
             mu, logvar = self.encode(norm_input)
             z = self.reparameterize(mu, logvar)
             theta = F.softmax(z, dim=-1)
-            
         if self.training:
             return theta, mu, logvar
         else:
             return theta
+
 
 
     def get_beta(self):

@@ -11,7 +11,7 @@ import sentence_transformers
 
 
 class NeuroMax(nn.Module):
-    def __init__(self, vocab_size, num_topics=50, num_groups=10, en_units=200, dropout=0.,
+    def __init__(self, vocab_size, data_name = '20NG', num_topics=50, num_groups=10, en_units=200, dropout=0.,
                  cluster_distribution=None, cluster_mean=None, cluster_label=None,
                  pretrained_WE=None, embed_size=200, beta_temp=0.2, is_CTR=False,
                  weight_loss_ECR=250.0, weight_loss_GR=250.0,
@@ -23,6 +23,7 @@ class NeuroMax(nn.Module):
         self.num_topics = num_topics
         self.num_groups = num_groups
         self.beta_temp = beta_temp
+        self.data_name = data_name
         self.is_CTR = is_CTR
         self.a = 1 * np.ones((1, num_topics)).astype(np.float32)
         self.mu2 = nn.Parameter(torch.as_tensor(
@@ -78,8 +79,12 @@ class NeuroMax(nn.Module):
         self.group_connection_regularizer = None
 
         # for InfoNCE
-        self.prj_rep = nn.Sequential(nn.Linear(self.num_topics, 384),
-                                     nn.Dropout(dropout))
+        if self.data_name in ['20NG', 'AGNews', 'YahooAnswers', 'IMDB']:
+            self.prj_rep = nn.Sequential(nn.Linear(self.num_topics, 384),
+                                        nn.Dropout(dropout))
+        elif self.data_name in ['StackOverflow', 'SearchSnippets']:
+            self.prj_rep = nn.Sequential(nn.Linear(self.num_topics, 768),
+                                        nn.Dropout(dropout))
         self.prj_bert = nn.Sequential()
         self.weight_loss_InfoNCE = weight_loss_InfoNCE
         self.weight_loss_CL = weight_loss_CL

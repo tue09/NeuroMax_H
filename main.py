@@ -52,6 +52,7 @@ if __name__ == "__main__":
     
     if args.model == 'NeuroMax':
         model = NeuroMax(vocab_size=dataset.vocab_size,
+                        data_name=args.dataset,
                         num_topics=args.num_topics,
                         num_groups=args.num_groups,
                         dropout=args.dropout,

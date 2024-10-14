@@ -67,11 +67,9 @@ class NeuroMax(nn.Module):
         self.map_t2c = nn.Linear(self.word_embeddings.shape[1], self.cluster_mean.shape[1], bias=False)
         self.CTR = CTR(weight_loss_CTR, sinkhorn_alpha, sinkhorn_max_iter)
         #
-        self.topic_embeddings = torch.empty(
-            (num_topics, self.word_embeddings.shape[1]))
+        self.topic_embeddings = torch.empty((num_topics, self.word_embeddings.shape[1]))
         nn.init.trunc_normal_(self.topic_embeddings, std=0.1)
-        self.topic_embeddings = nn.Parameter(
-            F.normalize(self.topic_embeddings))
+        self.topic_embeddings = nn.Parameter(F.normalize(self.topic_embeddings))
 
         self.num_topics_per_group = num_topics // num_groups
         self.ECR = ECR(weight_loss_ECR, alpha_ECR, sinkhorn_max_iter)
@@ -82,7 +80,7 @@ class NeuroMax(nn.Module):
         if self.data_name in ['20NG', 'AGNews', 'YahooAnswers', 'IMDB']:
             self.prj_rep = nn.Sequential(nn.Linear(self.num_topics, 384),
                                         nn.Dropout(dropout))
-        elif self.data_name in ['StackOverflow', 'SearchSnippets']:
+        elif self.data_name in ['StackOverflow', 'SearchSnippets', 'GoogleNews']:
             self.prj_rep = nn.Sequential(nn.Linear(self.num_topics, 768),
                                         nn.Dropout(dropout))
         self.prj_bert = nn.Sequential()

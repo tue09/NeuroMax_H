@@ -10,6 +10,7 @@ import evaluations
 import datasethandler
 import scipy
 import torch
+import h5py
 
 RESULT_DIR = 'results'
 DATA_DIR = 'datasets'
@@ -29,7 +30,7 @@ if __name__ == "__main__":
     seed.seedEverything(args.seed)
     print(args)
 
-    if args.dataset in ['YahooAnswers', '20NG', 'AGNews', 'IMDB', 'SearchSnippets', 'StackOverflow']:
+    if args.dataset in ['YahooAnswers', '20NG', 'AGNews', 'IMDB', 'SearchSnippets', 'StackOverflow', 'GoogleNews']:
         read_labels = True
     else:
         read_labels = False
@@ -126,6 +127,12 @@ if __name__ == "__main__":
 
     # train the model
     trainer.train(dataset)
+
+    if args.render == 1:
+        with h5py.File(args.model + args.dataset +'.h5', 'w') as f:
+            for name, param in model.state_dict().items():
+                f.create_dataset(name, data=param.cpu().numpy())
+
 
     # save beta, theta and top words
     beta = trainer.save_beta(current_run_dir)

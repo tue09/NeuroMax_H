@@ -157,6 +157,7 @@ if __name__ == "__main__":
         param_vector = get_model_params_vector(model)
         direction1, direction2 = random_directions(param_vector)
 
+        model.theta_train = True
         for i, alpha in tqdm(enumerate(alpha_vals)):
             for j, beta in tqdm(enumerate(beta_vals)):
                 new_params = param_vector + alpha * direction1 + beta * direction2
@@ -173,7 +174,7 @@ if __name__ == "__main__":
                         rst_dict = model(indices, batch_data, epoch_id=0)
                         loss_ += rst_dict['loss']
                 losses[i, j] = loss_ / len(dataset.train_dataloader)
-        
+        model.theta_train = False
         np.savez('loss_landscape/' + args.model + args.dataset + str(args.use_SAM) + str(args.SAM_name) + 'loss_landscape.npz', alpha_vals=alpha_vals, beta_vals=beta_vals, losses=losses)
         np.savetxt('loss_landscape/' + args.dataset + str(args.use_SAM) + str(args.SAM_name) + 'alpha_vals.txt', alpha_vals, fmt='%.6f')
         np.savetxt('loss_landscape/' + args.dataset + str(args.use_SAM) + str(args.SAM_name) + 'beta_vals.txt', beta_vals, fmt='%.6f')

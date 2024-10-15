@@ -15,7 +15,7 @@ class ETM(nn.Module):
     '''
     def __init__(self, vocab_size, embed_size=200, num_topics=50, num_groups=10, en_units=800, dropout=0., 
                     cluster_distribution=None, cluster_mean=None, cluster_label=None, weight_CTR=1, is_CTR=False,
-                    pretrained_WE=None, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000, train_WE=False):
+                    pretrained_WE=None, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000, train_WE=False, theta_train=False):
         super().__init__()
         self.is_CTR = is_CTR
         if pretrained_WE is not None:
@@ -29,7 +29,7 @@ class ETM(nn.Module):
         self.topic_embeddings = torch.empty((num_topics, self.word_embeddings.shape[1]))
         nn.init.trunc_normal_(self.topic_embeddings, std=0.1)
         self.topic_embeddings = nn.Parameter(F.normalize(self.topic_embeddings))
-
+        self.theta_train = theta_train
         self.encoder1 = nn.Sequential(
             nn.Linear(vocab_size, en_units),
             nn.ReLU(),
@@ -93,7 +93,7 @@ class ETM(nn.Module):
         mu, logvar = self.encode(norm_input)
         z = self.reparameterize(mu, logvar)
         theta = F.softmax(z, dim=-1)
-        if self.training:
+        if self.training or self.theta_train == True:
             return theta, mu, logvar
         else:
             return theta

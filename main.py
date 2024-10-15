@@ -129,7 +129,7 @@ if __name__ == "__main__":
     trainer.train(dataset)
 
     if args.render == 1:
-        with h5py.File(args.model + args.dataset +'.h5', 'w') as f:
+        with h5py.File(args.model + args.dataset + args.use_SAM + args.SAM_name +'.h5', 'w') as f:
             for name, param in model.state_dict().items():
                 f.create_dataset(name, data=param.cpu().numpy())
 

@@ -108,3 +108,7 @@ git checkout origin/master -- datasets/AGNews
 git checkout origin/master -- datasets/IMDB
 git checkout origin/master -- datasets/YahooAnswers
 
+
+scp -r -P 44139 -i C:/Users/tueldt/Documents/NeuroMax/vast.pem root@67.2.199.21:NeuroMax/results/2024-10-15_07-48-20 C:\Users\tueldt\Documents\NeuroMax
+scp -r -P 8000 kc@label.bkict.org:nam_x/NeuroMax_/NeuroMax_H/results/2024-10-15_14-40-36 C:\Users\tueldt\Documents\NeuroMax
+

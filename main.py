@@ -133,7 +133,6 @@ if __name__ == "__main__":
             for name, param in model.state_dict().items():
                 f.create_dataset(name, data=param.cpu().numpy())
 
-
     # save beta, theta and top words
     beta = trainer.save_beta(current_run_dir)
     train_theta, test_theta = trainer.save_theta(dataset, current_run_dir)

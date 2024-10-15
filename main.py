@@ -150,16 +150,16 @@ if __name__ == "__main__":
     if args.render == 1:
         torch.save(model, args.model + args.dataset + str(args.use_SAM) + str(args.SAM_name) +'.pth')
         model.to('cuda')
-        losses = np.zeros((30, 30))
-        alpha_vals = np.linspace(-1, 1, 30)
-        beta_vals = np.linspace(-1, 1, 30)
+        losses = np.zeros((args.step, args.step))
+        alpha_vals = np.linspace(-args.alpha_range, args.alpha_range, args.step)
+        beta_vals = np.linspace(-args.alpha_range, args.alpha_range, args.step)
 
         param_vector = get_model_params_vector(model)
         direction1, direction2 = random_directions(param_vector)
 
         model.theta_train = True
         for i, alpha in tqdm(enumerate(alpha_vals)):
-            for j, beta in tqdm(enumerate(beta_vals)):
+            for j, beta in enumerate(beta_vals):
                 new_params = param_vector + alpha * direction1 + beta * direction2
                 set_model_params_vector(model, new_params)
                 total_loss = 0

@@ -31,6 +31,8 @@ def add_model_argument(parser):
     parser.add_argument('--beta_temp', type=float, default=0.2)
     parser.add_argument('--threshold', type=float, default=10)
     parser.add_argument('--render', type=int, default=0)
+    parser.add_argument('--step', type=float, default=150)
+    parser.add_argument('--alpha_range', type=float, default=1.5)
 
 
 def add_training_argument(parser):

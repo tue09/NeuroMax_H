@@ -99,8 +99,7 @@ if __name__ == "__main__":
                         pretrained_WE=pretrainWE if args.use_pretrainWE else None,
                         weight_CTR=args.weight_CTR
                         )
-    else:
-        print(f"Wrong model")
+
     
     model.weight_loss_GR = args.weight_GR
     model.weight_loss_ECR = args.weight_ECR
@@ -129,9 +128,10 @@ if __name__ == "__main__":
     trainer.train(dataset)
 
     if args.render == 1:
-        with h5py.File(args.model + args.dataset + str(args.use_SAM) + str(args.SAM_name) +'.h5', 'w') as f:
+        torch.save(model, args.model + args.dataset + str(args.use_SAM) + str(args.SAM_name) +'.pth')
+        '''with h5py.File(args.model + args.dataset + str(args.use_SAM) + str(args.SAM_name) +'.h5', 'w') as f:
             for name, param in model.state_dict().items():
-                f.create_dataset(name, data=param.cpu().numpy())
+                f.create_dataset(name, data=param.cpu().numpy())'''
 
     # save beta, theta and top words
     beta = trainer.save_beta(current_run_dir)

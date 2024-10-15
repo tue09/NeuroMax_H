@@ -167,13 +167,12 @@ if __name__ == "__main__":
                 with torch.no_grad():
                     model.eval()
                     loss_ = 0
-                    for idx in all_idx:
-                        batch_input = dataset.train_data[idx]
-                        *inputs, indices = batch_input
+                    for batch_id, batch in enumerate(dataset.train_dataloader):
+                        *inputs, indices = batch
                         batch_data = inputs
                         rst_dict = model(indices, batch_data, epoch_id=0)
                         loss_ += rst_dict['loss']
-                losses[i, j] = loss_ / len(all_idx)
+                losses[i, j] = loss_ / len(dataset.train_dataloader)
         
         np.savez('loss_landscape/' + args.model + args.dataset + str(args.use_SAM) + str(args.SAM_name) + 'loss_landscape.npz', alpha_vals=alpha_vals, beta_vals=beta_vals, losses=losses)
         np.savetxt('loss_landscape/' + args.dataset + str(args.use_SAM) + str(args.SAM_name) + 'alpha_vals.txt', alpha_vals, fmt='%.6f')

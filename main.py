@@ -175,10 +175,10 @@ if __name__ == "__main__":
                         loss_ += rst_dict['loss']
                 losses[i, j] = loss_ / len(all_idx)
         
-        np.savez('loss landscape/' + args.model + args.dataset + str(args.use_SAM) + str(args.SAM_name) + 'loss_landscape.npz', alpha_vals=alpha_vals, beta_vals=beta_vals, losses=losses)
-        np.savetxt('loss landscape/' + args.dataset + str(args.use_SAM) + str(args.SAM_name) + 'alpha_vals.txt', alpha_vals, fmt='%.6f')
-        np.savetxt('loss landscape/' + args.dataset + str(args.use_SAM) + str(args.SAM_name) + 'beta_vals.txt', beta_vals, fmt='%.6f')
-        np.savetxt('loss landscape/' + args.dataset + str(args.use_SAM) + str(args.SAM_name) + 'losses.txt', losses, fmt='%.6f')
+        np.savez('loss_landscape/' + args.model + args.dataset + str(args.use_SAM) + str(args.SAM_name) + 'loss_landscape.npz', alpha_vals=alpha_vals, beta_vals=beta_vals, losses=losses)
+        np.savetxt('loss_landscape/' + args.dataset + str(args.use_SAM) + str(args.SAM_name) + 'alpha_vals.txt', alpha_vals, fmt='%.6f')
+        np.savetxt('loss_landscape/' + args.dataset + str(args.use_SAM) + str(args.SAM_name) + 'beta_vals.txt', beta_vals, fmt='%.6f')
+        np.savetxt('loss_landscape/' + args.dataset + str(args.use_SAM) + str(args.SAM_name) + 'losses.txt', losses, fmt='%.6f')
         '''with h5py.File(args.model + args.dataset + str(args.use_SAM) + str(args.SAM_name) +'.h5', 'w') as f:
             for name, param in model.state_dict().items():
                 f.create_dataset(name, data=param.cpu().numpy())'''

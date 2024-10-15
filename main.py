@@ -11,9 +11,29 @@ import datasethandler
 import scipy
 import torch
 import h5py
+from tqdm import tqdm
 
 RESULT_DIR = 'results'
 DATA_DIR = 'datasets'
+
+def get_model_params_vector(model):
+    params = []
+    for param in model.parameters():
+        params.append(param.view(-1))
+    return torch.cat(params)
+
+def set_model_params_vector(model, vector):
+    pointer = 0
+    for param in model.parameters():
+        num_param = param.numel() 
+        param.data.copy_(vector[pointer:pointer + num_param].view(param.size()))
+        pointer += num_param
+
+def random_directions(param_vector):
+    direction1 = torch.randn_like(param_vector)
+    direction2 = torch.randn_like(param_vector)
+    return direction1, direction2
+
 
 if __name__ == "__main__":
     parser = config.new_parser()
@@ -129,6 +149,36 @@ if __name__ == "__main__":
 
     if args.render == 1:
         torch.save(model, args.model + args.dataset + str(args.use_SAM) + str(args.SAM_name) +'.pth')
+        model.to('cuda')
+        losses = np.zeros((30, 30))
+        alpha_vals = np.linspace(-1, 1, 30)
+        beta_vals = np.linspace(-1, 1, 30)
+
+        param_vector = get_model_params_vector(model)
+        direction1, direction2 = random_directions(param_vector)
+
+        for i, alpha in tqdm(enumerate(alpha_vals)):
+            for j, beta in tqdm(enumerate(beta_vals)):
+                new_params = param_vector + alpha * direction1 + beta * direction2
+                set_model_params_vector(model, new_params)
+                total_loss = 0
+                data_size = dataset.train_data.shape[0]
+                all_idx = torch.split(torch.arange(data_size), args.batch_size)
+                with torch.no_grad():
+                    model.eval()
+                    loss_ = 0
+                    for idx in all_idx:
+                        batch_input = dataset.train_data[idx]
+                        *inputs, indices = batch_input
+                        batch_data = inputs
+                        rst_dict = model(indices, batch_data, epoch_id=0)
+                        loss_ += rst_dict['loss']
+                losses[i, j] = loss_ / len(all_idx)
+        
+        np.savez('loss landscape/' + args.model + args.dataset + str(args.use_SAM) + str(args.SAM_name) + 'loss_landscape.npz', alpha_vals=alpha_vals, beta_vals=beta_vals, losses=losses)
+        np.savetxt('loss landscape/' + args.dataset + str(args.use_SAM) + str(args.SAM_name) + 'alpha_vals.txt', alpha_vals, fmt='%.6f')
+        np.savetxt('loss landscape/' + args.dataset + str(args.use_SAM) + str(args.SAM_name) + 'beta_vals.txt', beta_vals, fmt='%.6f')
+        np.savetxt('loss landscape/' + args.dataset + str(args.use_SAM) + str(args.SAM_name) + 'losses.txt', losses, fmt='%.6f')
         '''with h5py.File(args.model + args.dataset + str(args.use_SAM) + str(args.SAM_name) +'.h5', 'w') as f:
             for name, param in model.state_dict().items():
                 f.create_dataset(name, data=param.cpu().numpy())'''

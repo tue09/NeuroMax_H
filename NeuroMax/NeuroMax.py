@@ -16,7 +16,7 @@ class NeuroMax(nn.Module):
                  pretrained_WE=None, embed_size=200, beta_temp=0.2, is_OT=False,
                  weight_loss_ECR=250.0, weight_loss_GR=250.0,
                  alpha_GR=20.0, alpha_ECR=20.0, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000, weight_loss_OT=100.0,
-                 weight_loss_InfoNCE=10.0, weight_loss_CL=50.0):
+                 weight_loss_InfoNCE=10.0):
         super().__init__()
 
         self.weight_loss_OT = weight_loss_OT
@@ -85,7 +85,6 @@ class NeuroMax(nn.Module):
                                         nn.Dropout(dropout))
         self.prj_bert = nn.Sequential()
         self.weight_loss_InfoNCE = weight_loss_InfoNCE
-        self.weight_loss_CL = weight_loss_CL
 
     def create_group_connection_regularizer(self):
         kmean_model = torch_kmeans.KMeans(
@@ -218,14 +217,6 @@ class NeuroMax(nn.Module):
         theta = rep
         # theta, loss_KL = self.encode(bow)
 
-        loss_CL = 0
-        if self.weight_loss_CL != 0.0:
-            data1, data2, label = self.create_pairs(input[0], indices)
-            data1, data2, label = data1.to('cuda'), data2.to('cuda'), label.to('cuda')
-            if self.weight_loss_CL != 0.0:
-                theta1, loss_KL1 = self.encode(data1)
-                theta2, loss_KL2 = self.encode(data2)
-                loss_CL = self.weight_loss_CL * self.get_loss_CL(theta_1=theta1, theta_2=theta2, label=label)
         beta = self.get_beta()
 
         recon = F.softmax(self.decoder_bn(torch.matmul(theta, beta)), dim=-1)
@@ -240,7 +231,6 @@ class NeuroMax(nn.Module):
             loss_InfoNCE = self.compute_loss_InfoNCE(rep, contextual_emb)
             
         #OT
-
         if self.is_OT:
             loss_OT = self.get_loss_OT(input, indices)
         else:

@@ -82,7 +82,6 @@ if __name__ == "__main__":
                         alpha_GR=args.alpha_GR,
                         weight_loss_OT=args.weight_OT,
                         weight_loss_InfoNCE=args.weight_InfoNCE,
-                        weight_loss_CL=args.weight_CL,
                         beta_temp=args.beta_temp)
     elif args.model == 'FASTopic':
         model = FASTopic(vocab_size=dataset.vocab_size,

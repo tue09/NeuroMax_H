@@ -11,7 +11,7 @@ import scipy
 from SAM_function.DREAM import DREAM
 from SAM_function.FSAM import FSAM
 
-class BasicTrainer:
+class BasiOTainer:
     def __init__(self, model, epoch_threshold = 150, model_name='NeuroMax', use_SAM=1, SAM_name='DREAM', epochs=200, learning_rate=0.002, batch_size=200, lr_scheduler=None, lr_step_size=125, log_interval=5, 
                     rho = 0.005, device='cuda', sigma=0.1, lmbda=0.9, acc_step=8):
         self.model = model
@@ -32,16 +32,6 @@ class BasicTrainer:
         self.lmbda = lmbda
         self.acc_step = acc_step
         self.logger = logging.getLogger('main')
-
-
-
-        # Thêm ctr_loss
-        # self.cluster_distribution = cluster_distribution 
-        # self.cluster_mean = cluster_mean 
-        # self.topic_embeddings = topic_embeddings
-        # self.pairwise_euclidean_distance
-
-        # self.CTR = CTR(weight_loss_CTR, sinkhorn_alpha, OT_max_iter=sinkhorn_max_iter)
 
     def make_adam_optimizer(self,):
         args_dict = {
@@ -113,7 +103,7 @@ class BasicTrainer:
             for batch_id, batch in enumerate(dataset_handler.train_dataloader): 
                 *inputs, indices = batch
                 batch_data = inputs
-                # rst_dict = self.model(indices, is_CTR, batch_data, epoch_id=epoch)
+                # rst_dict = self.model(indices, is_OT, batch_data, epoch_id=epoch)
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
                 batch_loss = rst_dict['loss']
                 batch_loss.backward()
@@ -128,17 +118,17 @@ class BasicTrainer:
                     #if (batch_id + 1) % accumulation_steps == 0 or (batch_id + 1) == len(dataset_handler.train_dataloader):
                     if epoch_id > self.epoch_threshold:
                         #theta, _ = self.model.encode(batch_data[0].to('cuda'))
-                        #loss_ctr_ = self.model.get_loss_CTR(theta, indices)
+                        #loss_OT_ = self.model.get_loss_OT(theta, indices)
                         
                         if self.SAM_name == 'DREAM':
-                            self.model.is_CTR = False
-                            loss_ctr_ = self.model.get_loss_CTR(batch_data, indices)
-                            sam_optimizer.first_step(loss_ctr_,
+                            self.model.is_OT = False
+                            loss_OT_ = self.model.get_loss_OT(batch_data, indices)
+                            sam_optimizer.first_step(loss_OT_,
                                                     zero_grad=True)
                         else:
                             sam_optimizer.first_step(zero_grad=True)
 
-                        # rst_dict_adv = self.model(indices, is_CTR, batch_data, epoch_id=epoch)
+                        # rst_dict_adv = self.model(indices, is_OT, batch_data, epoch_id=epoch)
                         rst_dict_adv = self.model(indices, batch_data, epoch_id=epoch)
 
                         batch_loss_adv = rst_dict_adv['loss']
@@ -148,7 +138,7 @@ class BasicTrainer:
                     
                     else:
                         if self.SAM_name == 'DREAM':
-                            self.model.is_CTR = True
+                            self.model.is_OT = True
                         adam_optimizer.step()
                         adam_optimizer.zero_grad()
                     

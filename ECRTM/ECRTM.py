@@ -3,7 +3,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 from .ECR import ECR
-from NeuroMax.CTR import CTR
+from DREAM.NeuroMax.OT import CTR
 
 
 class ECRTM(nn.Module):
@@ -12,15 +12,15 @@ class ECRTM(nn.Module):
 
         Xiaobao Wu, Xinshuai Dong, Thong Thanh Nguyen, Anh Tuan Luu.
     '''
-    def __init__(self, vocab_size, num_topics=50, en_units=200, dropout=0., pretrained_WE=None, embed_size=200, is_CTR=False,
-                    cluster_distribution=None, cluster_mean=None, cluster_label=None, sinkhorn_alpha = 20.0, weight_CTR=100.0,
+    def __init__(self, vocab_size, num_topics=50, en_units=200, dropout=0., pretrained_WE=None, embed_size=200, is_OT=False,
+                    cluster_distribution=None, cluster_mean=None, cluster_label=None, sinkhorn_alpha = 20.0, weight_OT=100.0,
                     beta_temp=0.2, weight_loss_ECR=250.0, alpha_ECR=20.0, sinkhorn_max_iter=1000):
         super().__init__()
 
         self.num_topics = num_topics
         self.beta_temp = beta_temp
-        self.weight_CTR = weight_CTR
-        self.is_CTR = is_CTR
+        self.weight_OT = weight_OT
+        self.is_OT = is_OT
 
         self.a = 1 * np.ones((1, num_topics)).astype(np.float32)
         self.mu2 = nn.Parameter(torch.as_tensor((np.log(self.a).T - np.mean(np.log(self.a), 1)).T))
@@ -60,7 +60,7 @@ class ECRTM(nn.Module):
             self.cluster_label = self.cluster_label.to(device='cuda', dtype=torch.long)
         
         self.map_t2c = nn.Linear(self.word_embeddings.shape[1], self.cluster_mean.shape[1], bias=False)
-        self.CTR = CTR(weight_CTR, sinkhorn_alpha, sinkhorn_max_iter)
+        self.CTR = CTR(weight_OT, sinkhorn_alpha, sinkhorn_max_iter)
         # # 
 
         
@@ -134,13 +134,13 @@ class ECRTM(nn.Module):
 
 
     # Thêm
-    def get_loss_CTR(self, input, indices):
+    def get_loss_OT(self, input, indices):
         bow = input[0]
         theta, _ = self.encode(bow)
         cd_batch = self.cluster_distribution[indices]  
         cost = self.pairwise_euclidean_distance(self.cluster_mean, self.map_t2c(self.topic_embeddings))  
-        loss_CTR = self.weight_CTR * self.CTR(theta, cd_batch, cost)  
-        return loss_CTR
+        loss_OT = self.weight_OT * self.CTR(theta, cd_batch, cost)  
+        return loss_OT
 
 
     def forward(self, indices, input, epoch_id=None):
@@ -156,18 +156,18 @@ class ECRTM(nn.Module):
 
         loss_ECR = self.get_loss_ECR()
 
-        if self.is_CTR:
-            loss_CTR = self.get_loss_CTR(input, indices)
+        if self.is_OT:
+            loss_OT = self.get_loss_OT(input, indices)
         else:
-            loss_CTR = 0.0
+            loss_OT = 0.0
 
-        loss = loss_TM + loss_ECR + loss_CTR
+        loss = loss_TM + loss_ECR + loss_OT
 
         rst_dict = {
             'loss': loss,
             'loss_TM': loss_TM,
             'loss_ECR': loss_ECR,
-            'loss_CTR': loss_CTR
+            'loss_OT': loss_OT
         }
 
         return rst_dict

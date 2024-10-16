@@ -18,8 +18,7 @@
 ## Usage
 To run and evaluate our model, run the following command:
 
-> python main.py --model ZTM --dataset YahooAnswers --num_topics 50 --beta_temp 0.2 --num_groups 20 --epochs 500 --device cuda --lr 0.002 --lr_scheduler StepLR --dropout 0.2 --batch_size 200 --lr_step_size 125 --use_pretrainWE --weight_ECR 40 --weight_GR 1.0 
---alpha_ECR 20.0 --alpha_GR 5.0 --weight_InfoNCE 50.0
+> python main.py --model ETM --dataset YahooAnswers --num_topics 50 --beta_temp 0.15 --num_groups 20 --epoch_threshold 140 --epochs 200 --device cuda --lr 0.002 --lr_scheduler StepLR --dropout 0.2 --batch_size 200 --lr_step_size 125 --use_pretrainWE --weight_ECR 40 --weight_GR 1.0 --alpha_ECR 20.0 --alpha_GR 5.0 --weight_InfoNCE 50.0 --weight_OT 1 --rho 0.005 --lmbda 0.9 --use_SAM 1 --SAM_name DREAM
 
 ## Acknowledgement
 Some part of this implementation is based on [TopMost](https://github.com/BobXWu/TopMost). We also utilizes [Palmetto](https://github.com/dice-group/Palmetto) for the evaluation of topic coherence.

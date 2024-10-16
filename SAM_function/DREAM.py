@@ -27,10 +27,10 @@ class KLDivergence:
         return self.klfn(x, y) / x.size(0)
 
 
-class TRAM(torch.optim.Optimizer):
+class DREAM(torch.optim.Optimizer):
     def __init__(self, params, base_optimizer, device, adaptive=True, lr=0.002, sigma=1, lmbda=0.9):
         defaults = dict(adaptive=adaptive, lr=lr)
-        super(TRAM, self).__init__(params, defaults)
+        super(DREAM, self).__init__(params, defaults)
 
         self.base_optimizer = base_optimizer(self.param_groups)
         self.param_groups = self.base_optimizer.param_groups

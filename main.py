@@ -58,16 +58,11 @@ if __name__ == "__main__":
     cluster_distribution = np.load(os.path.join(DATA_DIR, str(args.dataset), "LLM", "cluster_distribution.npz"))['arr_0']
     cluster_mean = np.load(os.path.join(DATA_DIR, str(args.dataset), "LLM", "cluster_mean.npz"))['arr_0']
     cluster_label = [np.argmax(cluster_distribution[i]) for i in range(len(cluster_distribution))]
-    #for key in cluster_distribution.files:
-    #    array = cluster_distribution[key]
-    #    cluster_label = [np.argmax(array[i]) for i in range(len(array))]
 
-    # load a preprocessed dataset
     dataset = datasethandler.BasicDatasetHandler(
         os.path.join(DATA_DIR, args.dataset), device=args.device, read_labels=read_labels,
         as_tensor=True, contextual_embed=True)
 
-    # create a model
     pretrainWE = scipy.sparse.load_npz(os.path.join(
         DATA_DIR, args.dataset, "word_embeddings.npz")).toarray()
     
@@ -85,7 +80,7 @@ if __name__ == "__main__":
                         weight_loss_ECR=args.weight_ECR,
                         alpha_ECR=args.alpha_ECR,
                         alpha_GR=args.alpha_GR,
-                        weight_loss_CTR=args.weight_CTR,
+                        weight_loss_OT=args.weight_OT,
                         weight_loss_InfoNCE=args.weight_InfoNCE,
                         weight_loss_CL=args.weight_CL,
                         beta_temp=args.beta_temp)
@@ -96,7 +91,7 @@ if __name__ == "__main__":
                         cluster_distribution=cluster_distribution,
                         cluster_mean=cluster_mean,
                         cluster_label=cluster_label,
-                        weight_loss_CTR=args.weight_CTR)
+                        weight_loss_OT=args.weight_OT)
     elif args.model == 'ECRTM':
         model = ECRTM(vocab_size=dataset.vocab_size,
                         num_topics=args.num_topics,
@@ -107,7 +102,7 @@ if __name__ == "__main__":
                         pretrained_WE=pretrainWE if args.use_pretrainWE else None,
                         weight_loss_ECR=args.weight_ECR,
                         alpha_ECR=args.alpha_ECR,
-                        weight_CTR=args.weight_CTR,
+                        weight_OT=args.weight_OT,
                         beta_temp=args.beta_temp)
     elif args.model == 'ETM':
         model = ETM(vocab_size=dataset.vocab_size,
@@ -117,7 +112,7 @@ if __name__ == "__main__":
                         cluster_mean=cluster_mean,
                         cluster_label=cluster_label,
                         pretrained_WE=pretrainWE if args.use_pretrainWE else None,
-                        weight_CTR=args.weight_CTR
+                        weight_OT=args.weight_OT
                         )
 
     
@@ -137,7 +132,6 @@ if __name__ == "__main__":
                                             batch_size=args.batch_size,
                                             lr_scheduler=args.lr_scheduler,
                                             lr_step_size=args.lr_step_size,
-                                            threshold=args.threshold,
                                             device=args.device,
                                             sigma=args.sigma,
                                             lmbda=args.lmbda
@@ -216,7 +210,7 @@ if __name__ == "__main__":
         os.path.join(current_run_dir, 'top_words_15.txt'))
     print(f"TC_15: {TC_15:.5f}")
 
-    filename = f"results_{args.dataset}_topics{args.num_topics}_epochs{args.epochs}_w_ECR{args.weight_ECR}_w_GR{args.weight_GR}_w_CTR{args.weight_CTR}_w_InfoNCE{args.weight_InfoNCE}_w_CL{args.weight_CL}.txt"
+    filename = f"results_{args.dataset}_topics{args.num_topics}_epochs{args.epochs}_w_ECR{args.weight_ECR}_w_GR{args.weight_GR}_w_OT{args.weight_OT}_w_InfoNCE{args.weight_InfoNCE}_w_CL{args.weight_CL}.txt"
     filename = filename.replace(' ', '_')
     filepath = os.path.join(current_run_dir, filename)
     with open(filepath, 'w') as f:

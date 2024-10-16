@@ -8,12 +8,12 @@ import logging
 import os
 import scipy
 
-from SAM_function.TRAM import TRAM
+from SAM_function.DREAM import DREAM
 from SAM_function.FSAM import FSAM
 
 class BasicTrainer:
-    def __init__(self, model, epoch_threshold = 150, model_name='NeuroMax', use_SAM=1, SAM_name='TRAM', epochs=200, learning_rate=0.002, batch_size=200, lr_scheduler=None, lr_step_size=125, log_interval=5, 
-                    rho = 0.005, threshold=10, device='cuda', sigma=0.1, lmbda=0.9, acc_step=8):
+    def __init__(self, model, epoch_threshold = 150, model_name='NeuroMax', use_SAM=1, SAM_name='DREAM', epochs=200, learning_rate=0.002, batch_size=200, lr_scheduler=None, lr_step_size=125, log_interval=5, 
+                    rho = 0.005, device='cuda', sigma=0.1, lmbda=0.9, acc_step=8):
         self.model = model
         self.epoch_threshold = epoch_threshold
         self.model_name = model_name
@@ -24,7 +24,6 @@ class BasicTrainer:
         self.lr_scheduler = lr_scheduler
         self.lr_step_size = lr_step_size
         self.log_interval = log_interval
-        self.threshold = threshold
         self.use_SAM = use_SAM
 
         self.rho = rho 
@@ -63,8 +62,8 @@ class BasicTrainer:
                 lr=self.learning_rate,
                 sigma=self.sigma, lmbda=self.lmbda
                 )
-        elif self.SAM_name == 'TRAM':
-            optimizer = TRAM(
+        elif self.SAM_name == 'DREAM':
+            optimizer = DREAM(
                 self.model.parameters(),
                 base_optimizer, device=self.device,
                 lr=self.learning_rate,
@@ -110,8 +109,6 @@ class BasicTrainer:
         for epoch_id, epoch in enumerate(tqdm(range(1, self.epochs + 1))):
             self.model.train()
             loss_rst_dict = defaultdict(float)
-            # if epoch > self.threshold: is_CTR = True
-            # else: is_CTR = False
 
             for batch_id, batch in enumerate(dataset_handler.train_dataloader): 
                 *inputs, indices = batch
@@ -133,7 +130,7 @@ class BasicTrainer:
                         #theta, _ = self.model.encode(batch_data[0].to('cuda'))
                         #loss_ctr_ = self.model.get_loss_CTR(theta, indices)
                         
-                        if self.SAM_name == 'TRAM':
+                        if self.SAM_name == 'DREAM':
                             self.model.is_CTR = False
                             loss_ctr_ = self.model.get_loss_CTR(batch_data, indices)
                             sam_optimizer.first_step(loss_ctr_,
@@ -150,7 +147,7 @@ class BasicTrainer:
                         sam_optimizer.second_step(zero_grad=True)
                     
                     else:
-                        if self.SAM_name == 'TRAM':
+                        if self.SAM_name == 'DREAM':
                             self.model.is_CTR = True
                         adam_optimizer.step()
                         adam_optimizer.zero_grad()

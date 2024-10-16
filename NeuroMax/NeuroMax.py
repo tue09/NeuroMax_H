@@ -4,7 +4,7 @@ from torch import nn
 import torch.nn.functional as F
 from .ECR import ECR
 from .GR import GR
-from .CTR import CTR
+from .OT import OT
 import torch_kmeans
 import logging
 import sentence_transformers
@@ -13,18 +13,18 @@ import sentence_transformers
 class NeuroMax(nn.Module):
     def __init__(self, vocab_size, data_name = '20NG', num_topics=50, num_groups=10, en_units=200, dropout=0.,
                  cluster_distribution=None, cluster_mean=None, cluster_label=None,
-                 pretrained_WE=None, embed_size=200, beta_temp=0.2, is_CTR=False,
+                 pretrained_WE=None, embed_size=200, beta_temp=0.2, is_OT=False,
                  weight_loss_ECR=250.0, weight_loss_GR=250.0,
-                 alpha_GR=20.0, alpha_ECR=20.0, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000, weight_loss_CTR=100.0,
+                 alpha_GR=20.0, alpha_ECR=20.0, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000, weight_loss_OT=100.0,
                  weight_loss_InfoNCE=10.0, weight_loss_CL=50.0):
         super().__init__()
 
-        self.weight_loss_CTR = weight_loss_CTR
+        self.weight_loss_OT = weight_loss_OT
         self.num_topics = num_topics
         self.num_groups = num_groups
         self.beta_temp = beta_temp
         self.data_name = data_name
-        self.is_CTR = is_CTR
+        self.is_OT = is_OT
         self.a = 1 * np.ones((1, num_topics)).astype(np.float32)
         self.mu2 = nn.Parameter(torch.as_tensor(
             (np.log(self.a).T - np.mean(np.log(self.a), 1)).T))
@@ -55,7 +55,7 @@ class NeuroMax(nn.Module):
                 torch.empty(vocab_size, embed_size))
         self.word_embeddings = nn.Parameter(F.normalize(self.word_embeddings))
 
-        # Add CTR
+        # Add OT
         self.cluster_mean = nn.Parameter(torch.from_numpy(cluster_mean).float(), requires_grad=False)
         self.cluster_distribution = nn.Parameter(torch.from_numpy(cluster_distribution).float(), requires_grad=False)
         self.cluster_label = cluster_label
@@ -65,7 +65,7 @@ class NeuroMax(nn.Module):
             self.cluster_label = self.cluster_label.to(device='cuda', dtype=torch.long)
         
         self.map_t2c = nn.Linear(self.word_embeddings.shape[1], self.cluster_mean.shape[1], bias=False)
-        self.CTR = CTR(weight_loss_CTR, sinkhorn_alpha, sinkhorn_max_iter)
+        self.OT = OT(weight_loss_OT, sinkhorn_alpha, sinkhorn_max_iter)
         #
         self.topic_embeddings = torch.empty((num_topics, self.word_embeddings.shape[1]))
         nn.init.trunc_normal_(self.topic_embeddings, std=0.1)
@@ -193,47 +193,20 @@ class NeuroMax(nn.Module):
         loss_GR = self.GR(cost, self.group_connection_regularizer)
         return loss_GR
     
-    def get_loss_CTR(self, input, indices):
+    def get_loss_OT(self, input, indices):
         bow = input[0]
         theta, _ = self.encode(bow)
         cd_batch = self.cluster_distribution[indices]  
         cost = self.pairwise_euclidean_distance(self.cluster_mean, self.map_t2c(self.topic_embeddings))  
-        loss_CTR = self.weight_loss_CTR * self.CTR(theta, cd_batch, cost)  
-        return loss_CTR
-    
-    def create_pairs(self, batch_data, indices):
-        data = batch_data  
-        batch_size = data.size(0)
-        device = data.device  
-
-        idx = torch.arange(batch_size, device=device)
-        idx_combinations = torch.combinations(idx, r=2)
-        idx1 = idx_combinations[:, 0]
-        idx2 = idx_combinations[:, 1]
-
-        data1 = data[idx1]  
-        data2 = data[idx2]  
-
-        cluster_labels = self.cluster_label[indices].to(device)  
-
-        labels = (cluster_labels[idx1] != cluster_labels[idx2]).float()  
-
-        return data1, data2, labels
-
-    def get_loss_CL(self, theta_1, theta_2, label, margin=1.0):
-        euclidean_distance = nn.functional.pairwise_distance(theta_1, theta_2)
-        contrastive_loss = torch.mean(
-            (1-label) * torch.pow(euclidean_distance, 2) +
-            label * torch.pow(torch.clamp(margin - euclidean_distance, min=0.0), 2)
-        )
-        return contrastive_loss
+        loss_OT = self.weight_loss_OT * self.OT(theta, cd_batch, cost)  
+        return loss_OT
 
     def pairwise_euclidean_distance(self, x, y):
         cost = torch.sum(x ** 2, axis=1, keepdim=True) + \
             torch.sum(y ** 2, dim=1) - 2 * torch.matmul(x, y.t())
         return cost
 
-    # def forward(self, indices, is_CTR, input, epoch_id=None):
+    # def forward(self, indices, is_OT, input, epoch_id=None):
     def forward(self, indices, input, epoch_id=None):
         #bow = input["data"]
         #contextual_emb = input["contextual_embed"]
@@ -266,12 +239,12 @@ class NeuroMax(nn.Module):
         if self.weight_loss_InfoNCE != 0.0:
             loss_InfoNCE = self.compute_loss_InfoNCE(rep, contextual_emb)
             
-        #CTR
+        #OT
 
-        if self.is_CTR:
-            loss_CTR = self.get_loss_CTR(input, indices)
+        if self.is_OT:
+            loss_OT = self.get_loss_OT(input, indices)
         else:
-            loss_CTR = 0.0
+            loss_OT = 0.0
         if epoch_id == 10 and self.group_connection_regularizer is None:
             self.create_group_connection_regularizer()
         if self.group_connection_regularizer is not None and epoch_id > 10:
@@ -279,14 +252,10 @@ class NeuroMax(nn.Module):
         else:
             loss_GR = 0.
 
-        #loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE
-        #loss = loss_TM + loss_ECR + loss_GR + loss_CTR + loss_InfoNCE + loss_CL
-        # loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_CL
-        loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_CTR
-        # loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE
+        loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_OT
         rst_dict = {
             'loss': loss,
-            'loss_CTR': loss_CTR,
+            'loss_OT': loss_OT,
             'loss_TM': loss_TM,
             'loss_ECR': loss_ECR,
             'loss_GR': loss_GR,

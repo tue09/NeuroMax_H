@@ -3,7 +3,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 from .ECR import ECR
-from ..NeuroMax.OT import OT
+from .OT import OT
 
 
 class ECRTM(nn.Module):

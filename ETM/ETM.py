@@ -2,7 +2,7 @@ import numpy as np
 import torch_kmeans
 import torch
 import torch.nn as nn
-from ..NeuroMax.OT import OT
+from .OT import OT
 import torch.nn.functional as F
 import logging
 import sentence_transformers

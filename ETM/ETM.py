@@ -2,7 +2,7 @@ import numpy as np
 import torch_kmeans
 import torch
 import torch.nn as nn
-from DREAM.NeuroMax.OT import CTR
+from DREAM.NeuroMax.OT import OT
 import torch.nn.functional as F
 import logging
 import sentence_transformers
@@ -14,10 +14,10 @@ class ETM(nn.Module):
         Adji B. Dieng, Francisco J. R. Ruiz, David M. Blei.
     '''
     def __init__(self, vocab_size, embed_size=200, num_topics=50, num_groups=10, en_units=800, dropout=0., 
-                    cluster_distribution=None, cluster_mean=None, cluster_label=None, weight_CTR=1, is_CTR=False,
+                    cluster_distribution=None, cluster_mean=None, cluster_label=None, weight_OT=1, is_OT=False,
                     pretrained_WE=None, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000, train_WE=False, theta_train=False):
         super().__init__()
-        self.is_CTR = is_CTR
+        self.is_OT = is_OT
         if pretrained_WE is not None:
             self.word_embeddings = nn.Parameter(torch.from_numpy(pretrained_WE).float())
         else:
@@ -39,17 +39,17 @@ class ETM(nn.Module):
         )
 
         # # Thêm 
-        self.weight_CTR = weight_CTR
+        self.weight_OT = weight_OT
         self.num_topics = num_topics
         self.num_groups = num_groups
-        # self.is_CTR = is_CTR
+        # self.is_OT = is_OT
 
         self.mean_bn = nn.BatchNorm1d(num_topics)
         self.mean_bn.weight.requires_grad = False
         self.logvar_bn = nn.BatchNorm1d(num_topics)
         self.logvar_bn.weight.requires_grad = False
 
-        # Add CTR
+        # Add OT
         self.cluster_mean = nn.Parameter(torch.from_numpy(cluster_mean).float(), requires_grad=False)
         self.cluster_distribution = nn.Parameter(torch.from_numpy(cluster_distribution).float(), requires_grad=False)
         self.cluster_label = cluster_label
@@ -59,7 +59,7 @@ class ETM(nn.Module):
             self.cluster_label = self.cluster_label.to(device='cuda', dtype=torch.long)
         
         self.map_t2c = nn.Linear(self.word_embeddings.shape[1], self.cluster_mean.shape[1], bias=False)
-        self.CTR = CTR(weight_CTR, sinkhorn_alpha, sinkhorn_max_iter)
+        self.OT = OT(weight_OT, sinkhorn_alpha, sinkhorn_max_iter)
         # #
 
 
@@ -108,18 +108,18 @@ class ETM(nn.Module):
         beta = self.get_beta()
         recon_input = torch.matmul(theta, beta)
 
-        loss_CTR = 0
-        if self.is_CTR:
-             loss_CTR = self.get_loss_CTR(input, indices)
+        loss_OT = 0
+        if self.is_OT:
+             loss_OT = self.get_loss_OT(input, indices)
         else:
-             loss_CTR = 0.0
+             loss_OT = 0.0
 
         loss = self.loss_function(bow, recon_input, mu, logvar, avg_loss)
-        loss += loss_CTR
+        loss += loss_OT
 
         rst_dict = {
             'loss': loss,
-            'loss_CTR': loss_CTR
+            'loss_OT': loss_OT
         }
         return rst_dict
 
@@ -131,10 +131,10 @@ class ETM(nn.Module):
             loss = loss.mean()
         return loss
         
-    def get_loss_CTR(self, input, indices):
+    def get_loss_OT(self, input, indices):
         bow = input[0]
         theta, mu, logvar = self.get_theta(bow)
         cd_batch = self.cluster_distribution[indices]  
         cost = self.pairwise_euclidean_distance(self.cluster_mean, self.map_t2c(self.topic_embeddings))  
-        loss_CTR = self.weight_CTR * self.CTR(theta, cd_batch, cost)  
-        return loss_CTR
+        loss_OT = self.weight_OT * self.OT(theta, cd_batch, cost)  
+        return loss_OT

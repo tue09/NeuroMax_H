@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 from ._ETP import ETP
 from ._model_utils import pairwise_euclidean_distance
-from .OT import CTR
+from .OT import OT
 
 
 class FASTopic(nn.Module):
@@ -52,7 +52,7 @@ class FASTopic(nn.Module):
             self.cluster_label = self.cluster_label.to(device='cuda', dtype=torch.long)
         
         self.map_t2c = nn.Linear(self.word_embeddings.shape[1], self.cluster_mean.shape[1], bias=False)
-        self.CTR = CTR(weight_loss_OT, sinkhorn_alpha, sinkhorn_max_iter)
+        self.OT = OT(weight_loss_OT, sinkhorn_alpha, sinkhorn_max_iter)
 
     def get_transp_DT(self,
                       doc_embeddings,
@@ -94,7 +94,7 @@ class FASTopic(nn.Module):
         theta = transp_DT * transp_DT.shape[0]
         cd_batch = self.cluster_distribution[indices]  
         cost = pairwise_euclidean_distance(self.cluster_mean, self.map_t2c(self.topic_embeddings))  
-        loss_OT = self.weight_loss_OT * self.CTR(theta, cd_batch, cost)  
+        loss_OT = self.weight_loss_OT * self.OT(theta, cd_batch, cost)  
         return loss_OT
 
     def forward(self, indices, input, epoch_id=None):

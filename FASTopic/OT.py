@@ -2,7 +2,7 @@ import torch
 from torch import nn
 
 
-class CTR(nn.Module):
+class OT(nn.Module):
     def __init__(self, weight_loss_OT, sinkhorn_alpha, OT_max_iter=5000, stopThr=.5e-2):
         super().__init__()
 

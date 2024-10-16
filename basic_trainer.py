@@ -11,7 +11,7 @@ import scipy
 from SAM_function.DREAM import DREAM
 from SAM_function.FSAM import FSAM
 
-class BasiOTainer:
+class BasicTrainer:
     def __init__(self, model, epoch_threshold = 150, model_name='NeuroMax', use_SAM=1, SAM_name='DREAM', epochs=200, learning_rate=0.002, batch_size=200, lr_scheduler=None, lr_step_size=125, log_interval=5, 
                     rho = 0.005, device='cuda', sigma=0.1, lmbda=0.9, acc_step=8):
         self.model = model

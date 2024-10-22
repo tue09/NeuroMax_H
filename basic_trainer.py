@@ -8,23 +8,37 @@ import logging
 import os
 import scipy
 
+from Decomposer.Gram_Schmidt import Gram_Schmidt
+from Decomposer.SVD import SVD
+from MOO.CAGrad import CAGrad
+from MOO.PCGrad import PCGrad
+from MOO.DB_MTL import DB_MTL
 from SAM_function.DREAM import DREAM
 from SAM_function.FSAM import FSAM
 
 class BasicTrainer:
-    def __init__(self, model, epoch_threshold = 150, model_name='NeuroMax', use_SAM=1, SAM_name='DREAM', epochs=200, learning_rate=0.002, batch_size=200, lr_scheduler=None, lr_step_size=125, log_interval=5, 
+    def __init__(self, model, epoch_threshold = 150, model_name='NeuroMax', 
+                    use_decompose=1, decompose_name='Gram_Schmidt', use_MOO=1, MOO_name='PCGrad',
+                    use_SAM=1, SAM_name='DREAM', epochs=200, learning_rate=0.002, batch_size=200, 
+                    lr_scheduler=None, lr_step_size=125, log_interval=5, 
                     rho = 0.005, device='cuda', sigma=0.1, lmbda=0.9, acc_step=8):
         self.model = model
         self.epoch_threshold = epoch_threshold
         self.model_name = model_name
+
+        self.use_decompose = use_decompose
+        self.decompose_name = decompose_name
+        self.use_MOO = use_MOO
+        self.MOO_name = MOO_name
+        self.use_SAM = use_SAM
         self.SAM_name = SAM_name
+
         self.epochs = epochs
         self.learning_rate = learning_rate
         self.batch_size = batch_size
         self.lr_scheduler = lr_scheduler
         self.lr_step_size = lr_step_size
         self.log_interval = log_interval
-        self.use_SAM = use_SAM
 
         self.rho = rho 
         self.device = device
@@ -84,6 +98,22 @@ class BasicTrainer:
 
     def train(self, dataset_handler, verbose=False):
         accumulation_steps = self.acc_step
+        
+        if self.use_decompose == 1:
+            if self.decompose_name  == 'Gram_Schmidt':
+                grad_decomposer = Gram_Schmidt(model=self.model, device='cuda', buffer_size=task_num * 3)
+            elif self.decompose_name == 'SVD':
+                grad_decomposer = SVD(model=self.model, device='cuda', buffer_size=task_num*3)
+        
+        if self.use_MOO == 1:
+            if self.MOO_name == 'PCGrad':
+                moo_algorithm = PCGrad()
+            elif self.MOO_name == 'CAGrad':
+                moo_algorithm = CAGrad()
+            elif self.MOO_name == 'DB_MTL':
+                moo_algorithm = CAGrad()
+                moo_algorithm = DB_MTL(task_num)
+
         adam_optimizer = self.make_adam_optimizer()
         sam_optimizer = self.make_sam_optimizer() 
 
@@ -112,6 +142,26 @@ class BasicTrainer:
                 # theta = self.model.get_theta(batch_data_tensor)
 
                 if self.use_SAM == 0:
+                    if self.use_MOO:
+                        loss_array = [value for key, value in rst_dict.items() if key != 'loss']
+                        grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
+                        
+                        total_grad = torch.cat(grad_array)
+
+                        grad_decomposer.update_grad_buffer(total_grad)
+
+                        components = grad_decomposer.decompose_grad(total_grad)
+
+                        adjusted_grad, alpha = moo_algorithm.apply(components)
+                        
+                        grad_pointer = 0
+                        for p in self.model.parameters():
+                            if p.requires_grad:
+                                num_params = p.numel()
+                                grad_slice = adjusted_grad[grad_pointer:grad_pointer + num_params]
+                                p.grad = grad_slice.view_as(p).clone()
+                                grad_pointer += num_params
+
                     adam_optimizer.step()
                     adam_optimizer.zero_grad()
                 else:

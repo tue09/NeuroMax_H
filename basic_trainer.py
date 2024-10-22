@@ -17,7 +17,7 @@ from SAM_function.DREAM import DREAM
 from SAM_function.FSAM import FSAM
 
 class BasicTrainer:
-    def __init__(self, model, epoch_threshold = 150, model_name='NeuroMax', 
+    def __init__(self, model, epoch_threshold = 150, task_num=3, model_name='NeuroMax', 
                     use_decompose=1, decompose_name='Gram_Schmidt', use_MOO=1, MOO_name='PCGrad',
                     use_SAM=1, SAM_name='DREAM', epochs=200, learning_rate=0.002, batch_size=200, 
                     lr_scheduler=None, lr_step_size=125, log_interval=5, 
@@ -25,6 +25,7 @@ class BasicTrainer:
         self.model = model
         self.epoch_threshold = epoch_threshold
         self.model_name = model_name
+        self.task_num = task_num
 
         self.use_decompose = use_decompose
         self.decompose_name = decompose_name
@@ -101,9 +102,9 @@ class BasicTrainer:
         
         if self.use_decompose == 1:
             if self.decompose_name  == 'Gram_Schmidt':
-                grad_decomposer = Gram_Schmidt(model=self.model, device='cuda', buffer_size=task_num * 3)
+                grad_decomposer = Gram_Schmidt(model=self.model, device='cuda', buffer_size=self.task_num*3)
             elif self.decompose_name == 'SVD':
-                grad_decomposer = SVD(model=self.model, device='cuda', buffer_size=task_num*3)
+                grad_decomposer = SVD(model=self.model, device='cuda', buffer_size=self.task_num*3)
         
         if self.use_MOO == 1:
             if self.MOO_name == 'PCGrad':
@@ -112,7 +113,7 @@ class BasicTrainer:
                 moo_algorithm = CAGrad()
             elif self.MOO_name == 'DB_MTL':
                 moo_algorithm = CAGrad()
-                moo_algorithm = DB_MTL(task_num)
+                moo_algorithm = DB_MTL(self.task_num)
 
         adam_optimizer = self.make_adam_optimizer()
         sam_optimizer = self.make_sam_optimizer() 

@@ -124,6 +124,7 @@ if __name__ == "__main__":
     # create a trainer
     trainer = basic_trainer.BasicTrainer(model, model_name=args.model,
                                             epoch_threshold = args.epoch_threshold,
+                                            task_num = args.task_num,
                                             use_decompose = args.use_decompose,
                                             decompose_name=args.decompose_name,
                                             use_MOO = args.use_MOO,

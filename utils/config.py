@@ -14,8 +14,8 @@ def add_dataset_argument(parser):
 def add_model_argument(parser):
     parser.add_argument('--model', type=str, help='model name')
     parser.add_argument('--epoch_threshold', type=int, help='use epoch_threshold')
-    parser.add_argument('--use_Decompose', type=int, help='use Decompose')
-    parser.add_argument('--Decompose_name', type=str, help='Decompose Variant')
+    parser.add_argument('--use_decompose', type=int, help='use Decompose')
+    parser.add_argument('--decompose_name', type=str, help='Decompose Variant')
     parser.add_argument('--use_MOO', type=int, help='use MOO')
     parser.add_argument('--MOO_name', type=str, help='MOO Variant')
     parser.add_argument('--use_SAM', type=int, help='use SAM')

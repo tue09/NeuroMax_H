@@ -254,7 +254,7 @@ class NeuroMax(nn.Module):
 
         rst_dict = {
             'loss': loss,
-            'loss_OT': torch.tensor(loss_OT, dtype=torch.float32) if isinstance(loss_OT, float) else loss_OT,
+            #'loss_OT': torch.tensor(loss_OT, dtype=torch.float32) if isinstance(loss_OT, float) else loss_OT,
             'loss_TM': torch.tensor(loss_TM, dtype=torch.float32) if isinstance(loss_TM, float) else loss_TM,
             'loss_ECR': torch.tensor(loss_ECR, dtype=torch.float32) if isinstance(loss_ECR, float) else loss_ECR,
             'loss_GR': torch.tensor(loss_GR, dtype=torch.float32) if isinstance(loss_GR, float) else loss_GR,

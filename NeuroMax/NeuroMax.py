@@ -239,13 +239,31 @@ class NeuroMax(nn.Module):
             self.create_group_connection_regularizer()
         if self.group_connection_regularizer is not None and epoch_id > 10:
             loss_GR = self.get_loss_GR()
+            loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE
+            rst_dict = {
+                'loss': loss,
+                #'loss_OT': torch.tensor(loss_OT, device=bow.device) if isinstance(loss_OT, float) else loss_OT,
+                'loss_TM': torch.tensor(loss_TM, device=bow.device) if isinstance(loss_TM, float) else loss_TM,
+                'loss_ECR': torch.tensor(loss_ECR, device=bow.device) if isinstance(loss_ECR, float) else loss_ECR,
+                'loss_GR': torch.tensor(loss_GR, device=bow.device) if isinstance(loss_GR, float) else loss_GR,
+                'loss_InfoNCE': torch.tensor(loss_InfoNCE, device=bow.device) if isinstance(loss_InfoNCE, float) else loss_InfoNCE,
+            }
         else:
             #loss_GR = 0.
-            loss_GR = torch.tensor(0.0, device=bow.device) 
+            #loss_GR = torch.tensor(0.0, device=bow.device) 
+            loss = loss_TM + loss_ECR + loss_InfoNCE
+            rst_dict = {
+                'loss': loss,
+                #'loss_OT': torch.tensor(loss_OT, device=bow.device) if isinstance(loss_OT, float) else loss_OT,
+                'loss_TM': torch.tensor(loss_TM, device=bow.device) if isinstance(loss_TM, float) else loss_TM,
+                'loss_ECR': torch.tensor(loss_ECR, device=bow.device) if isinstance(loss_ECR, float) else loss_ECR,
+                #'loss_GR': torch.tensor(loss_GR, device=bow.device) if isinstance(loss_GR, float) else loss_GR,
+                'loss_InfoNCE': torch.tensor(loss_InfoNCE, device=bow.device) if isinstance(loss_InfoNCE, float) else loss_InfoNCE,
+            }
 
 
         #loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_OT
-        loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE
+        #loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE
         '''rst_dict = {
             'loss': loss,
             #'loss_OT': loss_OT,
@@ -255,14 +273,13 @@ class NeuroMax(nn.Module):
             'loss_InfoNCE': loss_InfoNCE,
         }'''
 
-        rst_dict = {
+        '''rst_dict = {
             'loss': loss,
             #'loss_OT': torch.tensor(loss_OT, device=bow.device) if isinstance(loss_OT, float) else loss_OT,
             'loss_TM': torch.tensor(loss_TM, device=bow.device) if isinstance(loss_TM, float) else loss_TM,
             'loss_ECR': torch.tensor(loss_ECR, device=bow.device) if isinstance(loss_ECR, float) else loss_ECR,
             'loss_GR': torch.tensor(loss_GR, device=bow.device) if isinstance(loss_GR, float) else loss_GR,
             'loss_InfoNCE': torch.tensor(loss_InfoNCE, device=bow.device) if isinstance(loss_InfoNCE, float) else loss_InfoNCE,
-        }
-
+        }'''
 
         return rst_dict

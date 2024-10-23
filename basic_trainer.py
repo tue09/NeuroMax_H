@@ -143,7 +143,6 @@ class BasicTrainer:
                 # theta = self.model.get_theta(batch_data_tensor)
 
                 if self.use_SAM == 0:
-                    adam_optimizer.zero_grad()
                     if self.use_MOO and epoch > self.epoch_threshold:
                         loss_array = [value for key, value in rst_dict.items() if key != 'loss']
                         grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
@@ -166,7 +165,7 @@ class BasicTrainer:
                     else:
                         batch_loss.backward()
                     adam_optimizer.step()
-                    #adam_optimizer.zero_grad()
+                    adam_optimizer.zero_grad()
                 else:
                     #if (batch_id + 1) % accumulation_steps == 0 or (batch_id + 1) == len(dataset_handler.train_dataloader):
                     if epoch_id > self.epoch_threshold:

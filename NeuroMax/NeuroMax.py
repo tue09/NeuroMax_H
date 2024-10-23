@@ -240,7 +240,8 @@ class NeuroMax(nn.Module):
         if self.group_connection_regularizer is not None and epoch_id > 10:
             loss_GR = self.get_loss_GR()
         else:
-            loss_GR = torch.tensor(0.0, device=bow.device) 
+            #loss_GR = torch.tensor(0.0, device=bow.device) 
+            loss_GR = torch.zeros(1, device=bow.device, requires_grad=True)
 
 
         #loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_OT

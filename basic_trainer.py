@@ -137,7 +137,7 @@ class BasicTrainer:
                 # rst_dict = self.model(indices, is_OT, batch_data, epoch_id=epoch)
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
                 batch_loss = rst_dict['loss']
-                batch_loss.backward()
+                #batch_loss.backward()
 
                 # batch_data_tensor = torch.tensor(batch_data, dtype=torch.float32)
                 # theta = self.model.get_theta(batch_data_tensor)

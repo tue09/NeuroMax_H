@@ -252,5 +252,4 @@ class NeuroMax(nn.Module):
             'loss_InfoNCE': loss_InfoNCE,
         }
 
-
         return rst_dict

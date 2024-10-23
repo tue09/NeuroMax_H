@@ -143,7 +143,7 @@ class BasicTrainer:
                 # theta = self.model.get_theta(batch_data_tensor)
 
                 if self.use_SAM == 0:
-                    if self.use_MOO:
+                    if self.use_MOO and epoch > self.epoch_threshold:
                         loss_array = [value for key, value in rst_dict.items() if key != 'loss']
                         grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
                         
@@ -162,7 +162,8 @@ class BasicTrainer:
                                 grad_slice = adjusted_grad[grad_pointer:grad_pointer + num_params]
                                 p.grad = grad_slice.view_as(p).clone()
                                 grad_pointer += num_params
-
+                    else:
+                        batch_loss.backward()
                     adam_optimizer.step()
                     adam_optimizer.zero_grad()
                 else:

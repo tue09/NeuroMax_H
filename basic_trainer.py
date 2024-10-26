@@ -112,7 +112,6 @@ class BasicTrainer:
             elif self.MOO_name == 'CAGrad':
                 moo_algorithm = CAGrad()
             elif self.MOO_name == 'DB_MTL':
-                moo_algorithm = CAGrad()
                 moo_algorithm = DB_MTL(self.task_num)
 
         adam_optimizer = self.make_adam_optimizer()
@@ -147,14 +146,14 @@ class BasicTrainer:
                         #loss_array = [value for key, value in rst_dict.items() if key != 'loss']
                         loss_array = [value for key, value in rst_dict.items() if key != 'loss' and value.requires_grad]
                         grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
-                        
-                        total_grad = torch.cat(grad_array)
+
+                        total_grad = torch.stack(grad_array, dim=0)  # Shape: (N, x)
 
                         grad_decomposer.update_grad_buffer(total_grad)
-
                         components = grad_decomposer.decompose_grad(total_grad)
 
-                        adjusted_grad, alpha = moo_algorithm.apply(components)
+                        adjusted_grad = sum(components)
+                        #adjusted_grad, alpha = moo_algorithm.apply(components)
                         
                         grad_pointer = 0
                         for p in self.model.parameters():

@@ -161,13 +161,14 @@ class ECRTM(nn.Module):
         else:
             loss_OT = 0.0
 
-        loss = loss_TM + loss_ECR + loss_OT
+        #loss = loss_TM + loss_ECR + loss_OT
+        loss = loss_TM + loss_ECR
 
         rst_dict = {
             'loss': loss,
             'loss_TM': loss_TM,
             'loss_ECR': loss_ECR,
-            'loss_OT': loss_OT
+            #'loss_OT': loss_OT
         }
 
         return rst_dict

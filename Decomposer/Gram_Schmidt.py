@@ -38,10 +38,13 @@ class Gram_Schmidt:
         return total_grad.detach()'''
 
     
-    def update_grad_buffer(self, grad_):
+    '''def update_grad_buffer(self, grad_):
         if len(self.grad_buffer) > self.buffer_size:
             self.grad_buffer.pop(0)
-        self.grad_buffer.append(grad_.detach())
+        self.grad_buffer.append(grad_.detach())'''
+    
+    def update_grad_buffer(self, grad_):
+        self.grad_buffer = grad_.detach()
     
     def decompose_grad(self, total_grad):
         if len(self.grad_buffer) < self.buffer_size:

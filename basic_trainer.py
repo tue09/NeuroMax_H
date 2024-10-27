@@ -154,7 +154,7 @@ class BasicTrainer:
                         #components = grad_decomposer.decompose_grad(total_grad)
 
                         #total_grad = grad_decomposer._get_total_grad(batch_loss)
-                        #grad_decomposer.update_grad_buffer(total_grad)
+                        grad_decomposer.update_grad_buffer(total_grad)
                         components = grad_decomposer.decompose_grad(total_grad)
                         adjusted_grad = sum(components)
                         #print(f"components shape = {len(components[1])}")

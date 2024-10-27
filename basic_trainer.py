@@ -102,9 +102,9 @@ class BasicTrainer:
         
         if self.use_decompose == 1:
             if self.decompose_name  == 'Gram_Schmidt':
-                grad_decomposer = Gram_Schmidt(model=self.model, device='cuda', buffer_size=self.task_num*3)
+                grad_decomposer = Gram_Schmidt(model=self.model, device='cuda', buffer_size=self.task_num)
             elif self.decompose_name == 'SVD':
-                grad_decomposer = SVD(model=self.model, device='cuda', buffer_size=self.task_num*3)
+                grad_decomposer = SVD(model=self.model, device='cuda', buffer_size=self.task_num)
         
         if self.use_MOO == 1:
             if self.MOO_name == 'PCGrad':

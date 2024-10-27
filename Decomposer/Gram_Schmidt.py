@@ -29,6 +29,7 @@ class Gram_Schmidt:
         self.grad_buffer.append(grad_.detach())
     
     def decompose_grad(self, total_grad):
+        print(f"len = {len(self.grad_buffer)}")
         if len(self.grad_buffer) < self.buffer_size:
             return self.grad_buffer
         else:

@@ -13,7 +13,7 @@ python main.py \
     --alpha_ECR 20 \
     --weight_GR 1 \
     --alpha_GR 5 \
-    --weight_InfoNCE 0 \
+    --weight_InfoNCE 50 \
     --use_SAM 0 \
     --use_decompose 1 \
     --decompose_name Gram_Schmidt \
@@ -23,6 +23,6 @@ python main.py \
     --epoch_threshold -1 \
     --epochs 150 \
     --use_MOO 1 \
-    --MOO_name CAGrad \
-    --task_num 3
+    --MOO_name PCGrad \
+    --task_num 2
 

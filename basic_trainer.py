@@ -140,8 +140,8 @@ class BasicTrainer:
 
                 # batch_data_tensor = torch.tensor(batch_data, dtype=torch.float32)
                 # theta = self.model.get_theta(batch_data_tensor)
-                total_grad = grad_decomposer._get_total_grad(batch_loss)
-                grad_decomposer.update_grad_buffer(total_grad)
+                #total_grad = grad_decomposer._get_total_grad(batch_loss)
+                #grad_decomposer.update_grad_buffer(total_grad)
                 if self.use_SAM == 0:
                     if self.use_MOO and epoch > self.epoch_threshold:
                         #loss_array = [value for key, value in rst_dict.items() if key != 'loss']
@@ -153,12 +153,12 @@ class BasicTrainer:
                         grad_decomposer.update_grad_buffer(total_grad)
                         components = grad_decomposer.decompose_grad(total_grad)'''
 
-                        #total_grad = grad_decomposer._get_total_grad(batch_loss)
-                        #grad_decomposer.update_grad_buffer(total_grad)
-                        #components = grad_decomposer.decompose_grad(total_grad)
-                        #adjusted_grad = sum(components)
+                        total_grad = grad_decomposer._get_total_grad(batch_loss)
+                        grad_decomposer.update_grad_buffer(total_grad)
+                        components = grad_decomposer.decompose_grad(total_grad)
+                        adjusted_grad = sum(components)
                         #adjusted_grad, alpha = moo_algorithm.apply(components)
-                        adjusted_grad, alpha = moo_algorithm.apply(grad_decomposer.grad_buffer)
+                        #adjusted_grad, alpha = moo_algorithm.apply(grad_decomposer.grad_buffer)
                         
                         grad_pointer = 0
                         for p in self.model.parameters():

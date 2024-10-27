@@ -246,8 +246,8 @@ class NeuroMax(nn.Module):
             #loss_GR = torch.zeros(1, device=bow.device).sum()
 
         #loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_OT
-        #loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE
-        loss = loss_TM + loss_InfoNCE
+        loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE
+        #loss = loss_TM + loss_InfoNCE
         rst_dict = {
             'loss': loss,
             #'loss_OT': loss_OT,

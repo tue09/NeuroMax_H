@@ -17,13 +17,13 @@ class Gram_Schmidt:
     def _get_grad_dim(self):
         return sum(p.numel() for p in self.model.parameters() if p.requires_grad)
     
-    '''def _get_total_grad(self, total_loss):
+    def _get_total_grad(self, total_loss):
         self.model.zero_grad()
         total_loss.backward(retain_graph=True)
         total_grad = torch.cat([p.grad.flatten() for p in self.model.parameters() if p.grad is not None])
-        return total_grad.detach()'''
+        return total_grad.detach()
     
-    def _get_total_grad(self, total_loss):
+    '''def _get_total_grad(self, total_loss):
         self.model.zero_grad()
         total_loss.backward(retain_graph=True)
         total_grad_list = []
@@ -35,7 +35,7 @@ class Gram_Schmidt:
                     # Append zeros if p.grad is None
                     total_grad_list.append(torch.zeros_like(p).flatten())
         total_grad = torch.cat(total_grad_list)
-        return total_grad.detach()
+        return total_grad.detach()'''
 
     
     def update_grad_buffer(self, grad_):

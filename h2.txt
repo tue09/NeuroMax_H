@@ -1,0 +1,24 @@
+python main.py \
+    --dataset YahooAnswers \
+    --model NeuroMax \
+    --num_topics 50 \
+    --num_groups 20 \
+    --beta_temp 0.2 \
+    --device cuda \
+    --lr_scheduler StepLR \
+    --batch_size 128 \
+    --lr_step_size 125 \
+    --use_pretrainWE \
+    --weight_ECR 40 \
+    --alpha_ECR 20 \
+    --weight_GR 1 \
+    --alpha_GR 5 \
+    --weight_InfoNCE 0 \
+    --use_decompose 1 \
+    --decompose_name Gram_Schmidt \
+    --dropout 0.2 \
+    --seed 0 \
+    --lr 0.0022 \
+    --epochs 150 \
+    --task_num 2
+

@@ -59,7 +59,7 @@ class BasicTrainer:
     
 
     def make_sam_optimizer(self,):
-        base_optimizer = torch.optim.SGD
+        optimizer = torch.optim.SGD
         if self.SAM_name == 'FSAM':
             optimizer = FSAM(
                 self.model.parameters(),

@@ -14,11 +14,13 @@ python main.py \
     --weight_GR 1 \
     --alpha_GR 5 \
     --weight_InfoNCE 0 \
+    --use_SAM 0 \
     --use_decompose 1 \
     --decompose_name Gram_Schmidt \
     --dropout 0.2 \
     --seed 0 \
     --lr 0.0022 \
+    --epoch_threshold -1 \
     --epochs 150 \
     --task_num 2
 

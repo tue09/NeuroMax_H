@@ -145,7 +145,8 @@ class BasicTrainer:
                         #loss_array = [value for key, value in rst_dict.items() if key != 'loss']
                         loss_array = [value for key, value in rst_dict.items() if key != 'loss' and value.requires_grad]
                         grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
-                        adjusted_grad, alpha = moo_algorithm.apply(grad_array)
+                        adjusted_grad = sum(grad_array)
+                        #adjusted_grad, alpha = moo_algorithm.apply(grad_array)
                         #print(f"grad shape = {[grad_.shape for grad_ in grad_array]}")
                         #total_grad = torch.stack(grad_array, dim=0)  # Shape: (N, x)
 

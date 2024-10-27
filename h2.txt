@@ -1,5 +1,5 @@
 python main.py \
-    --dataset YahooAnswers \
+    --dataset GoogleNews \
     --model NeuroMax \
     --num_topics 50 \
     --num_groups 20 \

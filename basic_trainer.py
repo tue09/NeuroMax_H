@@ -155,7 +155,7 @@ class BasicTrainer:
                         #grad_decomposer.update_grad_buffer(total_grad)
                         #components = grad_decomposer.decompose_grad(total_grad)
                         adjusted_grad = sum(components)
-                        print(f"components shape = {len(components)}")
+                        print(f"components shape = {len(components[1])}")
                         print(f"adjust grad shape = {adjusted_grad.shape}")
                         #adjusted_grad, alpha = moo_algorithm.apply(components)
                         #adjusted_grad, alpha = moo_algorithm.apply(grad_decomposer.grad_buffer)

@@ -142,10 +142,10 @@ class BasicTrainer:
                 # theta = self.model.get_theta(batch_data_tensor)
                 if self.use_SAM == 0:
                     if self.use_MOO and epoch > self.epoch_threshold:
-                        loss_array = [value for key, value in rst_dict.items() if key != 'loss']
+                        #loss_array = [value for key, value in rst_dict.items() if key != 'loss']
                         loss_array = [value for key, value in rst_dict.items() if key != 'loss' and value.requires_grad]
                         grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
-
+                        print(f"grad shape = {[grad_.shape for grad_ in grad_array]}")
                         total_grad = torch.stack(grad_array, dim=0)  # Shape: (N, x)
 
                         grad_decomposer.update_grad_buffer(total_grad)

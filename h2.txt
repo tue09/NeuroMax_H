@@ -22,5 +22,7 @@ python main.py \
     --lr 0.0022 \
     --epoch_threshold -1 \
     --epochs 150 \
-    --task_num 2
+    --use_MOO 1 \
+    --MOO_name CAGrad \
+    --task_num 3
 

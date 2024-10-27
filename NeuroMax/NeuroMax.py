@@ -231,18 +231,19 @@ class NeuroMax(nn.Module):
             loss_InfoNCE = self.compute_loss_InfoNCE(rep, contextual_emb)
             
         #OT
-        if self.is_OT:
+        '''if self.is_OT:
             loss_OT = self.get_loss_OT(input, indices)
         else:
-            loss_OT = 0.0
+            loss_OT = 0.0'''
         if epoch_id == 10 and self.group_connection_regularizer is None:
             self.create_group_connection_regularizer()
         if self.group_connection_regularizer is not None and epoch_id > 10:
             loss_GR = self.get_loss_GR()
         else:
+            loss_GR = 0
             #loss_GR = torch.tensor(0.0, device=bow.device) 
             #loss_GR = torch.zeros(1, device=bow.device, requires_grad=True)
-            loss_GR = torch.zeros(1, device=bow.device).sum()
+            #loss_GR = torch.zeros(1, device=bow.device).sum()
 
         #loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_OT
         #loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE
@@ -251,8 +252,8 @@ class NeuroMax(nn.Module):
             'loss': loss,
             #'loss_OT': loss_OT,
             'loss_TM': loss_TM,
-            #'loss_ECR': loss_ECR,
-            #'loss_GR': loss_GR,
+            'loss_ECR': loss_ECR,
+            'loss_GR': loss_GR,
             'loss_InfoNCE': loss_InfoNCE,
         }
 

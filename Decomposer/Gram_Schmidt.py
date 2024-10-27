@@ -23,14 +23,14 @@ class Gram_Schmidt:
         total_grad = torch.cat([p.grad.flatten() for p in self.model.parameters() if p.grad is not None])
         return total_grad.detach()
     
-    def update_grad_buffer(self, total_grad):
-        #if len(self.grad_buffer) >= self.buffer_size:
-        #    self.grad_buffer.pop(0)
-        self.grad_buffer = total_grad
+    def update_grad_buffer(self, grad_):
+        if len(self.grad_buffer) >= self.buffer_size:
+            self.grad_buffer.pop(0)
+        self.grad_buffer.append(grad_.detach())
     
     def decompose_grad(self, total_grad):
-        if len(self.grad_buffer) == 0:
-            return [total_grad]
+        if len(self.grad_buffer) < self.buffer_size:
+            return self.grad_buffer
         else:
             orthonormal_basis = []
             for v in self.grad_buffer:

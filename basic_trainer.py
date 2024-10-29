@@ -13,6 +13,7 @@ from Decomposer.SVD import SVD
 from MOO.CAGrad import CAGrad
 from MOO.PCGrad import PCGrad
 from MOO.DB_MTL import DB_MTL
+from MOO.MGDA import MGDA
 from SAM_function.DREAM import DREAM
 from SAM_function.FSAM import FSAM
 
@@ -113,6 +114,8 @@ class BasicTrainer:
                 moo_algorithm = CAGrad()
             elif self.MOO_name == 'DB_MTL':
                 moo_algorithm = DB_MTL(self.task_num)
+            elif self.MOO_name == 'MGDA':
+                moo_algorithm = MGDA()
 
         adam_optimizer = self.make_adam_optimizer()
         sam_optimizer = self.make_sam_optimizer() 

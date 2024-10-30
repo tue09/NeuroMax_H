@@ -60,3 +60,6 @@ python main.py \
     --task_num 5 \
     --coef_ 0.3
 
+
+chmod +x bash4.sh
+./bash4.sh

@@ -18,9 +18,10 @@ class FASTopic(nn.Module):
                  DT_alpha: float=3.0,
                  TW_alpha: float=2.0,
                  weight_loss_OT=100.0, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000,
+                 coef_=0.5,
                 ):
         super().__init__()
-
+        self.coef_ = coef_
         self.DT_alpha = DT_alpha
         self.TW_alpha = TW_alpha
         self.theta_temp = theta_temp
@@ -114,17 +115,26 @@ class FASTopic(nn.Module):
 
         loss_DSR = -(train_bow * (recon + self.epsilon).log()).sum(axis=1).mean()
 
-        if self.is_OT:
+        #if self.is_OT:
+        if self.weight_loss_OT != 0:
             loss_OT = self.get_loss_OT(input, indices)
         else:
             loss_OT = 0.0
 
         loss = loss_DSR + loss_ETP + loss_OT
 
-        rst_dict = {
+        '''rst_dict = {
             'loss': loss,
             'loss_OT': loss_OT
-        }
+        }'''
+
+        if self.weight_loss_OT == 0:
+            rst_dict = {
+                'loss': loss,
+                'loss_1': loss_DSR + loss_ETP + self.coef_ * loss_OT,
+                'loss_2': loss_DSR + self.coef_ * loss_ETP + loss_OT,
+                'loss_3': self.coef_ * loss_DSR + loss_ETP + loss_OT
+            }
 
         return rst_dict
 

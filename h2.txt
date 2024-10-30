@@ -24,5 +24,6 @@ python main.py \
     --epochs 150 \
     --use_MOO 1 \
     --MOO_name PCGrad \
-    --task_num 5
+    --task_num 5 \
+    --coef_ 0.5
 

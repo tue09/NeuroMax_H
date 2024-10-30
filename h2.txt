@@ -1,5 +1,5 @@
 python main.py \
-    --dataset GoogleNews \
+    --dataset 20NG \
     --model NeuroMax \
     --num_topics 50 \
     --num_groups 20 \
@@ -25,5 +25,5 @@ python main.py \
     --use_MOO 1 \
     --MOO_name PCGrad \
     --task_num 5 \
-    --coef_ 0.5
+    --coef_ 0.3
 

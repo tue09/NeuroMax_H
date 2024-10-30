@@ -31,7 +31,7 @@ def add_model_argument(parser):
     parser.add_argument('--weight_GR', type=float, default=1.)
     parser.add_argument('--alpha_ECR', type=float, default=20.)
     parser.add_argument('--alpha_GR', type=float, default=5.)
-    parser.add_argument('--weight_OT', default=0, type=float, default=100.)
+    parser.add_argument('--weight_OT', default=0, type=float)
     parser.add_argument('--weight_InfoNCE', type=float, default=50.)
     parser.add_argument('--beta_temp', type=float, default=0.2)
     parser.add_argument('--render', type=int, default=0)

@@ -31,9 +31,9 @@ python main.py \
 
 
 python main.py \
-    --dataset YahooAnswers \
+    --dataset 20NG \
     --model FASTopic \
-    --num_topics 100 \
+    --num_topics 50 \
     --num_groups 20 \
     --beta_temp 0.2 \
     --device cuda \
@@ -51,7 +51,7 @@ python main.py \
     --use_decompose 1 \
     --decompose_name Gram_Schmidt \
     --dropout 0.2 \
-    --seed 0 \
+    --seed 1113 \
     --lr 0.0022 \
     --epoch_threshold -1 \
     --epochs 15 \

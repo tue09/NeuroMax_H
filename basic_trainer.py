@@ -119,7 +119,7 @@ class BasicTrainer:
             elif self.MOO_name == 'MGDA':
                 moo_algorithm = MGDA()
             elif self.MOO_name == 'ExcessMTL':
-                moo_algorithm = ExcessMTL()
+                moo_algorithm = ExcessMTL(self.task_num)
             elif self.MOO_name == 'FairGrad':
                 moo_algorithm = FairGrad()
 

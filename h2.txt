@@ -31,7 +31,7 @@ python main.py \
 
 
 python main.py \
-    --dataset 20NG \
+    --dataset AGNews \
     --model FASTopic \
     --num_topics 50 \
     --num_groups 20 \
@@ -51,12 +51,12 @@ python main.py \
     --use_decompose 1 \
     --decompose_name Gram_Schmidt \
     --dropout 0.2 \
-    --seed 1113 \
+    --seed 111 \
     --lr 0.0022 \
     --epoch_threshold -1 \
     --epochs 15 \
-    --use_MOO 0 \
-    --MOO_name PCGrad \
+    --use_MOO 1 \
+    --MOO_name ExcessMTL \
     --task_num 5 \
     --coef_ 0.3
 

@@ -255,8 +255,8 @@ class NeuroMax(nn.Module):
                 #'loss_OT': loss_OT,
                 'loss_1': loss_TM + loss_ECR + loss_GR + self.coef_ * loss_InfoNCE,
                 'loss_2': loss_TM + loss_ECR + self.coef_ * loss_GR + loss_InfoNCE,
-                'loss_3': loss_TM + self.coef_ *loss_ECR + loss_GR + loss_InfoNCE,
-                'loss_4': self.coef_ * loss_TM + loss_ECR + loss_GR + loss_InfoNCE,
+                'loss_3': loss_TM + self.coef_ * loss_ECR + loss_GR + loss_InfoNCE,
+                'loss_4': self.coef_ * loss_TM + loss_ECR + loss_GR + loss_InfoNCE
             }
         else:
             rst_dict = {
@@ -266,7 +266,7 @@ class NeuroMax(nn.Module):
                 'loss_2': loss_TM + loss_ECR + loss_GR + self.coef_ * loss_InfoNCE + loss_OT,
                 'loss_3': loss_TM + loss_ECR + self.coef_ * loss_GR + loss_InfoNCE + loss_OT,
                 'loss_4': loss_TM + self.coef_ * loss_ECR + loss_GR + loss_InfoNCE + loss_OT,
-                'loss_5': self.coef_ * loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_OT,
+                'loss_5': self.coef_ * loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_OT
             }
 
 

@@ -10,10 +10,12 @@ import scipy
 
 from Decomposer.Gram_Schmidt import Gram_Schmidt
 from Decomposer.SVD import SVD
+from MOO.MGDA import MGDA
 from MOO.CAGrad import CAGrad
 from MOO.PCGrad import PCGrad
 from MOO.DB_MTL import DB_MTL
-from MOO.MGDA import MGDA
+from MOO.ExcessMTL import ExcessMTL
+from MOO.FairGrad import FairGrad
 from SAM_function.DREAM import DREAM
 from SAM_function.FSAM import FSAM
 
@@ -116,6 +118,10 @@ class BasicTrainer:
                 moo_algorithm = DB_MTL(self.task_num)
             elif self.MOO_name == 'MGDA':
                 moo_algorithm = MGDA()
+            elif self.MOO_name == 'ExcessMTL':
+                moo_algorithm = ExcessMTL()
+            elif self.MOO_name == 'FairGrad':
+                moo_algorithm = FairGrad()
 
         adam_optimizer = self.make_adam_optimizer()
         sam_optimizer = self.make_sam_optimizer() 

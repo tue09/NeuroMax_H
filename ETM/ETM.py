@@ -15,8 +15,9 @@ class ETM(nn.Module):
     '''
     def __init__(self, vocab_size, embed_size=200, num_topics=50, num_groups=10, en_units=800, dropout=0., 
                     cluster_distribution=None, cluster_mean=None, cluster_label=None, weight_OT=1, is_OT=False,
-                    pretrained_WE=None, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000, train_WE=False, theta_train=False):
+                    pretrained_WE=None, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000, train_WE=False, theta_train=False, coef_=0.5):
         super().__init__()
+        self.coef_ = coef_
         self.is_OT = is_OT
         if pretrained_WE is not None:
             self.word_embeddings = nn.Parameter(torch.from_numpy(pretrained_WE).float())
@@ -109,18 +110,26 @@ class ETM(nn.Module):
         recon_input = torch.matmul(theta, beta)
 
         loss_OT = 0
-        if self.is_OT:
-             loss_OT = self.get_loss_OT(input, indices)
+        #if self.is_OT:
+        if self.weight_loss_OT != 0:
+            loss_OT = self.get_loss_OT(input, indices)
         else:
-             loss_OT = 0.0
+            loss_OT = 0.0
 
         loss = self.loss_function(bow, recon_input, mu, logvar, avg_loss)
         loss += loss_OT
 
-        rst_dict = {
-            'loss': loss,
-            'loss_OT': loss_OT
-        }
+        if self.weight_loss_OT != 0:
+            rst_dict = {
+                'loss': loss,
+                'loss_1': loss + self.coef_ * loss_OT,
+                'loss_2': self.coef_ * loss + loss_OT
+            }
+        else:
+            rst_dict = {
+                'loss': loss,
+                'loss_1': loss
+            }
         return rst_dict
 
     def loss_function(self, bow, recon_input, mu, logvar, avg_loss=True):

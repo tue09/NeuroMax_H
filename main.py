@@ -104,7 +104,8 @@ if __name__ == "__main__":
                         weight_loss_ECR=args.weight_ECR,
                         alpha_ECR=args.alpha_ECR,
                         weight_OT=args.weight_OT,
-                        beta_temp=args.beta_temp)
+                        beta_temp=args.beta_temp,
+                        coef_=args.coef_)
     elif args.model == 'ETM':
         model = ETM(vocab_size=dataset.vocab_size,
                         num_topics=args.num_topics,
@@ -113,7 +114,8 @@ if __name__ == "__main__":
                         cluster_mean=cluster_mean,
                         cluster_label=cluster_label,
                         pretrained_WE=pretrainWE if args.use_pretrainWE else None,
-                        weight_OT=args.weight_OT
+                        weight_OT=args.weight_OT,
+                        coef_=args.coef_
                         )
 
     

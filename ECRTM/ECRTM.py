@@ -14,9 +14,9 @@ class ECRTM(nn.Module):
     '''
     def __init__(self, vocab_size, num_topics=50, en_units=200, dropout=0., pretrained_WE=None, embed_size=200, is_OT=False,
                     cluster_distribution=None, cluster_mean=None, cluster_label=None, sinkhorn_alpha = 20.0, weight_OT=100.0,
-                    beta_temp=0.2, weight_loss_ECR=250.0, alpha_ECR=20.0, sinkhorn_max_iter=1000):
+                    beta_temp=0.2, weight_loss_ECR=250.0, alpha_ECR=20.0, sinkhorn_max_iter=1000, coef_=0.5):
         super().__init__()
-
+        self.coef_ = coef_
         self.num_topics = num_topics
         self.beta_temp = beta_temp
         self.weight_OT = weight_OT
@@ -156,7 +156,8 @@ class ECRTM(nn.Module):
 
         loss_ECR = self.get_loss_ECR()
 
-        if self.is_OT:
+        #if self.is_OT:
+        if self.weight_loss_OT != 0:
             loss_OT = self.get_loss_OT(input, indices)
         else:
             loss_OT = 0.0
@@ -164,12 +165,19 @@ class ECRTM(nn.Module):
         #loss = loss_TM + loss_ECR + loss_OT
         loss = loss_TM + loss_ECR
 
-        rst_dict = {
-            'loss': loss,
-            'loss_TM': loss_TM,
-            'loss_ECR': loss_ECR,
-            #'loss_OT': loss_OT
-        }
+        if self.weight_loss_OT != 0:
+            rst_dict = {
+                'loss': loss,
+                'loss_1': loss_TM + loss_ECR + self.coef_ * loss_OT,
+                'loss_2': loss_TM + self.coef_ * loss_ECR + loss_OT,
+                'loss_3': self.coef_ * loss_TM + loss_ECR + loss_OT
+            }
+        else:
+            rst_dict = {
+                'loss': loss,
+                'loss_1': loss_TM + self.coef_ * loss_ECR,
+                'loss_2': self.coef_ * loss_TM + loss_ECR,
+            }
 
         return rst_dict
 

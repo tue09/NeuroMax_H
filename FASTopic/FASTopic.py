@@ -145,9 +145,9 @@ class FASTopic(nn.Module):
         if self.weight_loss_OT != 0:
             rst_dict = {
                 'loss': loss,
-                'loss_1': self.coef_ * loss_DSR + self.coef_ * loss_ETP + loss_OT,
-                'loss_2': self.coef_ * loss_DSR + loss_ETP + self.coef_ * loss_OT,
-                'loss_3': loss_DSR + self.coef_ * loss_ETP + self.coef_ * loss_OT
+                'loss_1': loss_DSR + loss_ETP + self.coef_ * loss_OT,
+                'loss_2': loss_DSR + self.coef_ * loss_ETP + loss_OT,
+                'loss_3': self.coef_ * loss_DSR + loss_ETP + loss_OT
             }
         else:
             rst_dict = {

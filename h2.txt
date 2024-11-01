@@ -62,8 +62,8 @@ python main.py \
 
 [FairGrad | PCGrad | CAGrad | DB_MTL | MGDA]
 
-chmod +x bash4.sh
-./bash4.sh
+chmod +x bash1.sh
+./bash1.sh
 
 export CUDA_VISIBLE_DEVICES=1
 echo $CUDA_VISIBLE_DEVICES

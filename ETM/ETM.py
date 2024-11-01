@@ -111,7 +111,7 @@ class ETM(nn.Module):
 
         loss_OT = 0
         #if self.is_OT:
-        if self.weight_loss_OT != 0:
+        if self.weight_OT != 0:
             loss_OT = self.get_loss_OT(input, indices)
         else:
             loss_OT = 0.0
@@ -119,7 +119,7 @@ class ETM(nn.Module):
         loss = self.loss_function(bow, recon_input, mu, logvar, avg_loss)
         loss += loss_OT
 
-        if self.weight_loss_OT != 0:
+        if self.weight_OT != 0:
             rst_dict = {
                 'loss': loss,
                 'loss_1': loss + self.coef_ * loss_OT,

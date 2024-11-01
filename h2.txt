@@ -31,35 +31,36 @@ python main.py \
 
 
 python main.py \
-    --dataset AGNews \
-    --model FASTopic \
-    --num_topics 50 \
     --num_groups 20 \
-    --beta_temp 0.2 \
     --device cuda \
     --lr_scheduler StepLR \
     --batch_size 128 \
     --lr_step_size 125 \
     --use_pretrainWE \
+    --use_SAM 0 \
+    --task_num 5 \
+    --use_decompose 1 \
+    --decompose_name Gram_Schmidt \
+    --epoch_threshold -1 \
     --weight_ECR 40 \
     --alpha_ECR 20 \
     --weight_GR 1 \
     --alpha_GR 5 \
     --weight_InfoNCE 50 \
-    --weight_OT 0 \
-    --use_SAM 0 \
-    --use_decompose 1 \
-    --decompose_name Gram_Schmidt \
+    --weight_OT 0.5 \
+    --beta_temp 0.2 \
+    --dataset AGNews \
+    --model ECRTM \
+    --num_topics 50 \
     --dropout 0.2 \
     --seed 111 \
     --lr 0.0022 \
-    --epoch_threshold -1 \
     --epochs 15 \
     --use_MOO 1 \
     --MOO_name FairGrad \
-    --task_num 5 \
     --coef_ 0.3
 
+[FairGrad | PCGrad | CAGrad | DB_MTL | MGDA]
 
 chmod +x bash4.sh
 ./bash4.sh

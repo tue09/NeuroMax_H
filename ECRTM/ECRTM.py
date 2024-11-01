@@ -157,7 +157,7 @@ class ECRTM(nn.Module):
         loss_ECR = self.get_loss_ECR()
 
         #if self.is_OT:
-        if self.weight_loss_OT != 0:
+        if self.weight_OT != 0:
             loss_OT = self.get_loss_OT(input, indices)
         else:
             loss_OT = 0.0
@@ -165,7 +165,7 @@ class ECRTM(nn.Module):
         #loss = loss_TM + loss_ECR + loss_OT
         loss = loss_TM + loss_ECR
 
-        if self.weight_loss_OT != 0:
+        if self.weight_OT != 0:
             rst_dict = {
                 'loss': loss,
                 'loss_1': loss_TM + loss_ECR + self.coef_ * loss_OT,

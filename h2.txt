@@ -47,7 +47,7 @@ python main.py \
     --weight_GR 1 \
     --alpha_GR 5 \
     --weight_InfoNCE 50 \
-    --weight_OT 0.5 \
+    --weight_OT 0.0 \
     --beta_temp 0.2 \
     --dataset AGNews \
     --model ETM \
@@ -58,7 +58,7 @@ python main.py \
     --epochs 150 \
     --use_MOO 1 \
     --MOO_name FairGrad \
-    --coef_ 2.0
+    --coef_ 1.5
 
 [FairGrad | PCGrad | CAGrad | DB_MTL | MGDA]
 
@@ -68,3 +68,35 @@ chmod +x bash1.sh
 export CUDA_VISIBLE_DEVICES=1
 echo $CUDA_VISIBLE_DEVICES
 unset CUDA_VISIBLE_DEVICES
+
+
+python main.py \
+    --num_groups 20 \
+    --device cuda \
+    --lr_scheduler StepLR \
+    --batch_size 128 \
+    --lr_step_size 125 \
+    --use_pretrainWE \
+    --use_SAM 0 \
+    --SAM_name FSAM \
+    --task_num 5 \
+    --use_decompose 1 \
+    --decompose_name Gram_Schmidt \
+    --epoch_threshold -1 \
+    --weight_ECR 40 \
+    --alpha_ECR 20 \
+    --weight_GR 1 \
+    --alpha_GR 5 \
+    --weight_InfoNCE 50 \
+    --weight_CTR 0.0 \
+    --beta_temp 0.2 \
+    --dataset AGNews \
+    --model ETM \
+    --num_topics 100 \
+    --dropout 0.2 \
+    --seed 111 \
+    --lr 0.0022 \
+    --epochs 150 \
+    --use_MOO 1 \
+    --MOO_name PCGrad \
+    --coef_ 1.5

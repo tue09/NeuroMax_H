@@ -143,7 +143,6 @@ class ECRTM(nn.Module):
         loss_CTR = self.weight_CTR * self.CTR(theta, cd_batch, cost)  
         return loss_CTR
 
-
     def forward(self, indices, input, epoch_id=None):
         # input = input['data']
         bow = input[0]
@@ -181,8 +180,9 @@ class ECRTM(nn.Module):
         else:
             rst_dict = {
                 'loss': loss,
-                'loss_1': loss_TM + self.coef_ * loss_ECR,
-                'loss_2': self.coef_ * loss_TM + loss_ECR,
+                'loss_1': recon_loss + loss_KL + self.coef_ * loss_ECR,
+                'loss_2': recon_loss + self.coef_ * loss_KL + loss_ECR,
+                'loss_3': self.coef_ * recon_loss + loss_KL + loss_ECR,
             }
 
         return rst_dict

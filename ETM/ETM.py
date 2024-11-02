@@ -107,31 +107,38 @@ class ETM(nn.Module):
         bow = input[0]
         theta, mu, logvar = self.get_theta(bow)
         beta = self.get_beta()
-        recon_input = torch.matmul(theta, beta)
+        recon_x = torch.matmul(theta, beta)
 
-        loss_OT = 0
-        #if self.is_OT:
-        if self.weight_OT != 0:
-            loss_OT = self.get_loss_OT(input, indices)
-        else:
-            loss_OT = 0.0
+        loss = self.loss_function(bow, recon_x, mu, logvar, avg_loss)
+        return {'loss': loss}
+        # bow = input[0]
+        # theta, mu, logvar = self.get_theta(bow)
+        # beta = self.get_beta()
+        # recon_input = torch.matmul(theta, beta)
 
-        loss, recon_loss, KLD = self.loss_function(bow, recon_input, mu, logvar, avg_loss)
-        loss += loss_OT
+        # loss_OT = 0
+        # #if self.is_OT:
+        # if self.weight_OT != 0:
+        #     loss_OT = self.get_loss_OT(input, indices)
+        # else:
+        #     loss_OT = 0.0
 
-        if self.weight_OT != 0:
-            rst_dict = {
-                'loss': loss,
-                'loss_1': recon_loss + KLD + self.coef_ * loss_OT,
-                'loss_2': recon_loss + self.coef_ * KLD + loss_OT,
-                'loss_3': self.coef_ * recon_loss + KLD + loss_OT,
-            }
-        else:
-            rst_dict = {
-                'loss': loss,
-                'loss_1': loss
-            }
-        return rst_dict
+        # loss, recon_loss, KLD = self.loss_function(bow, recon_input, mu, logvar, avg_loss)
+        # loss += loss_OT
+
+        # if self.weight_OT != 0:
+        #     rst_dict = {
+        #         'loss': loss,
+        #         'loss_1': recon_loss + KLD + self.coef_ * loss_OT,
+        #         'loss_2': recon_loss + self.coef_ * KLD + loss_OT,
+        #         'loss_3': self.coef_ * recon_loss + KLD + loss_OT,
+        #     }
+        # else:
+        #     rst_dict = {
+        #         'loss': loss,
+        #         'loss_1': loss
+        #     }
+        # return rst_dict
 
     def loss_function(self, bow, recon_input, mu, logvar, avg_loss=True):
         recon_loss = -(bow * (recon_input + 1e-12).log()).sum(1)

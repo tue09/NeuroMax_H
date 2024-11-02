@@ -63,6 +63,7 @@ class BasicTrainer:
 
     def make_sam_optimizer(self,):
         optimizer = torch.optim.SGD
+        base_optimizer = optimizer
         if self.SAM_name == 'FSAM':
             optimizer = FSAM(
                 self.model.parameters(),
@@ -146,7 +147,8 @@ class BasicTrainer:
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
                 batch_loss = rst_dict['loss']
                 #batch_loss.backward()
-
+                adam_optimizer.zero_grad()
+                
                 # batch_data_tensor = torch.tensor(batch_data, dtype=torch.float32)
                 # theta = self.model.get_theta(batch_data_tensor)
                 if self.use_SAM == 0:
@@ -189,7 +191,7 @@ class BasicTrainer:
                     else:
                         batch_loss.backward()
                     adam_optimizer.step()
-                    adam_optimizer.zero_grad()
+                    #adam_optimizer.zero_grad()
                 else:
                     #if (batch_id + 1) % accumulation_steps == 0 or (batch_id + 1) == len(dataset_handler.train_dataloader):
                     if epoch_id > self.epoch_threshold:

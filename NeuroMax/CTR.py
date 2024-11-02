@@ -1,13 +1,14 @@
 import torch
 from torch import nn
 
-class OT(nn.Module):
-    def __init__(self, weight_loss_OT, sinkhorn_alpha, OT_max_iter=1000, stopThr=.5e-2):
+
+class CTR(nn.Module):
+    def __init__(self, weight_loss_CTR, sinkhorn_alpha, OT_max_iter=1000, stopThr=.5e-2):
         super().__init__()
 
         self.sinkhorn_alpha = sinkhorn_alpha
         self.OT_max_iter = OT_max_iter
-        self.weight_loss_OT = weight_loss_OT
+        self.weight_loss_CTR = weight_loss_CTR
         self.stopThr = stopThr
         self.epsilon = 1e-16
 
@@ -16,7 +17,7 @@ class OT(nn.Module):
         # b: B x V
         # M: K x V
 
-        if self.weight_loss_OT <= 1e-6:
+        if self.weight_loss_CTR <= 1e-6:
             return 0.0
 
         B, K = a.size()
@@ -54,5 +55,5 @@ class OT(nn.Module):
         transp = u.unsqueeze(2) * K_mat * v.unsqueeze(1)  # Shape: (B, K, V)
 
         # Compute the loss
-        loss_OT = torch.mean(torch.sum(transp * M, dim=(1, 2)))  # Scalar
-        return loss_OT
+        loss_CTR = torch.mean(torch.sum(transp * M, dim=(1, 2)))  # Scalar
+        return loss_CTR

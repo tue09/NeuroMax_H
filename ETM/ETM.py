@@ -2,7 +2,7 @@ import numpy as np
 import torch_kmeans
 import torch
 import torch.nn as nn
-from .OT import OT
+from NeuroMax.CTR import CTR
 import torch.nn.functional as F
 import logging
 import sentence_transformers
@@ -14,11 +14,10 @@ class ETM(nn.Module):
         Adji B. Dieng, Francisco J. R. Ruiz, David M. Blei.
     '''
     def __init__(self, vocab_size, embed_size=200, num_topics=50, num_groups=10, en_units=800, dropout=0., 
-                    cluster_distribution=None, cluster_mean=None, cluster_label=None, weight_OT=1, is_OT=False,
-                    pretrained_WE=None, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000, train_WE=False, theta_train=False, coef_=0.5):
+                    cluster_distribution=None, cluster_mean=None, cluster_label=None, weight_CTR=1, is_CTR=False,
+                    pretrained_WE=None, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000, train_WE=False):
         super().__init__()
-        self.coef_ = coef_
-        self.is_OT = is_OT
+        self.is_CTR = is_CTR
         if pretrained_WE is not None:
             self.word_embeddings = nn.Parameter(torch.from_numpy(pretrained_WE).float())
         else:
@@ -26,11 +25,8 @@ class ETM(nn.Module):
 
         self.word_embeddings.requires_grad = train_WE
 
-        #self.topic_embeddings = nn.Parameter(torch.randn((num_topics, self.word_embeddings.shape[1])))
-        self.topic_embeddings = torch.empty((num_topics, self.word_embeddings.shape[1]))
-        nn.init.trunc_normal_(self.topic_embeddings, std=0.1)
-        self.topic_embeddings = nn.Parameter(F.normalize(self.topic_embeddings))
-        self.theta_train = theta_train
+        self.topic_embeddings = nn.Parameter(torch.randn((num_topics, self.word_embeddings.shape[1])))
+
         self.encoder1 = nn.Sequential(
             nn.Linear(vocab_size, en_units),
             nn.ReLU(),
@@ -40,17 +36,17 @@ class ETM(nn.Module):
         )
 
         # # Thêm 
-        self.weight_OT = weight_OT
+        self.weight_CTR = weight_CTR
         self.num_topics = num_topics
         self.num_groups = num_groups
-        # self.is_OT = is_OT
+        # self.is_CTR = is_CTR
 
         self.mean_bn = nn.BatchNorm1d(num_topics)
         self.mean_bn.weight.requires_grad = False
         self.logvar_bn = nn.BatchNorm1d(num_topics)
         self.logvar_bn.weight.requires_grad = False
 
-        # Add OT
+        # Add CTR
         self.cluster_mean = nn.Parameter(torch.from_numpy(cluster_mean).float(), requires_grad=False)
         self.cluster_distribution = nn.Parameter(torch.from_numpy(cluster_distribution).float(), requires_grad=False)
         self.cluster_label = cluster_label
@@ -60,7 +56,7 @@ class ETM(nn.Module):
             self.cluster_label = self.cluster_label.to(device='cuda', dtype=torch.long)
         
         self.map_t2c = nn.Linear(self.word_embeddings.shape[1], self.cluster_mean.shape[1], bias=False)
-        self.OT = OT(weight_OT, sinkhorn_alpha, sinkhorn_max_iter)
+        self.CTR = CTR(weight_CTR, sinkhorn_alpha, sinkhorn_max_iter)
         # #
 
 
@@ -94,10 +90,23 @@ class ETM(nn.Module):
         mu, logvar = self.encode(norm_input)
         z = self.reparameterize(mu, logvar)
         theta = F.softmax(z, dim=-1)
-        if self.training or self.theta_train == True:
+        if self.training:
             return theta, mu, logvar
         else:
             return theta
+        
+    def get_theta_ctr(self, input):
+        norm_input = input / input.sum(1, keepdim=True)
+        with torch.no_grad():  # Prevent gradient computation
+            mu, logvar = self.encode(norm_input)
+            z = self.reparameterize(mu, logvar)
+            theta = F.softmax(z, dim=-1)
+            
+        if self.training:
+            return theta, mu, logvar
+        else:
+            return theta
+
 
     def get_beta(self):
         beta = F.softmax(torch.matmul(self.topic_embeddings, self.word_embeddings.T), dim=1)
@@ -107,39 +116,22 @@ class ETM(nn.Module):
         bow = input[0]
         theta, mu, logvar = self.get_theta(bow)
         beta = self.get_beta()
-        recon_x = torch.matmul(theta, beta)
+        recon_input = torch.matmul(theta, beta)
 
-        loss, recon_loss, KLD = self.loss_function(bow, recon_x, mu, logvar, avg_loss)
-        rst_dict = {'loss': loss,}
+        loss_CTR = 0
+        if self.is_CTR:
+             loss_CTR = self.get_loss_CTR(input, indices)
+        else:
+             loss_CTR = 0.0
+
+        loss = self.loss_function(bow, recon_input, mu, logvar, avg_loss)
+        loss += loss_CTR
+
+        rst_dict = {
+            'loss': loss,
+            'loss_CTR': loss_CTR
+        }
         return rst_dict
-        # bow = input[0]
-        # theta, mu, logvar = self.get_theta(bow)
-        # beta = self.get_beta()
-        # recon_input = torch.matmul(theta, beta)
-
-        # loss_OT = 0
-        # #if self.is_OT:
-        # if self.weight_OT != 0:
-        #     loss_OT = self.get_loss_OT(input, indices)
-        # else:
-        #     loss_OT = 0.0
-
-        # loss, recon_loss, KLD = self.loss_function(bow, recon_input, mu, logvar, avg_loss)
-        # loss += loss_OT
-
-        # if self.weight_OT != 0:
-        #     rst_dict = {
-        #         'loss': loss,
-        #         'loss_1': recon_loss + KLD + self.coef_ * loss_OT,
-        #         'loss_2': recon_loss + self.coef_ * KLD + loss_OT,
-        #         'loss_3': self.coef_ * recon_loss + KLD + loss_OT,
-        #     }
-        # else:
-        #     rst_dict = {
-        #         'loss': loss,
-        #         'loss_1': loss
-        #     }
-        # return rst_dict
 
     def loss_function(self, bow, recon_input, mu, logvar, avg_loss=True):
         recon_loss = -(bow * (recon_input + 1e-12).log()).sum(1)
@@ -147,12 +139,12 @@ class ETM(nn.Module):
         loss = (recon_loss + KLD)
         if avg_loss:
             loss = loss.mean()
-        return loss, recon_loss.mean(), KLD.mean()
+        return loss
         
-    def get_loss_OT(self, input, indices):
+    def get_loss_CTR(self, input, indices):
         bow = input[0]
-        theta, mu, logvar = self.get_theta(bow)
+        theta, mu, logvar = self.get_theta_ctr(bow)
         cd_batch = self.cluster_distribution[indices]  
         cost = self.pairwise_euclidean_distance(self.cluster_mean, self.map_t2c(self.topic_embeddings))  
-        loss_OT = self.weight_OT * self.OT(theta, cd_batch, cost)  
-        return loss_OT
+        loss_CTR = self.weight_CTR * self.CTR(theta, cd_batch, cost)  
+        return loss_CTR

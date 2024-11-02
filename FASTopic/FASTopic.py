@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 from ._ETP import ETP
 from ._model_utils import pairwise_euclidean_distance
-from .OT import OT
+from .CTR import CTR
 
 
 class FASTopic(nn.Module):
@@ -13,20 +13,19 @@ class FASTopic(nn.Module):
                  cluster_distribution=None,
                  cluster_mean=None,
                  cluster_label=None,
-                 is_OT=False,
+                 is_CTR=False,
                  theta_temp: float=1.0,
                  DT_alpha: float=3.0,
                  TW_alpha: float=2.0,
-                 weight_loss_OT=100.0, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000,
-                 coef_=0.5,
+                 weight_loss_CTR=100.0, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000,
                 ):
         super().__init__()
-        self.coef_ = coef_
+
         self.DT_alpha = DT_alpha
         self.TW_alpha = TW_alpha
         self.theta_temp = theta_temp
         self.num_topics = num_topics
-        self.is_OT = is_OT
+        self.is_CTR = is_CTR
         self.epsilon = 1e-12
         
         self.word_embeddings = nn.init.trunc_normal_(torch.empty(vocab_size, embed_size))
@@ -43,7 +42,7 @@ class FASTopic(nn.Module):
         self.TW_ETP = ETP(self.TW_alpha, init_b_dist=self.word_weights)
 
         #OT Distance between topic proportion and cluster proportion
-        self.weight_loss_OT = weight_loss_OT
+        self.weight_loss_CTR = weight_loss_CTR
         self.cluster_mean = nn.Parameter(torch.from_numpy(cluster_mean).float(), requires_grad=False)
         self.cluster_distribution = nn.Parameter(torch.from_numpy(cluster_distribution).float(), requires_grad=False)
         self.cluster_label = cluster_label
@@ -53,7 +52,7 @@ class FASTopic(nn.Module):
             self.cluster_label = self.cluster_label.to(device='cuda', dtype=torch.long)
         
         self.map_t2c = nn.Linear(self.word_embeddings.shape[1], self.cluster_mean.shape[1], bias=False)
-        self.OT = OT(weight_loss_OT, sinkhorn_alpha, sinkhorn_max_iter)
+        self.CTR = CTR(weight_loss_CTR, sinkhorn_alpha, sinkhorn_max_iter)
 
     def get_transp_DT(self,
                       doc_embeddings,
@@ -89,14 +88,14 @@ class FASTopic(nn.Module):
 
         return theta
     
-    def get_loss_OT(self, input, indices):
+    def get_loss_CTR(self, input, indices):
         doc_embeddings = input[1]
         _, transp_DT = self.DT_ETP(doc_embeddings, self.topic_embeddings)
         theta = transp_DT * transp_DT.shape[0]
         cd_batch = self.cluster_distribution[indices]  
         cost = pairwise_euclidean_distance(self.cluster_mean, self.map_t2c(self.topic_embeddings))  
-        loss_OT = self.weight_loss_OT * self.OT(theta, cd_batch, cost)  
-        return loss_OT
+        loss_CTR = self.weight_loss_CTR * self.CTR(theta, cd_batch, cost)  
+        return loss_CTR
 
     def forward(self, indices, input, epoch_id=None):
         train_bow = input[0]
@@ -115,47 +114,17 @@ class FASTopic(nn.Module):
 
         loss_DSR = -(train_bow * (recon + self.epsilon).log()).sum(axis=1).mean()
 
-        #if self.is_OT:
-        if self.weight_loss_OT != 0:
-            loss_OT = self.get_loss_OT(input, indices)
+        if self.is_CTR:
+            loss_CTR = self.get_loss_CTR(input, indices)
         else:
-            loss_OT = 0.0
+            loss_CTR = 0.0
 
-        loss = loss_DSR + loss_ETP + loss_OT
+        loss = loss_DSR + loss_ETP + loss_CTR
 
-        '''rst_dict = {
+        rst_dict = {
             'loss': loss,
-            'loss_OT': loss_OT
-        }'''
-
-        '''if self.weight_loss_OT != 0:
-            rst_dict = {
-                'loss': loss,
-                'loss_1': loss_DSR + loss_ETP + self.coef_ * loss_OT,
-                'loss_2': loss_DSR + self.coef_ * loss_ETP + loss_OT,
-                'loss_3': self.coef_ * loss_DSR + loss_ETP + loss_OT
-            }
-        else:
-            rst_dict = {
-                'loss': loss,
-                'loss_1': loss_DSR + self.coef_ * loss_ETP,
-                'loss_2': self.coef_ * loss_DSR + loss_ETP
-            }'''
-        
-        if self.weight_loss_OT != 0:
-            rst_dict = {
-                'loss': loss,
-                'loss_1': loss_DSR + loss_ETP + self.coef_ * loss_OT,
-                'loss_2': loss_DSR + self.coef_ * loss_ETP + loss_OT,
-                'loss_3': self.coef_ * loss_DSR + loss_ETP + loss_OT
-            }
-        else:
-            rst_dict = {
-                'loss': loss,
-                'loss_1': loss_DSR + self.coef_ * loss_ETP,
-                'loss_2': self.coef_ * loss_DSR + loss_ETP
-            }
-
+            'loss_CTR': loss_CTR
+        }
 
         return rst_dict
 

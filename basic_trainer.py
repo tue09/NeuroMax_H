@@ -8,41 +8,24 @@ import logging
 import os
 import scipy
 
-from Decomposer.Gram_Schmidt import Gram_Schmidt
-from Decomposer.SVD import SVD
-from MOO.MGDA import MGDA
-from MOO.CAGrad import CAGrad
-from MOO.PCGrad import PCGrad
-from MOO.DB_MTL import DB_MTL
-from MOO.ExcessMTL import ExcessMTL
-from MOO.FairGrad import FairGrad
-from SAM_function.DREAM import DREAM
+from SAM_function.TRAM import TRAM
 from SAM_function.FSAM import FSAM
 
 class BasicTrainer:
-    def __init__(self, model, epoch_threshold = 150, task_num=3, model_name='NeuroMax', 
-                    use_decompose=1, decompose_name='Gram_Schmidt', use_MOO=1, MOO_name='PCGrad',
-                    use_SAM=1, SAM_name='DREAM', epochs=200, learning_rate=0.002, batch_size=200, 
-                    lr_scheduler=None, lr_step_size=125, log_interval=5, 
-                    rho = 0.005, device='cuda', sigma=0.1, lmbda=0.9, acc_step=8):
+    def __init__(self, model, epoch_threshold = 150, model_name='NeuroMax', use_SAM=1, SAM_name='TRAM', epochs=200, learning_rate=0.002, batch_size=200, lr_scheduler=None, lr_step_size=125, log_interval=5, 
+                    rho = 0.005, threshold=10, device='cuda', sigma=0.1, lmbda=0.9, acc_step=8):
         self.model = model
         self.epoch_threshold = epoch_threshold
         self.model_name = model_name
-        self.task_num = task_num
-
-        self.use_decompose = use_decompose
-        self.decompose_name = decompose_name
-        self.use_MOO = use_MOO
-        self.MOO_name = MOO_name
-        self.use_SAM = use_SAM
         self.SAM_name = SAM_name
-
         self.epochs = epochs
         self.learning_rate = learning_rate
         self.batch_size = batch_size
         self.lr_scheduler = lr_scheduler
         self.lr_step_size = lr_step_size
         self.log_interval = log_interval
+        self.threshold = threshold
+        self.use_SAM = use_SAM
 
         self.rho = rho 
         self.device = device
@@ -50,6 +33,16 @@ class BasicTrainer:
         self.lmbda = lmbda
         self.acc_step = acc_step
         self.logger = logging.getLogger('main')
+
+
+
+        # Thêm ctr_loss
+        # self.cluster_distribution = cluster_distribution 
+        # self.cluster_mean = cluster_mean 
+        # self.topic_embeddings = topic_embeddings
+        # self.pairwise_euclidean_distance
+
+        # self.CTR = CTR(weight_loss_CTR, sinkhorn_alpha, OT_max_iter=sinkhorn_max_iter)
 
     def make_adam_optimizer(self,):
         args_dict = {
@@ -62,8 +55,7 @@ class BasicTrainer:
     
 
     def make_sam_optimizer(self,):
-        optimizer = torch.optim.SGD
-        base_optimizer = optimizer
+        base_optimizer = torch.optim.SGD
         if self.SAM_name == 'FSAM':
             optimizer = FSAM(
                 self.model.parameters(),
@@ -71,8 +63,8 @@ class BasicTrainer:
                 lr=self.learning_rate,
                 sigma=self.sigma, lmbda=self.lmbda
                 )
-        elif self.SAM_name == 'DREAM':
-            optimizer = DREAM(
+        elif self.SAM_name == 'TRAM':
+            optimizer = TRAM(
                 self.model.parameters(),
                 base_optimizer, device=self.device,
                 lr=self.learning_rate,
@@ -103,27 +95,6 @@ class BasicTrainer:
 
     def train(self, dataset_handler, verbose=False):
         accumulation_steps = self.acc_step
-        
-        if self.use_decompose == 1:
-            if self.decompose_name  == 'Gram_Schmidt':
-                grad_decomposer = Gram_Schmidt(model=self.model, device='cuda', buffer_size=self.task_num)
-            elif self.decompose_name == 'SVD':
-                grad_decomposer = SVD(model=self.model, device='cuda', buffer_size=self.task_num)
-        
-        if self.use_MOO == 1:
-            if self.MOO_name == 'PCGrad':
-                moo_algorithm = PCGrad()
-            elif self.MOO_name == 'CAGrad':
-                moo_algorithm = CAGrad()
-            elif self.MOO_name == 'DB_MTL':
-                moo_algorithm = DB_MTL(self.task_num)
-            elif self.MOO_name == 'MGDA':
-                moo_algorithm = MGDA()
-            elif self.MOO_name == 'ExcessMTL':
-                moo_algorithm = ExcessMTL(self.task_num)
-            elif self.MOO_name == 'FairGrad':
-                moo_algorithm = FairGrad()
-
         adam_optimizer = self.make_adam_optimizer()
         sam_optimizer = self.make_sam_optimizer() 
 
@@ -139,73 +110,38 @@ class BasicTrainer:
         for epoch_id, epoch in enumerate(tqdm(range(1, self.epochs + 1))):
             self.model.train()
             loss_rst_dict = defaultdict(float)
+            # if epoch > self.threshold: is_CTR = True
+            # else: is_CTR = False
 
             for batch_id, batch in enumerate(dataset_handler.train_dataloader): 
                 *inputs, indices = batch
                 batch_data = inputs
-                # rst_dict = self.model(indices, is_OT, batch_data, epoch_id=epoch)
+                # rst_dict = self.model(indices, is_CTR, batch_data, epoch_id=epoch)
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
                 batch_loss = rst_dict['loss']
-                #batch_loss.backward()
-                
+                batch_loss.backward()
+
                 # batch_data_tensor = torch.tensor(batch_data, dtype=torch.float32)
                 # theta = self.model.get_theta(batch_data_tensor)
+
                 if self.use_SAM == 0:
-                    if epoch > self.epoch_threshold:
-                        #loss_array = [value for key, value in rst_dict.items() if key != 'loss']
-                        loss_array = [value for key, value in rst_dict.items() if key != 'loss' and value.requires_grad]
-                        grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
-                        #adjusted_grad = sum(grad_array)
-                        if self.use_MOO:
-                            adjusted_grad, alpha = moo_algorithm.apply(grad_array)
-                        else:
-                            total_grad = torch.stack(grad_array, dim=0)  # Shape: (N, x)
-                            grad_decomposer.update_grad_buffer(total_grad)
-                            components = grad_decomposer.decompose_grad(total_grad)
-                            adjusted_grad = sum(components)
-
-
-                        #print(f"grad shape = {[grad_.shape for grad_ in grad_array]}")
-                        #total_grad = torch.stack(grad_array, dim=0)  # Shape: (N, x)
-
-                        #grad_decomposer.update_grad_buffer(total_grad)
-                        #components = grad_decomposer.decompose_grad(total_grad)
-
-                        #total_grad = grad_decomposer._get_total_grad(batch_loss)
-                        #grad_decomposer.update_grad_buffer(total_grad)
-                        #components = grad_decomposer.decompose_grad(total_grad)
-                        #adjusted_grad = sum(components)
-                        #print(f"components shape = {len(components[1])}")
-                        #print(f"adjust grad shape = {adjusted_grad.shape}")
-                        #adjusted_grad, alpha = moo_algorithm.apply(components)
-                        #adjusted_grad, alpha = moo_algorithm.apply(grad_decomposer.grad_buffer)
-                        
-                        grad_pointer = 0
-                        for p in self.model.parameters():
-                            if p.requires_grad:
-                                num_params = p.numel()
-                                grad_slice = adjusted_grad[grad_pointer:grad_pointer + num_params]
-                                p.grad = grad_slice.view_as(p).clone()
-                                grad_pointer += num_params
-                    else:
-                        batch_loss.backward()
                     adam_optimizer.step()
                     adam_optimizer.zero_grad()
                 else:
                     #if (batch_id + 1) % accumulation_steps == 0 or (batch_id + 1) == len(dataset_handler.train_dataloader):
                     if epoch_id > self.epoch_threshold:
                         #theta, _ = self.model.encode(batch_data[0].to('cuda'))
-                        #loss_OT_ = self.model.get_loss_OT(theta, indices)
+                        #loss_ctr_ = self.model.get_loss_CTR(theta, indices)
                         
-                        if self.SAM_name == 'DREAM':
-                            self.model.is_OT = False
-                            loss_OT_ = self.model.get_loss_OT(batch_data, indices)
-                            sam_optimizer.first_step(loss_OT_,
+                        if self.SAM_name == 'TRAM':
+                            self.model.is_CTR = False
+                            loss_ctr_ = self.model.get_loss_CTR(batch_data, indices)
+                            sam_optimizer.first_step(loss_ctr_,
                                                     zero_grad=True)
                         else:
                             sam_optimizer.first_step(zero_grad=True)
 
-                        # rst_dict_adv = self.model(indices, is_OT, batch_data, epoch_id=epoch)
+                        # rst_dict_adv = self.model(indices, is_CTR, batch_data, epoch_id=epoch)
                         rst_dict_adv = self.model(indices, batch_data, epoch_id=epoch)
 
                         batch_loss_adv = rst_dict_adv['loss']
@@ -214,8 +150,8 @@ class BasicTrainer:
                         sam_optimizer.second_step(zero_grad=True)
                     
                     else:
-                        if self.SAM_name == 'DREAM':
-                            self.model.is_OT = True
+                        if self.SAM_name == 'TRAM':
+                            self.model.is_CTR = True
                         adam_optimizer.step()
                         adam_optimizer.zero_grad()
                     

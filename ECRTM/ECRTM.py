@@ -14,8 +14,9 @@ class ECRTM(nn.Module):
     '''
     def __init__(self, vocab_size, num_topics=50, en_units=200, dropout=0., pretrained_WE=None, embed_size=200, is_CTR=False,
                     cluster_distribution=None, cluster_mean=None, cluster_label=None, sinkhorn_alpha = 20.0, weight_CTR=100.0,
-                    beta_temp=0.2, weight_loss_ECR=250.0, alpha_ECR=20.0, sinkhorn_max_iter=1000):
+                    beta_temp=0.2, weight_loss_ECR=250.0, alpha_ECR=20.0, sinkhorn_max_iter=1000, coef_=0.5):
         super().__init__()
+        self.coef_ = coef_
 
         self.num_topics = num_topics
         self.beta_temp = beta_temp

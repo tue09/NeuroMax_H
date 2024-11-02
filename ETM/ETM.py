@@ -110,7 +110,8 @@ class ETM(nn.Module):
         recon_x = torch.matmul(theta, beta)
 
         loss = self.loss_function(bow, recon_x, mu, logvar, avg_loss)
-        return {'loss': loss}
+        rst_dict = {'loss': loss,}
+        return rst_dict
         # bow = input[0]
         # theta, mu, logvar = self.get_theta(bow)
         # beta = self.get_beta()

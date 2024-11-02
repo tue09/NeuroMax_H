@@ -24,7 +24,7 @@ python main.py \
     --epoch_threshold -1 \
     --epochs 150 \
     --use_MOO 0 \
-    --MOO_name PCGrad \
+    --MOO_name FairGrad \
     --task_num 5 \
     --coef_ 0.3
 
@@ -57,8 +57,8 @@ python main.py \
     --lr 0.0022 \
     --epochs 150 \
     --use_MOO 1 \
-    --MOO_name PCGrad \
-    --coef_ 0.9
+    --MOO_name FairGrad \
+    --coef_ 2.0
 
 [FairGrad | PCGrad | CAGrad | DB_MTL | MGDA]
 

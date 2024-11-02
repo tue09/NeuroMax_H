@@ -146,79 +146,81 @@ class BasicTrainer:
                 # rst_dict = self.model(indices, is_OT, batch_data, epoch_id=epoch)
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
                 batch_loss = rst_dict['loss']
-                #batch_loss.backward()
                 adam_optimizer.zero_grad()
+                batch_loss.backward()
+                adam_optimizer.step()
+                # #batch_loss.backward()
                 
-                # batch_data_tensor = torch.tensor(batch_data, dtype=torch.float32)
-                # theta = self.model.get_theta(batch_data_tensor)
-                if self.use_SAM == 0:
-                    if epoch > self.epoch_threshold:
-                        #loss_array = [value for key, value in rst_dict.items() if key != 'loss']
-                        loss_array = [value for key, value in rst_dict.items() if key != 'loss' and value.requires_grad]
-                        grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
-                        #adjusted_grad = sum(grad_array)
-                        if self.use_MOO:
-                            adjusted_grad, alpha = moo_algorithm.apply(grad_array)
-                        else:
-                            total_grad = torch.stack(grad_array, dim=0)  # Shape: (N, x)
-                            grad_decomposer.update_grad_buffer(total_grad)
-                            components = grad_decomposer.decompose_grad(total_grad)
-                            adjusted_grad = sum(components)
+                # # batch_data_tensor = torch.tensor(batch_data, dtype=torch.float32)
+                # # theta = self.model.get_theta(batch_data_tensor)
+                # if self.use_SAM == 0:
+                #     if epoch > self.epoch_threshold:
+                #         #loss_array = [value for key, value in rst_dict.items() if key != 'loss']
+                #         loss_array = [value for key, value in rst_dict.items() if key != 'loss' and value.requires_grad]
+                #         grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
+                #         #adjusted_grad = sum(grad_array)
+                #         if self.use_MOO:
+                #             adjusted_grad, alpha = moo_algorithm.apply(grad_array)
+                #         else:
+                #             total_grad = torch.stack(grad_array, dim=0)  # Shape: (N, x)
+                #             grad_decomposer.update_grad_buffer(total_grad)
+                #             components = grad_decomposer.decompose_grad(total_grad)
+                #             adjusted_grad = sum(components)
 
 
-                        #print(f"grad shape = {[grad_.shape for grad_ in grad_array]}")
-                        #total_grad = torch.stack(grad_array, dim=0)  # Shape: (N, x)
+                #         #print(f"grad shape = {[grad_.shape for grad_ in grad_array]}")
+                #         #total_grad = torch.stack(grad_array, dim=0)  # Shape: (N, x)
 
-                        #grad_decomposer.update_grad_buffer(total_grad)
-                        #components = grad_decomposer.decompose_grad(total_grad)
+                #         #grad_decomposer.update_grad_buffer(total_grad)
+                #         #components = grad_decomposer.decompose_grad(total_grad)
 
-                        #total_grad = grad_decomposer._get_total_grad(batch_loss)
-                        #grad_decomposer.update_grad_buffer(total_grad)
-                        #components = grad_decomposer.decompose_grad(total_grad)
-                        #adjusted_grad = sum(components)
-                        #print(f"components shape = {len(components[1])}")
-                        #print(f"adjust grad shape = {adjusted_grad.shape}")
-                        #adjusted_grad, alpha = moo_algorithm.apply(components)
-                        #adjusted_grad, alpha = moo_algorithm.apply(grad_decomposer.grad_buffer)
+                #         #total_grad = grad_decomposer._get_total_grad(batch_loss)
+                #         #grad_decomposer.update_grad_buffer(total_grad)
+                #         #components = grad_decomposer.decompose_grad(total_grad)
+                #         #adjusted_grad = sum(components)
+                #         #print(f"components shape = {len(components[1])}")
+                #         #print(f"adjust grad shape = {adjusted_grad.shape}")
+                #         #adjusted_grad, alpha = moo_algorithm.apply(components)
+                #         #adjusted_grad, alpha = moo_algorithm.apply(grad_decomposer.grad_buffer)
                         
-                        grad_pointer = 0
-                        for p in self.model.parameters():
-                            if p.requires_grad:
-                                num_params = p.numel()
-                                grad_slice = adjusted_grad[grad_pointer:grad_pointer + num_params]
-                                p.grad = grad_slice.view_as(p).clone()
-                                grad_pointer += num_params
-                    else:
-                        batch_loss.backward()
-                    adam_optimizer.step()
-                    #adam_optimizer.zero_grad()
-                else:
-                    #if (batch_id + 1) % accumulation_steps == 0 or (batch_id + 1) == len(dataset_handler.train_dataloader):
-                    if epoch_id > self.epoch_threshold:
-                        #theta, _ = self.model.encode(batch_data[0].to('cuda'))
-                        #loss_OT_ = self.model.get_loss_OT(theta, indices)
+                #         grad_pointer = 0
+                #         for p in self.model.parameters():
+                #             if p.requires_grad:
+                #                 num_params = p.numel()
+                #                 grad_slice = adjusted_grad[grad_pointer:grad_pointer + num_params]
+                #                 p.grad = grad_slice.view_as(p).clone()
+                #                 grad_pointer += num_params
+                #     else:
+                #         batch_loss.backward()
+                #     adam_optimizer.step()
+                #     adam_optimizer.zero_grad()
+                # else:
+                #     #if (batch_id + 1) % accumulation_steps == 0 or (batch_id + 1) == len(dataset_handler.train_dataloader):
+                #     if epoch_id > self.epoch_threshold:
+                #         #theta, _ = self.model.encode(batch_data[0].to('cuda'))
+                #         #loss_OT_ = self.model.get_loss_OT(theta, indices)
                         
-                        if self.SAM_name == 'DREAM':
-                            self.model.is_OT = False
-                            loss_OT_ = self.model.get_loss_OT(batch_data, indices)
-                            sam_optimizer.first_step(loss_OT_,
-                                                    zero_grad=True)
-                        else:
-                            sam_optimizer.first_step(zero_grad=True)
+                #         if self.SAM_name == 'DREAM':
+                #             self.model.is_OT = False
+                #             loss_OT_ = self.model.get_loss_OT(batch_data, indices)
+                #             sam_optimizer.first_step(loss_OT_,
+                #                                     zero_grad=True)
+                #         else:
+                #             sam_optimizer.first_step(zero_grad=True)
 
-                        # rst_dict_adv = self.model(indices, is_OT, batch_data, epoch_id=epoch)
-                        rst_dict_adv = self.model(indices, batch_data, epoch_id=epoch)
+                #         # rst_dict_adv = self.model(indices, is_OT, batch_data, epoch_id=epoch)
+                #         rst_dict_adv = self.model(indices, batch_data, epoch_id=epoch)
 
-                        batch_loss_adv = rst_dict_adv['loss']
-                        batch_loss_adv.backward()
+                #         batch_loss_adv = rst_dict_adv['loss']
+                #         batch_loss_adv.backward()
 
-                        sam_optimizer.second_step(zero_grad=True)
+                #         sam_optimizer.second_step(zero_grad=True)
                     
-                    else:
-                        if self.SAM_name == 'DREAM':
-                            self.model.is_OT = True
-                        adam_optimizer.step()
-                        adam_optimizer.zero_grad()
+                #     else:
+                #         if self.SAM_name == 'DREAM':
+                #             self.model.is_OT = True
+                #         adam_optimizer.step()
+                #         adam_optimizer.zero_grad()
                     
 
                 for key in rst_dict:

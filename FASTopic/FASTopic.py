@@ -32,13 +32,10 @@ class FASTopic(nn.Module):
         self.word_embeddings = nn.init.trunc_normal_(torch.empty(vocab_size, embed_size))
         self.word_embeddings = nn.Parameter(F.normalize(self.word_embeddings))
 
-        if weight_loss_CTR == 0:
-            self.topic_embeddings = nn.Parameter(torch.randn((num_topics, self.word_embeddings.shape[1])))
-        else:
-            self.topic_embeddings = torch.empty((num_topics, self.word_embeddings.shape[1]))
-            nn.init.trunc_normal_(self.topic_embeddings, std=0.1)
-            self.topic_embeddings = nn.Parameter(F.normalize(self.topic_embeddings))
-
+        
+        self.topic_embeddings = torch.empty((self.num_topics, embed_size))
+        nn.init.trunc_normal_(self.topic_embeddings, std=0.1)
+        self.topic_embeddings = nn.Parameter(F.normalize(self.topic_embeddings))
 
         self.word_weights = nn.Parameter((torch.ones(vocab_size) / vocab_size).unsqueeze(1))
         self.topic_weights = nn.Parameter((torch.ones(self.num_topics) / self.num_topics).unsqueeze(1))

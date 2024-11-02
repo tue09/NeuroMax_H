@@ -50,14 +50,14 @@ python main.py \
     --weight_OT 0.5 \
     --beta_temp 0.2 \
     --dataset AGNews \
-    --model ECRTM \
+    --model ETM \
     --num_topics 100 \
     --dropout 0.2 \
     --seed 111 \
     --lr 0.0022 \
     --epochs 150 \
     --use_MOO 1 \
-    --MOO_name FairGrad \
+    --MOO_name PCGrad \
     --coef_ 0.9
 
 [FairGrad | PCGrad | CAGrad | DB_MTL | MGDA]

@@ -116,14 +116,15 @@ class ETM(nn.Module):
         else:
             loss_OT = 0.0
 
-        loss = self.loss_function(bow, recon_input, mu, logvar, avg_loss)
+        loss, recon_loss, KLD = self.loss_function(bow, recon_input, mu, logvar, avg_loss)
         loss += loss_OT
 
         if self.weight_OT != 0:
             rst_dict = {
                 'loss': loss,
-                'loss_1': loss + self.coef_ * loss_OT,
-                'loss_2': self.coef_ * loss + loss_OT
+                'loss_1': recon_loss + KLD + self.coef_ * loss_OT,
+                'loss_2': recon_loss + self.coef_ * KLD + loss_OT,
+                'loss_3': self.coef_ * recon_loss + KLD + loss_OT,
             }
         else:
             rst_dict = {
@@ -138,7 +139,7 @@ class ETM(nn.Module):
         loss = (recon_loss + KLD)
         if avg_loss:
             loss = loss.mean()
-        return loss
+        return loss, recon_loss, KLD
         
     def get_loss_OT(self, input, indices):
         bow = input[0]

@@ -26,7 +26,7 @@ class ETM(nn.Module):
 
         self.word_embeddings.requires_grad = train_WE
 
-        if self.weight_CTR == 0:
+        if weight_CTR == 0:
             self.topic_embeddings = nn.Parameter(torch.randn((num_topics, self.word_embeddings.shape[1])))
         else:
             self.topic_embeddings = torch.empty((num_topics, self.word_embeddings.shape[1]))

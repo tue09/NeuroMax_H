@@ -18,6 +18,9 @@ def add_model_argument(parser):
     parser.add_argument('--task_num', type=int, help='number of tasks')
     parser.add_argument('--use_decompose', type=int, help='use Decompose')
     parser.add_argument('--decompose_name', type=str, help='Decompose Variant')
+    parser.add_argument('--use_MOO', type=int, help='use MOO')
+    parser.add_argument('--MOO_name', type=str, help='MOO Variant')
+
     parser.add_argument('--use_SAM', type=int, help='use SAM')
     parser.add_argument('--SAM_name', type=str, help='SAM Variant')
     parser.add_argument('--num_topics', type=int, default=50)

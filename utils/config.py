@@ -14,6 +14,10 @@ def add_dataset_argument(parser):
 def add_model_argument(parser):
     parser.add_argument('--model', type=str, help='model name')
     parser.add_argument('--epoch_threshold', type=int, help='use epoch_threshold')
+    parser.add_argument('--coef_', type=float, default=0.5, help='use epoch_threshold')
+    parser.add_argument('--task_num', type=int, help='number of tasks')
+    parser.add_argument('--use_decompose', type=int, help='use Decompose')
+    parser.add_argument('--decompose_name', type=str, help='Decompose Variant')
     parser.add_argument('--use_SAM', type=int, help='use SAM')
     parser.add_argument('--SAM_name', type=str, help='SAM Variant')
     parser.add_argument('--num_topics', type=int, default=50)

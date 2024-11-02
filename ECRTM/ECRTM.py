@@ -156,19 +156,33 @@ class ECRTM(nn.Module):
 
         loss_ECR = self.get_loss_ECR()
 
-        if self.is_CTR:
+        if self.weight_CTR != 0:
             loss_CTR = self.get_loss_CTR(input, indices)
         else:
             loss_CTR = 0.0
 
         loss = loss_TM + loss_ECR + loss_CTR
 
-        rst_dict = {
-            'loss': loss,
-            'loss_TM': loss_TM,
-            'loss_ECR': loss_ECR,
-            'loss_CTR': loss_CTR
-        }
+        # rst_dict = {
+        #     'loss': loss,
+        #     'loss_TM': loss_TM,
+        #     'loss_ECR': loss_ECR,
+        #     'loss_CTR': loss_CTR
+        # }
+
+        if self.weight_CTR != 0:
+            rst_dict = {
+                'loss': loss,
+                'loss_1': loss_TM + loss_ECR + self.coef_ * loss_CTR,
+                'loss_2': loss_TM + self.coef_ * loss_ECR + loss_CTR,
+                'loss_3': self.coef_ * loss_TM + loss_ECR + loss_CTR
+            }
+        else:
+            rst_dict = {
+                'loss': loss,
+                'loss_1': loss_TM + self.coef_ * loss_ECR,
+                'loss_2': self.coef_ * loss_TM + loss_ECR,
+            }
 
         return rst_dict
 

@@ -66,7 +66,8 @@ if __name__ == "__main__":
                         weight_loss_CTR=args.weight_CTR,
                         weight_loss_InfoNCE=args.weight_InfoNCE,
                         weight_loss_CL=args.weight_CL,
-                        beta_temp=args.beta_temp)
+                        beta_temp=args.beta_temp,
+                        coef_=args.coef_)
     elif args.model == 'FASTopic':
         model = FASTopic(vocab_size=dataset.vocab_size,
                         embed_size=dataset.contextual_embed_size,
@@ -74,7 +75,8 @@ if __name__ == "__main__":
                         cluster_distribution=cluster_distribution,
                         cluster_mean=cluster_mean,
                         cluster_label=cluster_label,
-                        weight_loss_CTR=args.weight_CTR)
+                        weight_loss_CTR=args.weight_CTR,
+                        coef_=args.coef_)
     elif args.model == 'ECRTM':
         model = ECRTM(vocab_size=dataset.vocab_size,
                         num_topics=args.num_topics,
@@ -86,7 +88,8 @@ if __name__ == "__main__":
                         weight_loss_ECR=args.weight_ECR,
                         alpha_ECR=args.alpha_ECR,
                         weight_CTR=args.weight_CTR,
-                        beta_temp=args.beta_temp)
+                        beta_temp=args.beta_temp,
+                        coef_=args.coef_)
     elif args.model == 'ETM':
         model = ETM(vocab_size=dataset.vocab_size,
                         num_topics=args.num_topics,
@@ -95,7 +98,8 @@ if __name__ == "__main__":
                         cluster_mean=cluster_mean,
                         cluster_label=cluster_label,
                         pretrained_WE=pretrainWE if args.use_pretrainWE else None,
-                        weight_CTR=args.weight_CTR
+                        weight_CTR=args.weight_CTR,
+                        coef_=args.coef_
                         )
     else:
         print(f"Wrong model")
@@ -109,6 +113,11 @@ if __name__ == "__main__":
     # create a trainer
     trainer = basic_trainer.BasicTrainer(model, model_name=args.model,
                                             epoch_threshold = args.epoch_threshold,
+                                            task_num = args.task_num,
+                                            use_decompose = args.use_decompose,
+                                            decompose_name=args.decompose_name,
+                                            use_MOO = args.use_MOO,
+                                            MOO_name=args.MOO_name,
                                             use_SAM = args.use_SAM,
                                             SAM_name=args.SAM_name, epochs=args.epochs,
                                             learning_rate=args.lr,

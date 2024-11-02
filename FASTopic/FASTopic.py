@@ -114,17 +114,31 @@ class FASTopic(nn.Module):
 
         loss_DSR = -(train_bow * (recon + self.epsilon).log()).sum(axis=1).mean()
 
-        if self.is_CTR:
+        if self.weight_loss_CTR != 0:
             loss_CTR = self.get_loss_CTR(input, indices)
         else:
             loss_CTR = 0.0
 
         loss = loss_DSR + loss_ETP + loss_CTR
 
-        rst_dict = {
-            'loss': loss,
-            'loss_CTR': loss_CTR
-        }
+        # rst_dict = {
+        #     'loss': loss,
+        #     'loss_CTR': loss_CTR
+        # }
+
+        if self.weight_loss_CTR != 0:
+            rst_dict = {
+                'loss': loss,
+                'loss_1': loss_DSR + loss_ETP + self.coef_ * loss_CTR,
+                'loss_2': loss_DSR + self.coef_ * loss_ETP + loss_CTR,
+                'loss_3': self.coef_ * loss_DSR + loss_ETP + loss_CTR
+            }
+        else:
+            rst_dict = {
+                'loss': loss,
+                'loss_1': loss_DSR + self.coef_ * loss_ETP,
+                'loss_2': self.coef_ * loss_DSR + loss_ETP
+            }
 
         return rst_dict
 

@@ -265,7 +265,7 @@ class NeuroMax(nn.Module):
             
         #CTR
 
-        if self.is_CTR:
+        if self.weight_loss_CTR != 0:
             loss_CTR = self.get_loss_CTR(input, indices)
         else:
             loss_CTR = 0.0
@@ -281,13 +281,32 @@ class NeuroMax(nn.Module):
         # loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_CL
         loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_CTR
         # loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE
-        rst_dict = {
-            'loss': loss,
-            'loss_CTR': loss_CTR,
-            'loss_TM': loss_TM,
-            'loss_ECR': loss_ECR,
-            'loss_GR': loss_GR,
-            'loss_InfoNCE': loss_InfoNCE,
-        }
+        # rst_dict = {
+        #     'loss': loss,
+        #     'loss_CTR': loss_CTR,
+        #     'loss_TM': loss_TM,
+        #     'loss_ECR': loss_ECR,
+        #     'loss_GR': loss_GR,
+        #     'loss_InfoNCE': loss_InfoNCE,
+        # }
+        if self.weight_loss_CTR == 0:
+            rst_dict = {
+                'loss': loss,
+                #'loss_CTR': loss_CTR,
+                'loss_1': loss_TM + loss_ECR + loss_GR + self.coef_ * loss_InfoNCE,
+                'loss_2': loss_TM + loss_ECR + self.coef_ * loss_GR + loss_InfoNCE,
+                'loss_3': loss_TM + self.coef_ * loss_ECR + loss_GR + loss_InfoNCE,
+                'loss_4': self.coef_ * loss_TM + loss_ECR + loss_GR + loss_InfoNCE
+            }
+        else:
+            rst_dict = {
+                'loss': loss,
+                #'loss_CTR': loss_CTR,
+                'loss_1': loss_TM + loss_ECR + loss_GR + loss_InfoNCE + self.coef_ * loss_CTR,
+                'loss_2': loss_TM + loss_ECR + loss_GR + self.coef_ * loss_InfoNCE + loss_CTR,
+                'loss_3': loss_TM + loss_ECR + self.coef_ * loss_GR + loss_InfoNCE + loss_CTR,
+                'loss_4': loss_TM + self.coef_ * loss_ECR + loss_GR + loss_InfoNCE + loss_CTR,
+                'loss_5': self.coef_ * loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_CTR
+            }
 
         return rst_dict

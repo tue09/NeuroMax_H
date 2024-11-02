@@ -132,7 +132,7 @@ class ETM(nn.Module):
         #     'loss': loss,
         #     'loss_CTR': loss_CTR
         # }
-        loss = self.loss_function(bow, recon_input, mu, logvar, avg_loss)
+        loss, recon_loss, KLD = self.loss_function(bow, recon_input, mu, logvar, avg_loss)
         loss += loss_CTR
 
         if self.weight_CTR != 0:
@@ -144,7 +144,8 @@ class ETM(nn.Module):
         else:
             rst_dict = {
                 'loss': loss,
-                'loss_1': loss
+                'loss_1': recon_loss + self.coef_ * KLD,
+                'loss_2': self.coef_ * recon_loss + KLD,
             }
         return rst_dict
 
@@ -154,7 +155,7 @@ class ETM(nn.Module):
         loss = (recon_loss + KLD)
         if avg_loss:
             loss = loss.mean()
-        return loss
+        return loss, recon_loss.mean(), KLD.mean()
         
     def get_loss_CTR(self, input, indices):
         bow = input[0]

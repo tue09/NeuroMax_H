@@ -139,7 +139,7 @@ class ETM(nn.Module):
         loss = (recon_loss + KLD)
         if avg_loss:
             loss = loss.mean()
-        return loss, recon_loss, KLD
+        return loss, recon_loss.mean(), KLD.mean()
         
     def get_loss_OT(self, input, indices):
         bow = input[0]

@@ -65,10 +65,12 @@ class ECRTM(nn.Module):
         # # 
 
         
-
-        self.topic_embeddings = torch.empty((num_topics, self.word_embeddings.shape[1]))
-        nn.init.trunc_normal_(self.topic_embeddings, std=0.1)
-        self.topic_embeddings = nn.Parameter(F.normalize(self.topic_embeddings))
+        if weight_CTR == 0:
+            self.topic_embeddings = nn.Parameter(torch.randn((num_topics, self.word_embeddings.shape[1])))
+        else:
+            self.topic_embeddings = torch.empty((num_topics, self.word_embeddings.shape[1]))
+            nn.init.trunc_normal_(self.topic_embeddings, std=0.1)
+            self.topic_embeddings = nn.Parameter(F.normalize(self.topic_embeddings))
 
         self.ECR = ECR(weight_loss_ECR, alpha_ECR, sinkhorn_max_iter)
 

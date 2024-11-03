@@ -84,21 +84,21 @@ python main.py \
     --decompose_name Gram_Schmidt \
     --epoch_threshold -1 \
     --weight_CL 0 \
-    --weight_ECR 250 \
+    --weight_ECR 5.5 \
     --alpha_ECR 20 \
     --weight_GR 2 \
     --alpha_GR 5 \
     --weight_InfoNCE 50 \
-    --weight_CTR 0.0 \
+    --weight_CTR 0.01 \
     --beta_temp 0.2 \
-    --dataset 20NG \
+    --dataset AGNews \
     --model ECRTM \
     --num_topics 100 \
     --dropout 0.0 \
-    --seed 669 \
-    --lr 0.0021 \
-    --epochs 200 \
+    --seed 668 \
+    --lr 0.002 \
+    --epochs 350 \
     --use_MOO 1 \
     --MOO_name FairGrad \
     --init_2 0 \
-    --coef_ 2.1
+    --coef_ 0.2

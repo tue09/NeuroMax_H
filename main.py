@@ -89,7 +89,7 @@ if __name__ == "__main__":
                         alpha_ECR=args.alpha_ECR,
                         weight_CTR=args.weight_CTR,
                         beta_temp=args.beta_temp,
-                        coef_=args.coef_)
+                        coef_=args.coef_, init_2=args.init_2)
     elif args.model == 'ETM':
         model = ETM(vocab_size=dataset.vocab_size,
                         num_topics=args.num_topics,

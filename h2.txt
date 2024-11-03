@@ -74,7 +74,7 @@ python main.py \
     --num_groups 20 \
     --device cuda \
     --lr_scheduler StepLR \
-    --batch_size 128 \
+    --batch_size 200 \
     --lr_step_size 125 \
     --use_pretrainWE \
     --use_SAM 0 \
@@ -84,20 +84,21 @@ python main.py \
     --decompose_name Gram_Schmidt \
     --epoch_threshold -1 \
     --weight_CL 0 \
-    --weight_ECR 50 \
+    --weight_ECR 250 \
     --alpha_ECR 20 \
     --weight_GR 2 \
     --alpha_GR 5 \
     --weight_InfoNCE 50 \
-    --weight_CTR 0.01 \
+    --weight_CTR 0.0 \
     --beta_temp 0.2 \
-    --dataset AGNews \
+    --dataset 20NG \
     --model ECRTM \
     --num_topics 100 \
-    --dropout 0.2 \
-    --seed 112 \
-    --lr 0.0022 \
-    --epochs 150 \
+    --dropout 0.0 \
+    --seed 669 \
+    --lr 0.0021 \
+    --epochs 200 \
     --use_MOO 1 \
     --MOO_name FairGrad \
-    --coef_ 2.0
+    --init_2 0 \
+    --coef_ 2.1

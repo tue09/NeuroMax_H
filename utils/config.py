@@ -30,6 +30,10 @@ def add_model_argument(parser):
     parser.add_argument('--dropout', type=float, default=0.2)
     parser.add_argument('--use_pretrainWE', action='store_true',
                         default=False, help='Enable use_pretrainWE mode')
+    parser.add_argument('--theta_temp', type=float, default=1.)
+    parser.add_argument('--DT_alpha', type=float, default=3.)
+    parser.add_argument('--TW_alpha', type=float, default=2.)
+
     parser.add_argument('--weight_ECR', type=float, default=40.)
     parser.add_argument('--weight_GR', type=float, default=1.)
     parser.add_argument('--alpha_ECR', type=float, default=20.)

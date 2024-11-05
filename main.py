@@ -75,6 +75,9 @@ if __name__ == "__main__":
                         cluster_distribution=cluster_distribution,
                         cluster_mean=cluster_mean,
                         cluster_label=cluster_label,
+                        theta_temp=args.theta_temp,
+                        DT_alpha=args.DT_alpha,
+                        TW_alpha=args.TW_alpha,
                         weight_loss_CTR=args.weight_CTR,
                         coef_=args.coef_)
     elif args.model == 'ECRTM':

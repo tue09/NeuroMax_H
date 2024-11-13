@@ -155,13 +155,17 @@ class BasicTrainer:
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
                 batch_loss = rst_dict['loss_']
                 
+                loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
+                if (epoch % 10 == 0) and (batch_id == 0):
+                    loss_values = [value.item() for value in loss_array]
+                    print(f"Loss array = {loss_values}")
                 if self.use_SAM == 0:
                     if epoch > self.epoch_threshold:
                         if self.use_MOO == 1:
-                            loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
-                            if (epoch % 10 == 0) and (batch_id == 0):
-                                loss_values = [value.item() for value in loss_array]
-                                print(f"Loss array = {loss_values}")
+                            # loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
+                            # if (epoch % 10 == 0) and (batch_id == 0):
+                            #     loss_values = [value.item() for value in loss_array]
+                            #     print(f"Loss array = {loss_values}")
                             grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
                             adjusted_grad, alpha = moo_algorithm.apply(grad_array)
                             '''if self.use_MOO:
@@ -184,10 +188,10 @@ class BasicTrainer:
                                 print("WRONG config: FASTopic cannot support for traditional MOO !!")
                                 break
                             # Collect losses excluding the total 'loss'
-                            loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
-                            if (epoch % 10 == 0) and (batch_id == 0):
-                                loss_values = [value.item() for value in loss_array]
-                                print(f"Loss array = {loss_values}")
+                            # loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
+                            # if (epoch % 10 == 0) and (batch_id == 0):
+                            #     loss_values = [value.item() for value in loss_array]
+                            #     print(f"Loss array = {loss_values}")
 
                             grad_array = []
                             for loss_ in loss_array:

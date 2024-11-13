@@ -14,12 +14,13 @@ class NeuroMax(nn.Module):
     def __init__(self, vocab_size, num_topics=50, num_groups=10, en_units=200, dropout=0.,
                  cluster_distribution=None, cluster_mean=None, cluster_label=None,
                  pretrained_WE=None, embed_size=200, beta_temp=0.2, is_CTR=False,
-                 weight_loss_ECR=250.0, weight_loss_GR=250.0,
+                 weight_loss_ECR=250.0, weight_loss_GR=250.0, epoch_threshold=10,
                  alpha_GR=20.0, alpha_ECR=20.0, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000, weight_loss_CTR=100.0,
                  weight_loss_InfoNCE=10.0, weight_loss_CL=50.0, coef_=0.5, use_MOO=1):
         super().__init__()
         self.coef_ = coef_
         self.use_MOO = use_MOO
+        self.epoch_threshold = epoch_threshold
 
         self.weight_loss_CTR = weight_loss_CTR
         self.num_topics = num_topics
@@ -281,9 +282,9 @@ class NeuroMax(nn.Module):
             loss_CTR = self.get_loss_CTR(input, indices)
         else:
             loss_CTR = 0.0
-        if epoch_id == 10 and self.group_connection_regularizer is None:
+        if epoch_id == self.epoch_threshold and self.group_connection_regularizer is None:
             self.create_group_connection_regularizer()
-        if self.group_connection_regularizer is not None and epoch_id > 10:
+        if self.group_connection_regularizer is not None and epoch_id > self.epoch_threshold:
             loss_GR = self.get_loss_GR()
         else:
             loss_GR = 0.

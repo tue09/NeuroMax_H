@@ -153,12 +153,12 @@ class BasicTrainer:
                 *inputs, indices = batch
                 batch_data = inputs
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
-                batch_loss = rst_dict['loss']
+                batch_loss = rst_dict['loss_']
                 
                 if self.use_SAM == 0:
                     if epoch > self.epoch_threshold:
                         if self.use_MOO == 1:
-                            loss_array = [value for key, value in rst_dict.items() if 'loss' not in key and value.requires_grad]
+                            loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
                             if (epoch % 10 == 0) and (batch_id == 0):
                                 loss_values = [value.item() for value in loss_array]
                                 print(f"Loss array = {loss_values}")
@@ -184,7 +184,7 @@ class BasicTrainer:
                                 print("WRONG config: FASTopic cannot support for traditional MOO !!")
                                 break
                             # Collect losses excluding the total 'loss'
-                            loss_array = [value for key, value in rst_dict.items() if key != 'loss' and value.requires_grad]
+                            loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
                             if (epoch % 10 == 0) and (batch_id == 0):
                                 loss_values = [value.item() for value in loss_array]
                                 print(f"Loss array = {loss_values}")
@@ -217,7 +217,7 @@ class BasicTrainer:
                             #other_params = [param for param in self.model.parameters() if id(param) not in encoder_param_ids]
                             other_params = [param for param in self.model.parameters() if id(param) not in encoder_param_ids and param.requires_grad]
                             if other_params:
-                                grads = torch.autograd.grad(rst_dict['loss'], other_params, allow_unused=True)
+                                grads = torch.autograd.grad(rst_dict['loss_'], other_params, allow_unused=True)
                                 for param, grad in zip(other_params, grads):
                                     if grad is not None:
                                         param.grad = grad.clone()
@@ -238,7 +238,7 @@ class BasicTrainer:
 
                         rst_dict_adv = self.model(indices, batch_data, epoch_id=epoch)
 
-                        batch_loss_adv = rst_dict_adv['loss']
+                        batch_loss_adv = rst_dict_adv['loss_']
                         batch_loss_adv.backward()
 
                         sam_optimizer.second_step(zero_grad=True)

@@ -304,16 +304,16 @@ class NeuroMax(nn.Module):
         if self.use_MOO == 1:
             if self.weight_loss_CTR == 0:
                 rst_dict = {
-                    'loss': loss,
+                    'loss_': loss,
                     #'loss_CTR': loss_CTR,
                     'loss_1': loss_TM + loss_ECR + loss_GR + self.coef_ * loss_InfoNCE,
                     'loss_2': loss_TM + loss_ECR + self.coef_ * loss_GR + loss_InfoNCE,
                     'loss_3': loss_TM + self.coef_ * loss_ECR + loss_GR + loss_InfoNCE,
                     'loss_4': self.coef_ * loss_TM + loss_ECR + loss_GR + loss_InfoNCE,
-                    'loss_TM': loss_TM,
-                    'loss_ECR': loss_ECR,
-                    'loss_GR': loss_GR,
-                    'loss_InfoNCE': loss_InfoNCE,
+                    'lossTM': loss_TM,
+                    'lossECR': loss_ECR,
+                    'lossGR': loss_GR,
+                    'lossInfoNCE': loss_InfoNCE,
                 }
             else:
                 rst_dict = {
@@ -324,19 +324,19 @@ class NeuroMax(nn.Module):
                     'loss_3': loss_TM + loss_ECR + self.coef_ * loss_GR + loss_InfoNCE + loss_CTR,
                     'loss_4': loss_TM + self.coef_ * loss_ECR + loss_GR + loss_InfoNCE + loss_CTR,
                     'loss_5': self.coef_ * loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_CTR,
-                    'loss_TM': loss_TM,
-                    'loss_ECR': loss_ECR,
-                    'loss_GR': loss_GR,
-                    'loss_InfoNCE': loss_InfoNCE,
+                    'lossTM': loss_TM,
+                    'lossECR': loss_ECR,
+                    'lossGR': loss_GR,
+                    'lossInfoNCE': loss_InfoNCE,
                 }
         else:
             rst_dict = {
                 'loss': loss,
                 #'loss_CTR': loss_CTR,
-                'loss_TM': loss_TM,
-                'loss_ECR': loss_ECR,
-                'loss_GR': loss_GR,
-                'loss_InfoNCE': loss_InfoNCE,
+                'lossTM': loss_TM,
+                'lossECR': loss_ECR,
+                'lossGR': loss_GR,
+                'lossInfoNCE': loss_InfoNCE,
             }
 
         return rst_dict

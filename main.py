@@ -68,6 +68,7 @@ if __name__ == "__main__":
                         weight_loss_CL=args.weight_CL,
                         beta_temp=args.beta_temp,
                         coef_=args.coef_,
+                        epoch_threshold = args.epoch_threshold,
                         use_MOO=args.use_MOO)
     elif args.model == 'FASTopic':
         model = FASTopic(vocab_size=dataset.vocab_size,

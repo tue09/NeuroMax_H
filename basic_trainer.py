@@ -118,7 +118,7 @@ class BasicTrainer:
             elif self.decompose_name == 'SVD':
                 grad_decomposer = SVD(model=self.model, device='cuda', buffer_size=self.task_num)
         
-        if self.use_MOO == 1:
+        if self.use_MOO != 0:
             if self.MOO_name == 'PCGrad':
                 moo_algorithm = PCGrad()
             elif self.MOO_name == 'CAGrad':
@@ -157,23 +157,55 @@ class BasicTrainer:
                 
                 if self.use_SAM == 0:
                     if epoch > self.epoch_threshold:
-                        loss_array = [value for key, value in rst_dict.items() if key != 'loss' and value.requires_grad]
-                        grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
-                        if self.use_MOO:
+                        if self.use_MOO == 1:
+                            loss_array = [value for key, value in rst_dict.items() if key != 'loss' and value.requires_grad]
+                            grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
                             adjusted_grad, alpha = moo_algorithm.apply(grad_array)
-                        else:
-                            total_grad = torch.stack(grad_array, dim=0)  # Shape: (N, x)
-                            grad_decomposer.update_grad_buffer(total_grad)
-                            components = grad_decomposer.decompose_grad(total_grad)
-                            adjusted_grad = sum(components)
-                        
-                        grad_pointer = 0
-                        for p in self.model.parameters():
-                            if p.requires_grad:
-                                num_params = p.numel()
-                                grad_slice = adjusted_grad[grad_pointer:grad_pointer + num_params]
-                                p.grad = grad_slice.view_as(p).clone()
-                                grad_pointer += num_params
+                            '''if self.use_MOO:
+                                adjusted_grad, alpha = moo_algorithm.apply(grad_array)
+                            else:
+                                total_grad = torch.stack(grad_array, dim=0)  # Shape: (N, x)
+                                grad_decomposer.update_grad_buffer(total_grad)
+                                components = grad_decomposer.decompose_grad(total_grad)
+                                adjusted_grad = sum(components)'''
+                            
+                            grad_pointer = 0
+                            for p in self.model.parameters():
+                                if p.requires_grad:
+                                    num_params = p.numel()
+                                    grad_slice = adjusted_grad[grad_pointer:grad_pointer + num_params]
+                                    p.grad = grad_slice.view_as(p).clone()
+                                    grad_pointer += num_params
+                        elif self.use_MOO == 2:
+                            if self.model_name == 'FASTopic':
+                                print("WRONG config: FASTopic cannot support for traditional MOO !!")
+                                break
+                            # loss_array = [value for key, value in rst_dict.items() if key != 'loss' and value.requires_grad]
+                            # grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
+                            # adjusted_grad, alpha = moo_algorithm.apply(grad_array)
+
+                            loss_array = [value for key, value in rst_dict.items() if key != 'loss' and value.requires_grad]
+
+                            grad_array = []
+                            for loss_ in loss_array:
+                                grads = torch.autograd.grad(loss_, self.model.encode.parameters(), retain_graph=True)
+                                grad_vector = torch.cat([g.contiguous().view(-1) for g in grads])
+                                grad_array.append(grad_vector)
+
+                            adjusted_grad, alpha = moo_algorithm.apply(grad_array)
+
+                            start_idx = 0
+                            for param in self.encode.parameters():
+                                param_size = param.numel()
+                                param_grad = adjusted_grad[start_idx:start_idx+param_size].view_as(param)
+                                param.grad = param_grad.clone()
+                                start_idx += param_size
+
+                            other_params = [param for param in self.parameters() if param not in self.encode.parameters()]
+                            if other_params:
+                                grads = torch.autograd.grad(rst_dict['loss'], other_params)
+                                for param, grad in zip(other_params, grads):
+                                    param.grad = grad.clone()
                     else:
                         batch_loss.backward()
                     adam_optimizer.step()

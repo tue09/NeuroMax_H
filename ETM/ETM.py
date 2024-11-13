@@ -15,9 +15,10 @@ class ETM(nn.Module):
     '''
     def __init__(self, vocab_size, embed_size=200, num_topics=50, num_groups=10, en_units=800, dropout=0., 
                     cluster_distribution=None, cluster_mean=None, cluster_label=None, weight_CTR=1, is_CTR=False,
-                    pretrained_WE=None, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000, train_WE=False, coef_=0.5):
+                    pretrained_WE=None, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000, train_WE=False, coef_=0.5,use_MOO=1):
         super().__init__()
         self.coef_ = coef_
+        self.use_MOO = use_MOO
         self.is_CTR = is_CTR
         if pretrained_WE is not None:
             self.word_embeddings = nn.Parameter(torch.from_numpy(pretrained_WE).float())
@@ -140,17 +141,24 @@ class ETM(nn.Module):
         loss, recon_loss, KLD = self.loss_function(bow, recon_input, mu, logvar, avg_loss)
         loss += loss_CTR
 
-        if self.weight_CTR != 0:
-            rst_dict = {
-                'loss': loss,
-                'loss_1': loss + self.coef_ * loss_CTR,
-                'loss_2': self.coef_ * loss + loss_CTR,
-            }
+        if self.use_MOO == 1:
+            if self.weight_CTR != 0:
+                rst_dict = {
+                    'loss': loss,
+                    'loss_1': loss + self.coef_ * loss_CTR,
+                    'loss_2': self.coef_ * loss + loss_CTR,
+                }
+            else:
+                rst_dict = {
+                    'loss': loss,
+                    'loss_1': recon_loss + self.coef_ * KLD,
+                    'loss_2': self.coef_ * recon_loss + KLD,
+                }
         else:
             rst_dict = {
                 'loss': loss,
-                'loss_1': recon_loss + self.coef_ * KLD,
-                'loss_2': self.coef_ * recon_loss + KLD,
+                'recon_loss': recon_loss,
+                'KLD': KLD,
             }
         return rst_dict
 

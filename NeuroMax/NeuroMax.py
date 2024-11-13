@@ -16,9 +16,11 @@ class NeuroMax(nn.Module):
                  pretrained_WE=None, embed_size=200, beta_temp=0.2, is_CTR=False,
                  weight_loss_ECR=250.0, weight_loss_GR=250.0,
                  alpha_GR=20.0, alpha_ECR=20.0, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000, weight_loss_CTR=100.0,
-                 weight_loss_InfoNCE=10.0, weight_loss_CL=50.0, coef_=0.5):
+                 weight_loss_InfoNCE=10.0, weight_loss_CL=50.0, coef_=0.5, use_MOO=1):
         super().__init__()
         self.coef_ = coef_
+        self.use_MOO = use_MOO
+
         self.weight_loss_CTR = weight_loss_CTR
         self.num_topics = num_topics
         self.num_groups = num_groups
@@ -290,24 +292,34 @@ class NeuroMax(nn.Module):
         #     'loss_GR': loss_GR,
         #     'loss_InfoNCE': loss_InfoNCE,
         # }
-        if self.weight_loss_CTR == 0:
-            rst_dict = {
-                'loss': loss,
-                #'loss_CTR': loss_CTR,
-                'loss_1': loss_TM + loss_ECR + loss_GR + self.coef_ * loss_InfoNCE,
-                'loss_2': loss_TM + loss_ECR + self.coef_ * loss_GR + loss_InfoNCE,
-                'loss_3': loss_TM + self.coef_ * loss_ECR + loss_GR + loss_InfoNCE,
-                'loss_4': self.coef_ * loss_TM + loss_ECR + loss_GR + loss_InfoNCE
-            }
+        if self.use_MOO == 1:
+            if self.weight_loss_CTR == 0:
+                rst_dict = {
+                    'loss': loss,
+                    #'loss_CTR': loss_CTR,
+                    'loss_1': loss_TM + loss_ECR + loss_GR + self.coef_ * loss_InfoNCE,
+                    'loss_2': loss_TM + loss_ECR + self.coef_ * loss_GR + loss_InfoNCE,
+                    'loss_3': loss_TM + self.coef_ * loss_ECR + loss_GR + loss_InfoNCE,
+                    'loss_4': self.coef_ * loss_TM + loss_ECR + loss_GR + loss_InfoNCE
+                }
+            else:
+                rst_dict = {
+                    'loss': loss,
+                    #'loss_CTR': loss_CTR,
+                    'loss_1': loss_TM + loss_ECR + loss_GR + loss_InfoNCE + self.coef_ * loss_CTR,
+                    'loss_2': loss_TM + loss_ECR + loss_GR + self.coef_ * loss_InfoNCE + loss_CTR,
+                    'loss_3': loss_TM + loss_ECR + self.coef_ * loss_GR + loss_InfoNCE + loss_CTR,
+                    'loss_4': loss_TM + self.coef_ * loss_ECR + loss_GR + loss_InfoNCE + loss_CTR,
+                    'loss_5': self.coef_ * loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_CTR
+                }
         else:
             rst_dict = {
                 'loss': loss,
                 #'loss_CTR': loss_CTR,
-                'loss_1': loss_TM + loss_ECR + loss_GR + loss_InfoNCE + self.coef_ * loss_CTR,
-                'loss_2': loss_TM + loss_ECR + loss_GR + self.coef_ * loss_InfoNCE + loss_CTR,
-                'loss_3': loss_TM + loss_ECR + self.coef_ * loss_GR + loss_InfoNCE + loss_CTR,
-                'loss_4': loss_TM + self.coef_ * loss_ECR + loss_GR + loss_InfoNCE + loss_CTR,
-                'loss_5': self.coef_ * loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_CTR
+                'loss_TM': loss_TM,
+                'loss_ECR': loss_ECR,
+                'loss_GR': loss_GR,
+                'loss_InfoNCE': loss_InfoNCE,
             }
 
         return rst_dict

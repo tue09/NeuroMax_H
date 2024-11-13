@@ -67,7 +67,8 @@ if __name__ == "__main__":
                         weight_loss_InfoNCE=args.weight_InfoNCE,
                         weight_loss_CL=args.weight_CL,
                         beta_temp=args.beta_temp,
-                        coef_=args.coef_)
+                        coef_=args.coef_,
+                        use_MOO=args.use_MOO)
     elif args.model == 'FASTopic':
         model = FASTopic(vocab_size=dataset.vocab_size,
                         embed_size=dataset.contextual_embed_size,
@@ -79,7 +80,8 @@ if __name__ == "__main__":
                         DT_alpha=args.DT_alpha,
                         TW_alpha=args.TW_alpha,
                         weight_loss_CTR=args.weight_CTR,
-                        coef_=args.coef_)
+                        coef_=args.coef_,
+                        use_MOO=args.use_MOO)
     elif args.model == 'ECRTM':
         model = ECRTM(vocab_size=dataset.vocab_size,
                         num_topics=args.num_topics,
@@ -92,7 +94,8 @@ if __name__ == "__main__":
                         alpha_ECR=args.alpha_ECR,
                         weight_CTR=args.weight_CTR,
                         beta_temp=args.beta_temp,
-                        coef_=args.coef_, init_2=args.init_2)
+                        coef_=args.coef_, init_2=args.init_2,
+                        use_MOO=args.use_MOO)
     elif args.model == 'ETM':
         model = ETM(vocab_size=dataset.vocab_size,
                         num_topics=args.num_topics,
@@ -102,7 +105,8 @@ if __name__ == "__main__":
                         cluster_label=cluster_label,
                         pretrained_WE=pretrainWE if args.use_pretrainWE else None,
                         weight_CTR=args.weight_CTR,
-                        coef_=args.coef_
+                        coef_=args.coef_,
+                        use_MOO=args.use_MOO
                         )
     else:
         print(f"Wrong model")

@@ -14,9 +14,10 @@ class ECRTM(nn.Module):
     '''
     def __init__(self, vocab_size, num_topics=50, en_units=200, dropout=0., pretrained_WE=None, embed_size=200, is_CTR=False,
                     cluster_distribution=None, cluster_mean=None, cluster_label=None, sinkhorn_alpha = 20.0, weight_CTR=100.0,
-                    beta_temp=0.2, weight_loss_ECR=250.0, alpha_ECR=20.0, sinkhorn_max_iter=1000, coef_=0.5, init_2=0):
+                    beta_temp=0.2, weight_loss_ECR=250.0, alpha_ECR=20.0, sinkhorn_max_iter=1000, coef_=0.5, init_2=0, use_MOO=1):
         super().__init__()
         self.coef_ = coef_
+        self.use_MOO = use_MOO
 
         self.num_topics = num_topics
         self.beta_temp = beta_temp
@@ -172,20 +173,30 @@ class ECRTM(nn.Module):
         #     'loss_CTR': loss_CTR
         # }
 
-        if self.weight_CTR != 0:
-            rst_dict = {
-                'loss': loss,
-                'loss_1': loss_TM + loss_ECR + self.coef_ * loss_CTR,
-                'loss_2': loss_TM + self.coef_ * loss_ECR + loss_CTR,
-                'loss_3': self.coef_ * loss_TM + loss_ECR + loss_CTR
-            }
+        if self.use_MOO == 1:
+            if self.weight_CTR != 0:
+                rst_dict = {
+                    'loss': loss,
+                    'loss_1': loss_TM + loss_ECR + self.coef_ * loss_CTR,
+                    'loss_2': loss_TM + self.coef_ * loss_ECR + loss_CTR,
+                    'loss_3': self.coef_ * loss_TM + loss_ECR + loss_CTR
+                }
+            else:
+                rst_dict = {
+                    'loss': loss,
+                    'loss_1': recon_loss + loss_KL + self.coef_ * loss_ECR,
+                    'loss_2': recon_loss + self.coef_ * loss_KL + loss_ECR,
+                    'loss_3': self.coef_ * recon_loss + loss_KL + loss_ECR,
+                }
         else:
             rst_dict = {
-                'loss': loss,
-                'loss_1': recon_loss + loss_KL + self.coef_ * loss_ECR,
-                'loss_2': recon_loss + self.coef_ * loss_KL + loss_ECR,
-                'loss_3': self.coef_ * recon_loss + loss_KL + loss_ECR,
-            }
+                    'loss': loss,
+                    'recon_loss': recon_loss,
+                    'loss_KL': loss_KL,
+                    'loss_ECR': loss_ECR,
+                    #'loss_CTR': loss_CTR
+                }
+
 
         return rst_dict
 

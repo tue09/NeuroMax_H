@@ -18,10 +18,13 @@ class FASTopic(nn.Module):
                  DT_alpha: float=3.0,
                  TW_alpha: float=2.0,
                  weight_loss_CTR=100.0, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000,
-                 coef_=0.5
+                 coef_=0.5,
+                 use_MOO=1,
                 ):
         super().__init__()
         self.coef_ = coef_
+        self.use_MOO = use_MOO
+
         self.DT_alpha = DT_alpha
         self.TW_alpha = TW_alpha
         self.theta_temp = theta_temp
@@ -128,19 +131,27 @@ class FASTopic(nn.Module):
         #     'loss_CTR': loss_CTR
         # }
 
-        if self.weight_loss_CTR != 0:
-            rst_dict = {
-                'loss': loss,
-                'loss_1': loss_DSR + loss_ETP + self.coef_ * loss_CTR,
-                'loss_2': loss_DSR + self.coef_ * loss_ETP + loss_CTR,
-                'loss_3': self.coef_ * loss_DSR + loss_ETP + loss_CTR
-            }
+        if self.use_MOO == 1:
+            if self.weight_loss_CTR != 0:
+                rst_dict = {
+                    'loss': loss,
+                    'loss_1': loss_DSR + loss_ETP + self.coef_ * loss_CTR,
+                    'loss_2': loss_DSR + self.coef_ * loss_ETP + loss_CTR,
+                    'loss_3': self.coef_ * loss_DSR + loss_ETP + loss_CTR
+                }
+            else:
+                rst_dict = {
+                    'loss': loss,
+                    'loss_1': loss_DSR + loss_DT + self.coef_ * loss_TW,
+                    'loss_2': loss_DSR + self.coef_ * loss_DT + loss_TW,
+                    'loss_3': self.coef_ * loss_DSR + loss_DT + loss_TW,
+                }
         else:
             rst_dict = {
                 'loss': loss,
-                'loss_1': loss_DSR + loss_DT + self.coef_ * loss_TW,
-                'loss_2': loss_DSR + self.coef_ * loss_DT + loss_TW,
-                'loss_3': self.coef_ * loss_DSR + loss_DT + loss_TW,
+                'loss_DSR': loss_DSR,
+                'loss_DT': loss_DT,
+                'loss_TW': loss_TW,
             }
         loss_DT + loss_TW
 

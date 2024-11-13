@@ -182,29 +182,40 @@ class BasicTrainer:
                             if self.model_name == 'FASTopic':
                                 print("WRONG config: FASTopic cannot support for traditional MOO !!")
                                 break
-                            loss_array = [value for key, value in rst_dict.items() if key != 'loss' and value.requires_grad]
-                            if epoch % 10 == 0:
-                                print(f"Loss array = {loss_array}")
-                            grad_array = []
-                            for loss_ in loss_array:
-                                grads = torch.autograd.grad(loss_, self.model.encoder1.parameters(), retain_graph=True)
-                                grad_vector = torch.cat([g.contiguous().view(-1) for g in grads])
+                        loss_array = [value for key, value in rst_dict.items() if key != 'loss' and value.requires_grad]
+                        if epoch % 10 == 0:
+                            print(f"Loss array = {loss_array}")
+
+                        grad_array = []
+                        for loss_ in loss_array:
+                            grads = torch.autograd.grad(loss_, self.model.encoder1.parameters(), retain_graph=True, allow_unused=True)
+                            # Filter out None gradients (if any parameter was not used in the computation graph)
+                            valid_grads = [g for g in grads if g is not None]
+                            if len(valid_grads) > 0:
+                                grad_vector = torch.cat([g.contiguous().view(-1) for g in valid_grads])
                                 grad_array.append(grad_vector)
 
+                        # Apply the MOO algorithm if there are valid gradients
+                        if grad_array:
                             adjusted_grad, alpha = moo_algorithm.apply(grad_array)
 
+                            # Assign adjusted gradients back to self.model.encoder1.parameters()
                             start_idx = 0
                             for param in self.model.encoder1.parameters():
-                                param_size = param.numel()
-                                param_grad = adjusted_grad[start_idx:start_idx+param_size].view_as(param)
-                                param.grad = param_grad.clone()
-                                start_idx += param_size
+                                if param.grad is not None:  # Only assign if the parameter was involved in the computation
+                                    param_size = param.numel()
+                                    param_grad = adjusted_grad[start_idx:start_idx + param_size].view_as(param)
+                                    param.grad = param_grad.clone()
+                                    start_idx += param_size
 
-                            other_params = [param for param in self.model.parameters() if param not in self.model.encoder1.parameters()]
-                            if other_params:
-                                grads = torch.autograd.grad(rst_dict['loss'], other_params)
-                                for param, grad in zip(other_params, grads):
+                        # Compute gradients for the rest of the parameters
+                        other_params = [param for param in self.model.parameters() if param not in self.model.encoder1.parameters()]
+                        if other_params:
+                            grads = torch.autograd.grad(rst_dict['loss'], other_params, allow_unused=True)
+                            for param, grad in zip(other_params, grads):
+                                if grad is not None:  # Only assign if there is a valid gradient
                                     param.grad = grad.clone()
+
                     else:
                         batch_loss.backward()
                     adam_optimizer.step()

@@ -51,6 +51,13 @@ class ECRTM(nn.Module):
             self.word_embeddings = nn.init.trunc_normal_(torch.empty(vocab_size, embed_size))
         self.word_embeddings = nn.Parameter(F.normalize(self.word_embeddings))
 
+        self.encoder1 = nn.Sequential(
+            nn.Linear(vocab_size, en_units),
+            nn.Softplus(),
+            nn.Linear(en_units, en_units),
+            nn.Softplus(),
+            nn.Dropout(dropout)
+        )
 
         # Add CTR
         self.cluster_mean = nn.Parameter(torch.from_numpy(cluster_mean).float(), requires_grad=False)
@@ -92,9 +99,10 @@ class ECRTM(nn.Module):
 
     # Same
     def encode(self, input):
-        e1 = F.softplus(self.fc11(input))
-        e1 = F.softplus(self.fc12(e1))
-        e1 = self.fc1_dropout(e1)
+        # e1 = F.softplus(self.fc11(input))
+        # e1 = F.softplus(self.fc12(e1))
+        # e1 = self.fc1_dropout(e1)
+        e1 = self.encoder1(input)
         mu = self.mean_bn(self.fc21(e1))
         logvar = self.logvar_bn(self.fc22(e1))
         z = self.reparameterize(mu, logvar)

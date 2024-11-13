@@ -187,20 +187,20 @@ class BasicTrainer:
                                 print(f"Loss array = {loss_array}")
                             grad_array = []
                             for loss_ in loss_array:
-                                grads = torch.autograd.grad(loss_, self.model.encode.parameters(), retain_graph=True)
+                                grads = torch.autograd.grad(loss_, self.model.encoder1.parameters(), retain_graph=True)
                                 grad_vector = torch.cat([g.contiguous().view(-1) for g in grads])
                                 grad_array.append(grad_vector)
 
                             adjusted_grad, alpha = moo_algorithm.apply(grad_array)
 
                             start_idx = 0
-                            for param in self.encode.parameters():
+                            for param in self.model.encoder1.parameters():
                                 param_size = param.numel()
                                 param_grad = adjusted_grad[start_idx:start_idx+param_size].view_as(param)
                                 param.grad = param_grad.clone()
                                 start_idx += param_size
 
-                            other_params = [param for param in self.parameters() if param not in self.encode.parameters()]
+                            other_params = [param for param in self.parameters() if param not in self.model.encoder1.parameters()]
                             if other_params:
                                 grads = torch.autograd.grad(rst_dict['loss'], other_params)
                                 for param, grad in zip(other_params, grads):

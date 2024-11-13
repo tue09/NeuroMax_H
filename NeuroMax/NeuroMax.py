@@ -74,6 +74,14 @@ class NeuroMax(nn.Module):
         nn.init.trunc_normal_(self.topic_embeddings, std=0.1)
         self.topic_embeddings = nn.Parameter(
             F.normalize(self.topic_embeddings))
+        
+        self.encoder1 = nn.Sequential(
+            nn.Linear(vocab_size, en_units),
+            nn.Softplus(),
+            nn.Linear(en_units, en_units),
+            nn.Softplus(),
+            nn.Dropout(dropout)
+        )
 
         self.num_topics_per_group = num_topics // num_groups
         self.ECR = ECR(weight_loss_ECR, alpha_ECR, sinkhorn_max_iter)
@@ -127,9 +135,10 @@ class NeuroMax(nn.Module):
             return mu
 
     def get_representation(self, input):
-        e1 = F.softplus(self.fc11(input))
-        e1 = F.softplus(self.fc12(e1))
-        e1 = self.fc1_dropout(e1)
+        # e1 = F.softplus(self.fc11(input))
+        # e1 = F.softplus(self.fc12(e1))
+        # e1 = self.fc1_dropout(e1)
+        e1 = self.encoder1(input)
         mu = self.mean_bn(self.fc21(e1))
         logvar = self.logvar_bn(self.fc22(e1))
         z = self.reparameterize(mu, logvar)

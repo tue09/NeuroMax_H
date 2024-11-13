@@ -313,7 +313,7 @@ class NeuroMax(nn.Module):
                     'loss_4': self.coef_ * loss_TM + loss_ECR + loss_GR + loss_InfoNCE,
                     'lossTM': loss_TM,
                     'lossECR': loss_ECR,
-                    #'lossGR': loss_GR,
+                    'lossGR': loss_GR,
                     'lossInfoNCE': loss_InfoNCE,
                 }
             else:
@@ -327,7 +327,7 @@ class NeuroMax(nn.Module):
                     'loss_5': self.coef_ * loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_CTR,
                     'lossTM': loss_TM,
                     'lossECR': loss_ECR,
-                    #'lossGR': loss_GR,
+                    'lossGR': loss_GR,
                     'lossInfoNCE': loss_InfoNCE,
                 }
         else:
@@ -336,7 +336,7 @@ class NeuroMax(nn.Module):
                 #'loss_CTR': loss_CTR,
                 'lossTM': loss_TM,
                 'lossECR': loss_ECR,
-                #'lossGR': loss_GR,
+                'lossGR': loss_GR,
                 'lossInfoNCE': loss_InfoNCE,
             }
 

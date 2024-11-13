@@ -159,8 +159,9 @@ class BasicTrainer:
                     if epoch > self.epoch_threshold:
                         if self.use_MOO == 1:
                             loss_array = [value for key, value in rst_dict.items() if key != 'loss' and value.requires_grad]
-                            if epoch % 10 == 0:
-                                print(f"Loss array = {loss_array}")
+                            if (epoch % 10 == 0) and (batch_id == 0):
+                                loss_values = [value.item() for value in loss_array]
+                                print(f"Loss array = {loss_values}")
                             grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
                             adjusted_grad, alpha = moo_algorithm.apply(grad_array)
                             '''if self.use_MOO:
@@ -184,8 +185,9 @@ class BasicTrainer:
                                 break
                             # Collect losses excluding the total 'loss'
                             loss_array = [value for key, value in rst_dict.items() if key != 'loss' and value.requires_grad]
-                            if epoch % 10 == 0:
-                                print(f"Loss array = {loss_array}")
+                            if (epoch % 10 == 0) and (batch_id == 0):
+                                loss_values = [value.item() for value in loss_array]
+                                print(f"Loss array = {loss_values}")
 
                             grad_array = []
                             for loss_ in loss_array:

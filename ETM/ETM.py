@@ -160,7 +160,7 @@ class ETM(nn.Module):
                 }
         else:
             rst_dict = {
-                'loss': loss,
+                'loss_': loss,
                 'recon_loss': recon_loss,
                 'KLD': KLD,
             }

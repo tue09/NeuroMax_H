@@ -200,7 +200,7 @@ class BasicTrainer:
                                 param.grad = param_grad.clone()
                                 start_idx += param_size
 
-                            other_params = [param for param in self.parameters() if param not in self.model.encoder1.parameters()]
+                            other_params = [param for param in self.model.parameters() if param not in self.model.encoder1.parameters()]
                             if other_params:
                                 grads = torch.autograd.grad(rst_dict['loss'], other_params)
                                 for param, grad in zip(other_params, grads):

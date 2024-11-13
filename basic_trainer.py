@@ -154,7 +154,7 @@ class BasicTrainer:
                 batch_data = inputs
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
                 batch_loss = rst_dict['loss_']
-                
+
                 loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
                 if (epoch % 10 == 0) and (batch_id == 0):
                     loss_values = [value.item() for value in loss_array]
@@ -201,11 +201,9 @@ class BasicTrainer:
                                     grad_vector = torch.cat([g.contiguous().view(-1) for g in valid_grads])
                                     grad_array.append(grad_vector)
 
-                            # Apply the MOO algorithm if there are valid gradients
                             if grad_array:
                                 adjusted_grad, alpha = moo_algorithm.apply(grad_array)
 
-                                # Assign adjusted gradients back to self.model.encoder1.parameters()
                                 start_idx = 0
                                 for param in self.model.encoder1.parameters():
                                     param_size = param.numel()
@@ -213,11 +211,9 @@ class BasicTrainer:
                                     param.grad = param_grad.clone()
                                     start_idx += param_size
 
-                            # Get encoder parameter IDs for comparison
                             encoder_params = list(self.model.encoder1.parameters())
                             encoder_param_ids = set(id(p) for p in encoder_params)
 
-                            # Compute gradients for the rest of the parameters
                             #other_params = [param for param in self.model.parameters() if id(param) not in encoder_param_ids]
                             other_params = [param for param in self.model.parameters() if id(param) not in encoder_param_ids and param.requires_grad]
                             if other_params:

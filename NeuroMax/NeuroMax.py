@@ -336,7 +336,7 @@ class NeuroMax(nn.Module):
                 #'loss_CTR': loss_CTR,
                 'lossTM': loss_TM,
                 'lossECR': loss_ECR,
-                'lossGR': loss_GR,
+                #'lossGR': loss_GR,
                 'lossInfoNCE': loss_InfoNCE,
             }
 

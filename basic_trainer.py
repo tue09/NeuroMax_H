@@ -212,7 +212,8 @@ class BasicTrainer:
                             encoder_param_ids = set(id(p) for p in encoder_params)
 
                             # Compute gradients for the rest of the parameters
-                            other_params = [param for param in self.model.parameters() if id(param) not in encoder_param_ids]
+                            #other_params = [param for param in self.model.parameters() if id(param) not in encoder_param_ids]
+                            other_params = [param for param in self.model.parameters() if id(param) not in encoder_param_ids and param.requires_grad]
                             if other_params:
                                 grads = torch.autograd.grad(rst_dict['loss'], other_params, allow_unused=True)
                                 for param, grad in zip(other_params, grads):

@@ -162,7 +162,7 @@ class BasicTrainer:
                 if self.use_SAM == 0:
                     if epoch > self.epoch_threshold:
                         if self.use_MOO == 1:
-                            loss_array = [value for key, value in rst_dict.items() if 'loss_x' in key and value.requires_grad]
+                            loss_array = [value for key, value in rst_dict.items() if 'loss_x' in key]
                             if (epoch % 10 == 0) and (batch_id == 0):
                                 loss_values = [value.item() for value in loss_array]
                                 print(f"Loss array = {loss_values}")

@@ -145,16 +145,16 @@ class ETM(nn.Module):
             if self.weight_CTR != 0:
                 rst_dict = {
                     'loss_': loss,
-                    'loss_1': loss + self.coef_ * loss_CTR,
-                    'loss_2': self.coef_ * loss + loss_CTR,
+                    'loss_x1': loss + self.coef_ * loss_CTR,
+                    'loss_x2': self.coef_ * loss + loss_CTR,
                     'recon_loss': recon_loss,
                     'KLD': KLD,
                 }
             else:
                 rst_dict = {
                     'loss_': loss,
-                    'loss_1': recon_loss + self.coef_ * KLD,
-                    'loss_2': self.coef_ * recon_loss + KLD,
+                    'loss_x1': recon_loss + self.coef_ * KLD,
+                    'loss_x2': self.coef_ * recon_loss + KLD,
                     'recon_loss': recon_loss,
                     'KLD': KLD,
                 }

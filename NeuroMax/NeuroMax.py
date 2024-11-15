@@ -282,17 +282,17 @@ class NeuroMax(nn.Module):
             loss_CTR = self.get_loss_CTR(input, indices)
         else:
             loss_CTR = 0.0
-        if epoch_id == self.epoch_threshold and self.group_connection_regularizer is None:
+        if epoch_id == 10 and self.group_connection_regularizer is None:
             self.create_group_connection_regularizer()
-        if self.group_connection_regularizer is not None and epoch_id > self.epoch_threshold:
+        if self.group_connection_regularizer is not None and epoch_id > 10:
             loss_GR = self.get_loss_GR()
         else:
             loss_GR = 0.
 
-        #loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE
-        #loss = loss_TM + loss_ECR + loss_GR + loss_CTR + loss_InfoNCE + loss_CL
+        loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE
+        # loss = loss_TM + loss_ECR + loss_GR + loss_CTR + loss_InfoNCE + loss_CL
         # loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_CL
-        loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_CTR
+        # loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE + loss_CTR
         # loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE
         # rst_dict = {
         #     'loss': loss,

@@ -6,7 +6,6 @@ from ._ETP import ETP
 from ._model_utils import pairwise_euclidean_distance
 from .CTR import CTR
 
-
 class FASTopic(nn.Module):
     def __init__(self,
                  vocab_size: int, embed_size: int, num_topics: int,

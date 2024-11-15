@@ -284,10 +284,10 @@ class NeuroMax(nn.Module):
             loss_CTR = 0.0
         if epoch_id == 10 and self.group_connection_regularizer is None:
             self.create_group_connection_regularizer()
+        loss_GR = torch.tensor(0.0, requires_grad=False).to('cuda')
         if self.group_connection_regularizer is not None and epoch_id > 10:
             loss_GR = self.get_loss_GR()
-        else:
-            loss_GR = 0.
+
 
         loss = loss_TM + loss_ECR + loss_GR + loss_InfoNCE
         # loss = loss_TM + loss_ECR + loss_GR + loss_CTR + loss_InfoNCE + loss_CL

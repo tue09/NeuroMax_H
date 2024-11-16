@@ -212,7 +212,10 @@ class BasicTrainer:
                                     grad_array.append(grad_vector)
 
                             if grad_array:
-                                adjusted_grad, alpha = moo_algorithm.apply(grad_array)
+                                if self.MOO_name == 'MoCo':
+                                    adjusted_grad, alpha = moo_algorithm.apply(grad_array, loss_array)
+                                else:
+                                    adjusted_grad, alpha = moo_algorithm.apply(grad_array)
 
                                 start_idx = 0
                                 for param in self.model.encoder1.parameters():

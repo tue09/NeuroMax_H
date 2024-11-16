@@ -16,6 +16,7 @@ from MOO.PCGrad import PCGrad
 from MOO.DB_MTL import DB_MTL
 from MOO.ExcessMTL import ExcessMTL
 from MOO.FairGrad import FairGrad
+from MOO.MoCo import MoCo
 
 from SAM_function.TRAM import TRAM
 from SAM_function.FSAM import FSAM
@@ -131,6 +132,8 @@ class BasicTrainer:
                 moo_algorithm = ExcessMTL(self.task_num)
             elif self.MOO_name == 'FairGrad':
                 moo_algorithm = FairGrad()
+            elif self.MOO_name == 'MoCo':
+                moo_algorithm = MoCo()
         adam_optimizer = self.make_adam_optimizer()
         sam_optimizer = self.make_sam_optimizer() 
 
@@ -168,7 +171,10 @@ class BasicTrainer:
                                 loss_values = [value.item() for value in loss_array2]
                                 print(f"Loss array = {loss_values}")
                             grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
-                            adjusted_grad, alpha = moo_algorithm.apply(grad_array)
+                            if self.MOO_name == 'MoCo':
+                                adjusted_grad, alpha = moo_algorithm.apply(grad_array, loss_array)
+                            else:
+                                adjusted_grad, alpha = moo_algorithm.apply(grad_array)
                             '''if self.use_MOO:
                                 adjusted_grad, alpha = moo_algorithm.apply(grad_array)
                             else:

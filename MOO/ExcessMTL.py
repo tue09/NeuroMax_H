@@ -9,7 +9,7 @@ class ExcessMTL:
         self.first_epoch = True
         self.initial_w = None
 
-    def apply(self, losses, components):
+    def apply(self, components):
         device = components[0].device
         dtype = components[0].dtype
         task_num = len(components)

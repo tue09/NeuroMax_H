@@ -72,7 +72,7 @@ unset CUDA_VISIBLE_DEVICES
 scp -P 8000 kc@label.bkict.org:~/nam_x/NeuroMax_/NeuroMax_H/bash5_output.txt C:/Users/tueldt/Documents/Vin/MOO-paper
 
 tmux capture-pane -S -
-tmux save-buffer ./bash2_output.txt
+tmux save-buffer ./bash4_output.txt
 
 
 python main.py \

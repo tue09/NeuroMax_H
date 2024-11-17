@@ -169,7 +169,7 @@ class BasicTrainer:
                             loss_array = [value for key, value in rst_dict.items() if 'loss_x' in key]
                             if (epoch % 10 == 0) and (batch_id == 0):
                                 loss_values = [value.item() for value in loss_array2]
-                                print(f"Loss array = {loss_values}")
+                                #print(f"Loss array = {loss_values}")
                             grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
                             if self.MOO_name == 'MoCo':
                                 adjusted_grad, alpha = moo_algorithm.apply(grad_array, loss_array)
@@ -202,7 +202,7 @@ class BasicTrainer:
                             loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
                             if (epoch % 10 == 0) and (batch_id == 0):
                                 loss_values = [value.item() for value in loss_array]
-                                print(f"Loss array = {loss_values}")
+                                #print(f"Loss array = {loss_values}")
                             grad_array = []
                             for loss_ in loss_array:
                                 grads = torch.autograd.grad(loss_, self.model.encoder1.parameters(), retain_graph=True, allow_unused=True)
@@ -238,7 +238,7 @@ class BasicTrainer:
                         loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
                         if (epoch % 10 == 0) and (batch_id == 0):
                             loss_values = [value.item() for value in loss_array]
-                            print(f"Loss array = {loss_values}")
+                            #print(f"Loss array = {loss_values}")
                         batch_loss.backward()
                     adam_optimizer.step()
                     adam_optimizer.zero_grad()

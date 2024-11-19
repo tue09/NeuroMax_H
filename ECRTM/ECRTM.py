@@ -99,10 +99,10 @@ class ECRTM(nn.Module):
 
     # Same
     def encode(self, input):
-        # e1 = F.softplus(self.fc11(input))
-        # e1 = F.softplus(self.fc12(e1))
-        # e1 = self.fc1_dropout(e1)
-        e1 = self.encoder1(input)
+        e1 = F.softplus(self.fc11(input))
+        e1 = F.softplus(self.fc12(e1))
+        e1 = self.fc1_dropout(e1)
+        #e1 = self.encoder1(input)
         mu = self.mean_bn(self.fc21(e1))
         logvar = self.logvar_bn(self.fc22(e1))
         z = self.reparameterize(mu, logvar)
@@ -196,11 +196,9 @@ class ECRTM(nn.Module):
             else:
                 rst_dict = {
                     'loss_': loss,
-                    'loss_x1': recon_loss + self.coef_ * loss,
-                    'loss_x2': loss_KL + self.coef_ * loss,
-                    'loss_x3': loss_ECR + self.coef_ * loss,
-                    'lossrecon': recon_loss,
-                    'lossKL': loss_KL,
+                    'loss_x1': loss_TM + self.coef_ * loss,
+                    'loss_x2': loss_ECR + self.coef_ * loss,
+                    'lossTM': loss_TM,
                     'lossECR': loss_ECR,
                 }
         else:

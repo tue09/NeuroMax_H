@@ -1,3 +1,5 @@
+git fetch https://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@github.com/tue09/NeuroMax_H.git
+
 python main.py \
     --dataset 20NG \
     --model NeuroMax \

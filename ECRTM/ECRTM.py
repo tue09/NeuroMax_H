@@ -198,7 +198,8 @@ class ECRTM(nn.Module):
                     'loss_': loss,
                     'loss_x1': loss_TM + self.coef_ * loss,
                     'loss_x2': loss_ECR + self.coef_ * loss,
-                    'lossTM': loss_TM,
+                    'lossrecon': recon_loss,
+                    'lossKL': loss_KL,
                     'lossECR': loss_ECR,
                 }
         else:

@@ -69,6 +69,8 @@ chmod +x bash1.sh
 ./bash1.sh
 
 export CUDA_VISIBLE_DEVICES=1
+export CUDA_VISIBLE_DEVICES=0
+
 echo $CUDA_VISIBLE_DEVICES
 unset CUDA_VISIBLE_DEVICES
 

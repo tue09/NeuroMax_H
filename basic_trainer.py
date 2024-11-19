@@ -236,8 +236,8 @@ class BasicTrainer:
                                         param.grad = grad.clone()
                     else:
                         loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
-                        if (epoch % 10 == 0) and (batch_id == 0):
-                            loss_values = [value.item() for value in loss_array]
+                        #if (epoch % 10 == 0) and (batch_id == 0):
+                        #    loss_values = [value.item() for value in loss_array]
                             #print(f"Loss array = {loss_values}")
                         batch_loss.backward()
                     adam_optimizer.step()

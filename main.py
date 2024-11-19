@@ -175,34 +175,9 @@ if __name__ == "__main__":
         print(f"NMI: ", clustering_results['NMI'])
         print(f'Purity: ', clustering_results['Purity'])
 
-    array1 = trainer.loss_out[0]
-    array2 = trainer.loss_out[1]
-    array3 = trainer.loss_out[2]
-    for i in range(len(trainer.loss_out)):
-        print(f"Loss {i + 1}: mean = {np.mean(trainer.loss_out[i])}, std = {np.std(trainer.loss_out[i])}, max = {np.max(trainer.loss_out[i])}, min = {np.min(trainer.loss_out[i])}")
 
-    data = pd.DataFrame({
-        'Index': range(len(array1)),
-        'Array1': array1,
-        'Array2': array2,
-        'Array3': array3
-    })
+    np.save('loss_out.npy', trainer.loss_out)
 
-    data_melted = pd.melt(data, id_vars='Index', var_name='Array', value_name='Value')
-
-    sns.set_theme(style="whitegrid")
-    plt.figure(figsize=(10, 6))
-    sns.lineplot(data=data_melted, x='Index', y='Value', hue='Array', marker='o')
-
-    plt.title('Line Plot for Array1, Array2, and Array3', fontsize=16)
-    plt.xlabel('Index', fontsize=14)
-    plt.ylabel('Value', fontsize=14)
-    plt.legend(title='Arrays', fontsize=12)
-    plt.xticks(fontsize=12)
-    plt.yticks(fontsize=12)
-
-    plt.tight_layout()
-    plt.show()
 
     # TC_15_list, TC_15 = evaluations.topic_coherence.TC_on_wikipedia(
     #     os.path.join(current_run_dir, 'top_words_15.txt'))

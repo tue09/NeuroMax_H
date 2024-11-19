@@ -293,7 +293,7 @@ class BasicTrainer:
                 #print(output_log)
                 self.logger.info(output_log)
         
-        self.loss_out = np.array(self.loss_out).reshape(num_task, -1).T
+        self.loss_out = np.array(self.loss_out).reshape(-1, num_task).T
 
 
     def test(self, input_data, train_data=None):

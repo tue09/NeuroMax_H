@@ -17,6 +17,7 @@ from MOO.DB_MTL import DB_MTL
 from MOO.ExcessMTL import ExcessMTL
 from MOO.FairGrad import FairGrad
 from MOO.MoCo import MoCo
+import numpy as np
 
 from SAM_function.TRAM import TRAM
 from SAM_function.FSAM import FSAM
@@ -52,7 +53,7 @@ class BasicTrainer:
         self.acc_step = acc_step
         self.logger = logging.getLogger('main')
 
-
+        self.loss_out = []
 
         # Thêm ctr_loss
         # self.cluster_distribution = cluster_distribution 
@@ -146,6 +147,8 @@ class BasicTrainer:
         if self.use_SAM == 0:
             print("Donot use SAM")
 
+        num_task = 0
+
         for epoch_id, epoch in enumerate(tqdm(range(1, self.epochs + 1))):
             self.model.train()
             loss_rst_dict = defaultdict(float)
@@ -158,7 +161,10 @@ class BasicTrainer:
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
                 batch_loss = rst_dict['loss_']
 
-                # loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
+                loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
+                loss_values = [value.item() for value in loss_array]
+                num_task = len(loss_values)
+                self.loss_out += loss_values
                 # if (epoch % 10 == 0) and (batch_id == 0):
                 #     loss_values = [value.item() for value in loss_array]
                 #     print(f"Loss array = {loss_values}")
@@ -267,6 +273,7 @@ class BasicTrainer:
                         adam_optimizer.zero_grad()
                     
 
+
                 for key in rst_dict:
                     try:
                         loss_rst_dict[key] += rst_dict[key] * \
@@ -285,6 +292,9 @@ class BasicTrainer:
 
                 #print(output_log)
                 self.logger.info(output_log)
+        
+        self.loss_out = np.array(self.loss_out).reshape(num_task, -1).T
+
 
     def test(self, input_data, train_data=None):
         data_size = input_data.shape[0]

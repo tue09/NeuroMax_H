@@ -10,6 +10,10 @@ import evaluations
 import datasethandler
 import scipy
 import torch
+import seaborn as sns
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
 
 RESULT_DIR = 'results'
 DATA_DIR = 'datasets'
@@ -171,23 +175,51 @@ if __name__ == "__main__":
         print(f"NMI: ", clustering_results['NMI'])
         print(f'Purity: ', clustering_results['Purity'])
 
+    array1 = trainer.loss_out[0]
+    array2 = trainer.loss_out[1]
+    array3 = trainer.loss_out[2]
+    for i in range(len(trainer.loss_out)):
+        print(f"Loss {i + 1}: mean = {np.mean(trainer.loss_out[i])}, std = {np.std(trainer.loss_out[i])}, max = {np.max(trainer.loss_out[i])}, min = {np.min(trainer.loss_out[i])}")
 
-    TC_15_list, TC_15 = evaluations.topic_coherence.TC_on_wikipedia(
-        os.path.join(current_run_dir, 'top_words_15.txt'))
-    print(f"TC_15: {TC_15:.5f}")
+    data = pd.DataFrame({
+        'Index': range(len(array1)),
+        'Array1': array1,
+        'Array2': array2,
+        'Array3': array3
+    })
 
-    filename = f"results_{args.dataset}_topics{args.num_topics}_epochs{args.epochs}_w_ECR{args.weight_ECR}_w_GR{args.weight_GR}_w_CTR{args.weight_CTR}_w_InfoNCE{args.weight_InfoNCE}_w_CL{args.weight_CL}.txt"
-    filename = filename.replace(' ', '_')
-    filepath = os.path.join(current_run_dir, filename)
-    with open(filepath, 'w') as f:
-        if read_labels:
-            f.write(f"NMI: {clustering_results['NMI']}\n")
-            f.write(f"Purity: {clustering_results['Purity']}\n")
-        else:
-            f.write("NMI: N/A\n")
-            f.write("Purity: N/A\n")
-        f.write(f"TD_15: {TD_15:.5f}\n")
-        f.write(f"TC_15: {TC_15:.5f}\n")
+    data_melted = pd.melt(data, id_vars='Index', var_name='Array', value_name='Value')
 
-    print(f"Done in {filepath}")
+    sns.set_theme(style="whitegrid")
+    plt.figure(figsize=(10, 6))
+    sns.lineplot(data=data_melted, x='Index', y='Value', hue='Array', marker='o')
+
+    plt.title('Line Plot for Array1, Array2, and Array3', fontsize=16)
+    plt.xlabel('Index', fontsize=14)
+    plt.ylabel('Value', fontsize=14)
+    plt.legend(title='Arrays', fontsize=12)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+
+    plt.tight_layout()
+    plt.show()
+
+    # TC_15_list, TC_15 = evaluations.topic_coherence.TC_on_wikipedia(
+    #     os.path.join(current_run_dir, 'top_words_15.txt'))
+    # print(f"TC_15: {TC_15:.5f}")
+
+    # filename = f"results_{args.dataset}_topics{args.num_topics}_epochs{args.epochs}_w_ECR{args.weight_ECR}_w_GR{args.weight_GR}_w_CTR{args.weight_CTR}_w_InfoNCE{args.weight_InfoNCE}_w_CL{args.weight_CL}.txt"
+    # filename = filename.replace(' ', '_')
+    # filepath = os.path.join(current_run_dir, filename)
+    # with open(filepath, 'w') as f:
+    #     if read_labels:
+    #         f.write(f"NMI: {clustering_results['NMI']}\n")
+    #         f.write(f"Purity: {clustering_results['Purity']}\n")
+    #     else:
+    #         f.write("NMI: N/A\n")
+    #         f.write("Purity: N/A\n")
+    #     f.write(f"TD_15: {TD_15:.5f}\n")
+    #     f.write(f"TC_15: {TC_15:.5f}\n")
+
+    # print(f"Done in {filepath}")
 

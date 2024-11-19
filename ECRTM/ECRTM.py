@@ -99,10 +99,10 @@ class ECRTM(nn.Module):
 
     # Same
     def encode(self, input):
-        # e1 = F.softplus(self.fc11(input))
-        # e1 = F.softplus(self.fc12(e1))
-        # e1 = self.fc1_dropout(e1)
-        e1 = self.encoder1(input)
+        e1 = F.softplus(self.fc11(input))
+        e1 = F.softplus(self.fc12(e1))
+        e1 = self.fc1_dropout(e1)
+        #e1 = self.encoder1(input)
         mu = self.mean_bn(self.fc21(e1))
         logvar = self.logvar_bn(self.fc22(e1))
         z = self.reparameterize(mu, logvar)

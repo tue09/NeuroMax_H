@@ -305,7 +305,7 @@ class BasicTrainer:
         print(f"Average time: {total_time:.5f}")
         print(f"Average phase 1 time: {phase1_time:.5f}")
         print(f"Average phase 2 time: {phase2_time:.5f}")
-        self.loss_out = np.array(self.loss_out).reshape(-1, num_task).T
+        #self.loss_out = np.array(self.loss_out).reshape(-1, num_task).T
 
 
     def test(self, input_data, train_data=None):

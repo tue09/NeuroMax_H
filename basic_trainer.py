@@ -165,8 +165,8 @@ class BasicTrainer:
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
                 batch_loss = rst_dict['loss_']
 
-                loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
-                loss_values = [value.item() for value in loss_array]
+                #loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
+                #loss_values = [value.item() for value in loss_array]
                 num_task = len(loss_values)
                 self.loss_out += loss_values
                 # if (epoch % 10 == 0) and (batch_id == 0):

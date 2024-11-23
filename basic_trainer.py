@@ -255,7 +255,7 @@ class BasicTrainer:
                 else:
                     if epoch_id > self.epoch_threshold:
                         
-                        if self.SAM_name == 'DREAM':
+                        if self.SAM_name == 'TRAM':
                             self.model.is_CTR = False
                             loss_OT_ = self.model.get_loss_CTR(batch_data, indices)
                             sam_optimizer.first_step(loss_OT_,

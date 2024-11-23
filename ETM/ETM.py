@@ -163,6 +163,7 @@ class ETM(nn.Module):
                 'loss_': loss,
                 'recon_loss': recon_loss,
                 'KLD': KLD,
+                'loss_CTR': loss_CTR,
             }
         return rst_dict
 

@@ -253,8 +253,8 @@ class BasicTrainer:
                     adam_optimizer.step()
                     adam_optimizer.zero_grad()
                 else:
-                    batch_loss.backward()
                     if epoch_id > self.epoch_threshold:
+                        batch_loss.backward()
                         if self.SAM_name == 'TRAM':
                             self.model.is_CTR = False
                             loss_OT_ = self.model.get_loss_CTR(batch_data, indices)
@@ -273,8 +273,9 @@ class BasicTrainer:
                     else:
                         if self.SAM_name == 'DREAM':
                             self.model.is_CTR = True
-                        adam_optimizer.step()
                         adam_optimizer.zero_grad()
+                        batch_loss.backward()
+                        adam_optimizer.step()
                     
 
 

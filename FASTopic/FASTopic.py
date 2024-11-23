@@ -152,7 +152,6 @@ class FASTopic(nn.Module):
                 'lossDT': loss_DT,
                 'lossTW': loss_TW,
             }
-        loss_DT + loss_TW
 
         return rst_dict
 

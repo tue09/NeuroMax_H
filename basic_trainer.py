@@ -22,6 +22,8 @@ import numpy as np
 from SAM_function.TRAM import TRAM
 from SAM_function.FSAM import FSAM
 
+import time
+
 class BasicTrainer:
     def __init__(self, model, epoch_threshold = 150, model_name='NeuroMax', use_SAM=1, SAM_name='TRAM', epochs=200, 
                  use_decompose=1, decompose_name='Gram_Schmidt', use_MOO=1, MOO_name='PCGrad', task_num=3,
@@ -148,7 +150,7 @@ class BasicTrainer:
             print("Donot use SAM")
 
         num_task = 0
-
+        start_time = time.time()
         for epoch_id, epoch in enumerate(tqdm(range(1, self.epochs + 1))):
             self.model.train()
             loss_rst_dict = defaultdict(float)
@@ -156,6 +158,8 @@ class BasicTrainer:
             # else: is_CTR = False
 
             for batch_id, batch in enumerate(dataset_handler.train_dataloader): 
+                if epoch == self.epoch_threshold:
+                    endphase1_time = time.time()
                 *inputs, indices = batch
                 batch_data = inputs
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
@@ -281,7 +285,6 @@ class BasicTrainer:
                     except:
                         loss_rst_dict[key] += rst_dict[key] * len(batch_data)
 
-
             if self.lr_scheduler:
                 lr_scheduler.step()
 
@@ -292,7 +295,13 @@ class BasicTrainer:
 
                 #print(output_log)
                 self.logger.info(output_log)
-        
+        endphase2_time = time.time()
+        total_time = (endphase2_time - start_time) / self.epochs
+        phase1_time = (endphase1_time - start_time) / self.epoch_threshold
+        phase2_time = (endphase2_time - endphase1_time) / (self.epochs - self.epoch_threshold)
+        print(f"Average time: {total_time:.5f}")
+        print(f"Average phase 1 time: {phase1_time:.5f}")
+        print(f"Average phase 2 time: {phase2_time:.5f}")
         self.loss_out = np.array(self.loss_out).reshape(-1, num_task).T
 
 

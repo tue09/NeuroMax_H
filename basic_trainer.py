@@ -169,7 +169,7 @@ class BasicTrainer:
                 #loss_values = [value.item() for value in loss_array]
                 #num_task = len(loss_values)
                 #self.loss_out += loss_values
-                self.loss_out += 0
+                #self.loss_out += 0
                 # if (epoch % 10 == 0) and (batch_id == 0):
                 #     loss_values = [value.item() for value in loss_array]
                 #     print(f"Loss array = {loss_values}")

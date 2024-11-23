@@ -16,7 +16,7 @@ class FASTopic(nn.Module):
                  theta_temp: float=1.0,
                  DT_alpha: float=3.0,
                  TW_alpha: float=2.0,
-                 weight_loss_CTR=100.0, sinkhorn_alpha = 30.0, sinkhorn_max_iter=1000,
+                 weight_loss_CTR=100.0, sinkhorn_alpha=20.0, sinkhorn_max_iter=1000,
                  coef_=0.5,
                  use_MOO=1,
                 ):

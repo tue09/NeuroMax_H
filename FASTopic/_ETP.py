@@ -5,7 +5,7 @@ from ._model_utils import pairwise_euclidean_distance
 
 
 class ETP(nn.Module):
-    def __init__(self, sinkhorn_alpha, init_a_dist=None, init_b_dist=None, OT_max_iter=1000, stopThr=.5e-3):
+    def __init__(self, sinkhorn_alpha, init_a_dist=None, init_b_dist=None, OT_max_iter=1000, stopThr=.5e-2):
         super().__init__()
         self.sinkhorn_alpha = sinkhorn_alpha
         self.OT_max_iter = OT_max_iter

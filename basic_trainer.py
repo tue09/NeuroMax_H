@@ -273,7 +273,7 @@ class BasicTrainer:
                         sam_optimizer.second_step(zero_grad=True)
                     
                     else:
-                        if self.SAM_name == 'DREAM':
+                        if self.SAM_name == 'TRAM':
                             self.model.is_CTR = True
                         adam_optimizer.zero_grad()
                         batch_loss.backward()

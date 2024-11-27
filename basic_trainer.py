@@ -158,8 +158,8 @@ class BasicTrainer:
             # else: is_CTR = False
 
             for batch_id, batch in enumerate(dataset_handler.train_dataloader): 
-                if epoch == self.epoch_threshold:
-                    endphase1_time = time.time()
+                # if epoch == self.epoch_threshold:
+                #     endphase1_time = time.time()
                 *inputs, indices = batch
                 batch_data = inputs
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
@@ -298,13 +298,13 @@ class BasicTrainer:
 
                 #print(output_log)
                 self.logger.info(output_log)
-        endphase2_time = time.time()
-        total_time = (endphase2_time - start_time) / self.epochs
-        phase1_time = (endphase1_time - start_time) / self.epoch_threshold
-        phase2_time = (endphase2_time - endphase1_time) / (self.epochs - self.epoch_threshold)
-        print(f"Average time: {total_time:.5f}")
-        print(f"Average phase 1 time: {phase1_time:.5f}")
-        print(f"Average phase 2 time: {phase2_time:.5f}")
+        # endphase2_time = time.time()
+        # total_time = (endphase2_time - start_time) / self.epochs
+        # phase1_time = (endphase1_time - start_time) / self.epoch_threshold
+        # phase2_time = (endphase2_time - endphase1_time) / (self.epochs - self.epoch_threshold)
+        # print(f"Average time: {total_time:.5f}")
+        # print(f"Average phase 1 time: {phase1_time:.5f}")
+        # print(f"Average phase 2 time: {phase2_time:.5f}")
         #self.loss_out = np.array(self.loss_out).reshape(-1, num_task).T
 
 

@@ -172,8 +172,10 @@ class BasicTrainer:
                 batch_data = inputs
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
                 batch_loss = rst_dict['loss_']
-                if (epoch % 10 == 0) and (batch_id == 0):
+                if (epoch % 5 == 0) and (batch_id == 0):
                     print(f"ite in {itee}")
+                    print(int(self.learn))
+                    print(type(self.learn))
                 if int(self.learn) == 1:
                     if (epoch % 10 == 0) and (batch_id == 0):
                         print(f"ite out {itee}")

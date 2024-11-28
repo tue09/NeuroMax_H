@@ -157,6 +157,7 @@ class BasicTrainer:
         Loss_warehouse = []
         T_ = 2
         itee = 0
+        print(f"Learn = {self.learn}")
         for epoch_id, epoch in enumerate(tqdm(range(1, self.epochs + 1))):
             self.model.train()
             loss_rst_dict = defaultdict(float)

@@ -33,7 +33,7 @@ class BasicTrainer:
         self.epoch_threshold = epoch_threshold
         self.model_name = model_name
         self.task_num = task_num
-        self.learn = learn,
+        self.learn = learn
 
         self.use_decompose = use_decompose
         self.decompose_name = decompose_name
@@ -172,13 +172,7 @@ class BasicTrainer:
                 batch_data = inputs
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
                 batch_loss = rst_dict['loss_']
-                if (epoch % 5 == 0) and (batch_id == 0):
-                    print(f"ite in {itee}")
-                    print(int(self.learn))
-                    print(type(self.learn))
-                if int(self.learn) == 1:
-                    if (epoch % 10 == 0) and (batch_id == 0):
-                        print(f"ite out {itee}")
+                if self.learn == 1:
                     loss_array2 = [value.item() for key, value in rst_dict.items() if 'losss' in key]
                     Loss_warehouse_t_2 = Loss_warehouse_t_1
                     Loss_warehouse_t_1 = Loss_warehouse

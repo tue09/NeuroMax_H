@@ -172,7 +172,11 @@ class BasicTrainer:
                 batch_data = inputs
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
                 batch_loss = rst_dict['loss_']
+                if (epoch % 10 == 0) and (batch_id == 0):
+                    print(f"ite in {itee}")
                 if self.learn == 1:
+                    if (epoch % 10 == 0) and (batch_id == 0):
+                        print(f"ite out {itee}")
                     loss_array2 = [value.item() for key, value in rst_dict.items() if 'losss' in key]
                     Loss_warehouse_t_2 = Loss_warehouse_t_1
                     Loss_warehouse_t_1 = Loss_warehouse
@@ -181,8 +185,6 @@ class BasicTrainer:
                         Loss_warehouse = loss_array2
                     else:
                         Loss_warehouse = np.add(np.multiply(Loss_warehouse, itee - 1), loss_array2) / itee
-                    if (epoch % 10 == 0) and (batch_id == 0):
-                        print(f"ite {itee}")
                     if itee >= 3:
                         w_t_1 = np.divide(Loss_warehouse_t_2, np.multiply(T_, Loss_warehouse_t_1))
                         e_w_t_1 = np.exp(w_t_1 - np.max(w_t_1)) 

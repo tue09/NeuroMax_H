@@ -171,7 +171,7 @@ class BasicTrainer:
                 batch_data = inputs
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
                 batch_loss = rst_dict['loss_']
-                if self.learn != 0:
+                if self.learn == 1:
                     loss_array2 = [value.item() for key, value in rst_dict.items() if 'losss' in key]
                     Loss_warehouse_t_2 = Loss_warehouse_t_1
                     Loss_warehouse_t_1 = Loss_warehouse

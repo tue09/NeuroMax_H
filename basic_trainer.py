@@ -182,7 +182,7 @@ class BasicTrainer:
                     w_t_1 = [x / (T_ * y) for (x, y) in zip(Loss_warehouse_t_2, Loss_warehouse_t_1)]
                     e_w_t_1 = np.exp(w_t_1 - np.max(w_t_1))
                     lambda_t = (len(loss_array2) * e_w_t_1) / np.sum(e_w_t_1)
-                    if itee % 50000 == 0:
+                    if itee % 500 == 0:
                         print(lambda_t)
                     if self.model_name == "ECRTM":
                         self.model.lambda_1 = lambda_t[0]

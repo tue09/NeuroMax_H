@@ -174,7 +174,7 @@ class BasicTrainer:
                 batch_loss = rst_dict['loss_']
                 if (epoch % 10 == 0) and (batch_id == 0):
                     print(f"ite in {itee}")
-                if self.learn == 1:
+                if int(self.learn) == 1:
                     if (epoch % 10 == 0) and (batch_id == 0):
                         print(f"ite out {itee}")
                     loss_array2 = [value.item() for key, value in rst_dict.items() if 'losss' in key]

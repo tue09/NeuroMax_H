@@ -216,9 +216,9 @@ class ECRTM(nn.Module):
                         'loss_x1': recon_loss + self.lambda_1 * loss,
                         'loss_x2': loss_KL + self.lambda_2 * loss,
                         'loss_x3': loss_ECR + self.lambda_3 * loss,
-                        'lossrecon': recon_loss,
-                        'lossKL': loss_KL,
-                        'lossECR': loss_ECR,
+                        'losssrecon': recon_loss,
+                        'losssKL': loss_KL,
+                        'losssECR': loss_ECR,
                     }
         else:
             rst_dict = {

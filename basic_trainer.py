@@ -27,12 +27,13 @@ import time
 class BasicTrainer:
     def __init__(self, model, epoch_threshold = 150, model_name='NeuroMax', use_SAM=1, SAM_name='TRAM', epochs=200, 
                  use_decompose=1, decompose_name='Gram_Schmidt', use_MOO=1, MOO_name='PCGrad', task_num=3,
-                 learning_rate=0.002, batch_size=200, lr_scheduler=None, lr_step_size=125, log_interval=5, 
+                 learning_rate=0.002, batch_size=200, lr_scheduler=None, lr_step_size=125, log_interval=5, learn=0,
                     rho = 0.005, threshold=10, device='cuda', sigma=0.1, lmbda=0.9, acc_step=8):
         self.model = model
         self.epoch_threshold = epoch_threshold
         self.model_name = model_name
         self.task_num = task_num
+        self.learn = learn,
 
         self.use_decompose = use_decompose
         self.decompose_name = decompose_name
@@ -151,6 +152,11 @@ class BasicTrainer:
 
         num_task = 0
         start_time = time.time()
+        Loss_warehouse_t_2 = []
+        Loss_warehouse_t_1 = []
+        Loss_warehouse = []
+        T_ = 2
+        itee = 0
         for epoch_id, epoch in enumerate(tqdm(range(1, self.epochs + 1))):
             self.model.train()
             loss_rst_dict = defaultdict(float)
@@ -158,13 +164,33 @@ class BasicTrainer:
             # else: is_CTR = False
 
             for batch_id, batch in enumerate(dataset_handler.train_dataloader): 
+                itee += 1
                 # if epoch == self.epoch_threshold:
                 #     endphase1_time = time.time()
                 *inputs, indices = batch
                 batch_data = inputs
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
                 batch_loss = rst_dict['loss_']
-
+                loss_array2 = [value for key, value in rst_dict.items() if 'losss' in key]
+                Loss_warehouse_t_2 = Loss_warehouse_t_1
+                Loss_warehouse_t_1 = Loss_warehouse
+                if len(Loss_warehouse) == 0:
+                    Loss_warehouse = loss_array2
+                else:
+                    Loss_warehouse = (Loss_warehouse * (itee - 1) + loss_array2) / itee
+                if (self.learn != 0) and (itee >= 2):
+                    w_t_1 = [x / (T_ * y) for (x, y) in zip(Loss_warehouse_t_2, Loss_warehouse_t_1)]
+                    e_w_t_1 = np.exp(w_t_1 - np.max(w_t_1))
+                    lambda_t = (len(loss_array2) * e_w_t_1) / np.sum(e_w_t_1)
+                    if self.model_name == "ECRTM":
+                        self.model.lambda_1 = lambda_t[0]
+                        self.model.lambda_2 = lambda_t[1]
+                        self.model.lambda_3 = lambda_t[2]
+                    elif self.model_name == "NeuroMax":
+                        self.model.lambda_1 = lambda_t[0]
+                        self.model.lambda_2 = lambda_t[1]
+                        self.model.lambda_3 = lambda_t[2]
+                        self.model.lambda_4 = lambda_t[3]
                 #loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
                 #loss_values = [value.item() for value in loss_array]
                 #num_task = len(loss_values)
@@ -176,7 +202,7 @@ class BasicTrainer:
                 if self.use_SAM == 0:
                     if epoch > self.epoch_threshold:
                         if self.use_MOO == 1:
-                            loss_array2 = [value for key, value in rst_dict.items() if 'loss_' not in key]
+                            # loss_array2 = [value for key, value in rst_dict.items() if 'loss_' not in key]
                             loss_array = [value for key, value in rst_dict.items() if 'loss_x' in key]
                             # if (epoch % 10 == 0) and (batch_id == 0):
                             #     loss_values = [value.item() for value in loss_array2]

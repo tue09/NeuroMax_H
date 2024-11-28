@@ -22,10 +22,10 @@ class NeuroMax(nn.Module):
         self.use_MOO = use_MOO
         self.epoch_threshold = epoch_threshold
         self.learn_ = learn_
-        self.lambda_1 = nn.Parameter(torch.tensor(1.0))
-        self.lambda_2 = nn.Parameter(torch.tensor(1.0))
-        self.lambda_3 = nn.Parameter(torch.tensor(1.0))
-        self.lambda_4 = nn.Parameter(torch.tensor(1.0))
+        self.lambda_1 = self.coef_
+        self.lambda_2 = self.coef_
+        self.lambda_3 = self.coef_
+        self.lambda_4 = self.coef_
 
         self.weight_loss_CTR = weight_loss_CTR
         self.num_topics = num_topics

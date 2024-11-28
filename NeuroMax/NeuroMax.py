@@ -15,12 +15,17 @@ class NeuroMax(nn.Module):
                  cluster_distribution=None, cluster_mean=None, cluster_label=None,
                  pretrained_WE=None, embed_size=200, beta_temp=0.2, is_CTR=False,
                  weight_loss_ECR=250.0, weight_loss_GR=250.0, epoch_threshold=10,
-                 alpha_GR=20.0, alpha_ECR=20.0, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000, weight_loss_CTR=100.0,
+                 alpha_GR=20.0, alpha_ECR=20.0, sinkhorn_alpha = 20.0, sinkhorn_max_iter=1000, weight_loss_CTR=100.0, learn_=0,
                  weight_loss_InfoNCE=10.0, weight_loss_CL=50.0, coef_=0.5, use_MOO=1):
         super().__init__()
         self.coef_ = coef_
         self.use_MOO = use_MOO
         self.epoch_threshold = epoch_threshold
+        self.learn_ = learn_
+        self.lambda_1 = nn.Parameter(torch.tensor(1.0))
+        self.lambda_2 = nn.Parameter(torch.tensor(1.0))
+        self.lambda_3 = nn.Parameter(torch.tensor(1.0))
+        self.lambda_4 = nn.Parameter(torch.tensor(1.0))
 
         self.weight_loss_CTR = weight_loss_CTR
         self.num_topics = num_topics
@@ -304,18 +309,32 @@ class NeuroMax(nn.Module):
         # }
         if self.use_MOO == 1:
             if self.weight_loss_CTR == 0:
-                rst_dict = {
-                    'loss_': loss,
-                    #'loss_CTR': loss_CTR,
-                    'loss_x1': loss_TM + self.coef_ * loss,
-                    'loss_x2': loss_ECR + self.coef_ * loss,
-                    'loss_x3': loss_GR + self.coef_ * loss,
-                    'loss_x4': loss_InfoNCE + self.coef_ * loss,
-                    'lossTM': loss_TM,
-                    'lossECR': loss_ECR,
-                    'lossGR': loss_GR,
-                    'lossInfoNCE': loss_InfoNCE,
-                }
+                if self.learn_ == 0:
+                    rst_dict = {
+                        'loss_': loss,
+                        #'loss_CTR': loss_CTR,
+                        'loss_x1': loss_TM + self.coef_ * loss,
+                        'loss_x2': loss_ECR + self.coef_ * loss,
+                        'loss_x3': loss_GR + self.coef_ * loss,
+                        'loss_x4': loss_InfoNCE + self.coef_ * loss,
+                        'lossTM': loss_TM,
+                        'lossECR': loss_ECR,
+                        'lossGR': loss_GR,
+                        'lossInfoNCE': loss_InfoNCE,
+                    }
+                else:
+                    rst_dict = {
+                        'loss_': loss,
+                        #'loss_CTR': loss_CTR,
+                        'loss_x1': loss_TM + self.lambda_1 * loss,
+                        'loss_x2': loss_ECR + self.lambda_2 * loss,
+                        'loss_x3': loss_GR + self.lambda_3 * loss,
+                        'loss_x4': loss_InfoNCE + self.lambda_4 * loss,
+                        'lossTM': loss_TM,
+                        'lossECR': loss_ECR,
+                        'lossGR': loss_GR,
+                        'lossInfoNCE': loss_InfoNCE,
+                    }
             else:
                 rst_dict = {
                     'loss_': loss,

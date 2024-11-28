@@ -179,8 +179,12 @@ class BasicTrainer:
                             loss_array2 = [value for key, value in rst_dict.items() if 'loss_' not in key]
                             loss_array = [value for key, value in rst_dict.items() if 'loss_x' in key]
                             if (epoch % 10 == 0) and (batch_id == 0):
-                                loss_values = [value.item() for value in loss_array2]
-                                print(f"Loss array = {loss_values}")
+                                if self.model_name == "ECRTM":
+                                    print(f"{self.model.lambda_1.item()} | {self.model.lambda_2.item()} | {self.model.lambda_3.item()}")
+                                elif self.model_name == "NeuroMax":
+                                    print(f"{self.model.lambda_1.item()} | {self.model.lambda_2.item()} | {self.model.lambda_3.item()} | {self.model.lambda_4.item()}")
+                                # loss_values = [value.item() for value in loss_array2]
+                                # print(f"Loss array = {loss_values}")
                             grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
                             if self.MOO_name == 'MoCo':
                                 adjusted_grad, alpha = moo_algorithm.apply(grad_array, loss_array)

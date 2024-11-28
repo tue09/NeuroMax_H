@@ -177,7 +177,7 @@ class BasicTrainer:
                 if len(Loss_warehouse) == 0:
                     Loss_warehouse = loss_array2
                 else:
-                    Loss_warehouse = np.add(np.multiply(Loss_warehouse, itee - 1), loss_array2) / itee
+                    Loss_warehouse = [(x * (itee - 1) + y) / itee for (x, y) in zip(Loss_warehouse, loss_array2)]
 
                 if self.learn != 0 and itee >= 3:
                     w_t_1 = np.divide(Loss_warehouse_t_2, np.multiply(T_, Loss_warehouse_t_1))

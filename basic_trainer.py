@@ -171,26 +171,27 @@ class BasicTrainer:
                 batch_data = inputs
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
                 batch_loss = rst_dict['loss_']
-                loss_array2 = [value.item() for key, value in rst_dict.items() if 'losss' in key]
-                Loss_warehouse_t_2 = Loss_warehouse_t_1
-                Loss_warehouse_t_1 = Loss_warehouse
+                if self.learn != 0:
+                    loss_array2 = [value.item() for key, value in rst_dict.items() if 'losss' in key]
+                    Loss_warehouse_t_2 = Loss_warehouse_t_1
+                    Loss_warehouse_t_1 = Loss_warehouse
 
-                if len(Loss_warehouse) == 0:
-                    Loss_warehouse = loss_array2
-                else:
-                    Loss_warehouse = np.add(np.multiply(Loss_warehouse, itee - 1), loss_array2) / itee
+                    if len(Loss_warehouse) == 0:
+                        Loss_warehouse = loss_array2
+                    else:
+                        Loss_warehouse = np.add(np.multiply(Loss_warehouse, itee - 1), loss_array2) / itee
 
-                if self.learn != 0 and itee >= 3:
-                    w_t_1 = np.divide(Loss_warehouse_t_2, np.multiply(T_, Loss_warehouse_t_1))
-                    e_w_t_1 = np.exp(w_t_1 - np.max(w_t_1)) 
-                    lambda_t = len(loss_array2) * e_w_t_1 / np.sum(e_w_t_1)  
-                    if itee % 500 == 0:
-                        print(lambda_t)
+                    if itee >= 3:
+                        w_t_1 = np.divide(Loss_warehouse_t_2, np.multiply(T_, Loss_warehouse_t_1))
+                        e_w_t_1 = np.exp(w_t_1 - np.max(w_t_1)) 
+                        lambda_t = len(loss_array2) * e_w_t_1 / np.sum(e_w_t_1)  
+                        if itee % 500 == 0:
+                            print(lambda_t)
 
-                    if self.model_name in ["ECRTM", "NeuroMax"]:
-                        self.model.lambda_1, self.model.lambda_2, self.model.lambda_3 = lambda_t[:3]
-                        if self.model_name == "NeuroMax":
-                            self.model.lambda_4 = lambda_t[3]
+                        if self.model_name in ["ECRTM", "NeuroMax"]:
+                            self.model.lambda_1, self.model.lambda_2, self.model.lambda_3 = lambda_t[:3]
+                            if self.model_name == "NeuroMax":
+                                self.model.lambda_4 = lambda_t[3]
 
                 #loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
                 #loss_values = [value.item() for value in loss_array]

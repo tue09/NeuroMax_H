@@ -183,8 +183,8 @@ class BasicTrainer:
                                     print(f"{self.model.lambda_1.item()} | {self.model.lambda_2.item()} | {self.model.lambda_3.item()}")
                                 elif self.model_name == "NeuroMax":
                                     print(f"{self.model.lambda_1.item()} | {self.model.lambda_2.item()} | {self.model.lambda_3.item()} | {self.model.lambda_4.item()}")
-                                # loss_values = [value.item() for value in loss_array2]
-                                # print(f"Loss array = {loss_values}")
+                                loss_values = [value.item() for value in loss_array2]
+                                print(f"Loss array = {loss_values}")
                             grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
                             if self.MOO_name == 'MoCo':
                                 adjusted_grad, alpha = moo_algorithm.apply(grad_array, loss_array)

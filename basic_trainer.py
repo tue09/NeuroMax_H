@@ -183,7 +183,7 @@ class BasicTrainer:
                         Loss_warehouse = loss_array2
                         #Loss_warehouse = np.add(np.multiply(Loss_warehouse, itee - 1), loss_array2) / itee
                     if itee >= 3:
-                        w_t_1 = np.divide(Loss_warehouse_t_2, np.multiply(T_, Loss_warehouse_t_1))
+                        w_t_1 = np.divide(Loss_warehouse_t_2, np.multiply(T_, Loss_warehouse_t_1) + 1e-8)
                         e_w_t_1 = np.exp(w_t_1 - np.max(w_t_1)) 
                         lambda_t = len(loss_array2) * e_w_t_1 / np.sum(e_w_t_1)  
                         # if (epoch % 10 == 0) and (batch_id == 0):

@@ -180,8 +180,8 @@ class BasicTrainer:
                     if len(Loss_warehouse) == 0:
                         Loss_warehouse = loss_array2
                     else:
-                        #Loss_warehouse = loss_array2
-                        Loss_warehouse = np.add(np.multiply(Loss_warehouse, itee - 1), loss_array2) / itee
+                        Loss_warehouse = loss_array2
+                        #Loss_warehouse = np.add(np.multiply(Loss_warehouse, itee - 1), loss_array2) / itee
                     if itee >= 3:
                         w_t_1 = np.divide(Loss_warehouse_t_2, np.multiply(T_, Loss_warehouse_t_1) + 1e-8)
                         e_w_t_1 = np.exp(w_t_1 - np.max(w_t_1)) 

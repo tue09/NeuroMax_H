@@ -186,8 +186,8 @@ class BasicTrainer:
                         w_t_1 = np.divide(Loss_warehouse_t_2, np.multiply(T_, Loss_warehouse_t_1))
                         e_w_t_1 = np.exp(w_t_1 - np.max(w_t_1)) 
                         lambda_t = len(loss_array2) * e_w_t_1 / np.sum(e_w_t_1)  
-                        if (epoch % 10 == 0) and (batch_id == 0):
-                            print(f"ite {itee}: {lambda_t}")
+                        # if (epoch % 10 == 0) and (batch_id == 0):
+                        #     print(f"ite {itee}: {lambda_t}")
 
                         if self.model_name in ["ECRTM", "NeuroMax"]:
                             self.model.lambda_1, self.model.lambda_2, self.model.lambda_3 = lambda_t[:3]

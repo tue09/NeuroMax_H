@@ -322,7 +322,8 @@ class BasicTrainer:
 
             if self.lr_scheduler:
                 lr_scheduler.step()
-            print(f"Loss recon = {loss_aaa[0]}, Loss KL = {loss_aaa[1]}, Loss ECR = {loss_aaa[2]}")
+            if epoch_id % 50 == 0:
+                print(f"Loss recon = {loss_aaa[0]}, Loss KL = {loss_aaa[1]}, Loss ECR = {loss_aaa[2]}")
             if verbose and epoch % self.log_interval == 0:
                 output_log = f'Epoch: {epoch:03d}'
                 for key in loss_rst_dict:

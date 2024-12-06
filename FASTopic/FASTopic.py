@@ -18,7 +18,8 @@ class FASTopic(nn.Module):
                  TW_alpha: float=2.0,
                  weight_loss_CTR=100.0, sinkhorn_alpha=20.0, sinkhorn_max_iter=1000,
                  coef_=0.5,
-                 use_MOO=1, learn_=0,
+                 learn_=0,
+                 use_MOO=1,
                 ):
         super().__init__()
         self.coef_ = coef_

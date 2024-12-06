@@ -9,7 +9,7 @@ from scipy.optimize import minimize
 class IMTL:
     def __init__(self, task_num, device='cuda'):
         self.task_num = task_num
-        self.loss_scale = nn.Parameter(torch.zeros(task_num, device=self.device))
+        self.loss_scale = nn.Parameter(torch.zeros(task_num, device=device))
     
     def apply(self, components):
         task_num = len(components)

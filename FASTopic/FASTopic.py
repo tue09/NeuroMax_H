@@ -23,7 +23,10 @@ class FASTopic(nn.Module):
         super().__init__()
         self.coef_ = coef_
         self.use_MOO = use_MOO
-
+        self.lambda_1 = self.coef_
+        self.lambda_2 = self.coef_
+        self.lambda_3 = self.coef_
+        
         self.DT_alpha = DT_alpha
         self.TW_alpha = TW_alpha
         self.theta_temp = theta_temp
@@ -145,6 +148,27 @@ class FASTopic(nn.Module):
                     'loss_x2': loss_DSR + self.coef_ * loss_DT + loss_TW,
                     'loss_x3': self.coef_ * loss_DSR + loss_DT + loss_TW,
                 }
+
+                if self.learn_ == 0:
+                    rst_dict = {
+                        'loss_': loss,
+                        'loss_x1': loss_DSR + self.coef_ * loss,
+                        'loss_x2': loss_DT + self.coef_ * loss,
+                        'loss_x3': loss_TW + self.coef_ * loss,
+                        'lossDSR': loss_DSR,
+                        'lossDT': loss_DT,
+                        'lossTW': loss_TW,
+                    }
+                else:
+                    rst_dict = {
+                        'loss_': loss,
+                        'loss_x1': loss_DSR + self.lambda_1 * loss,
+                        'loss_x2': loss_DT + self.lambda_2 * loss,
+                        'loss_x3': loss_TW + self.lambda_3 * loss,
+                        'losssDSR': loss_DSR,
+                        'losssDT': loss_DT,
+                        'losssTW': loss_TW,
+                    }
         else:
             rst_dict = {
                 'loss_': loss,

@@ -172,9 +172,9 @@ class BasicTrainer:
                 batch_data = inputs
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
                 batch_loss = rst_dict['loss_']
-                loss_aaa[0] = rst_dict['loss_recon']
-                loss_aaa[1] = rst_dict['loss_KL']
-                loss_aaa[2] = rst_dict['lossECR']
+                # loss_aaa[0] = rst_dict['loss_recon']
+                # loss_aaa[1] = rst_dict['loss_KL']
+                # loss_aaa[2] = rst_dict['lossECR']
                 if self.learn == 1:
                     loss_array2 = [value.item() for key, value in rst_dict.items() if 'losss' in key]
                     Loss_warehouse_t_2 = Loss_warehouse_t_1
@@ -192,7 +192,7 @@ class BasicTrainer:
                         # if (epoch % 10 == 0) and (batch_id == 0):
                         #     print(f"ite {itee}: {lambda_t}")
                 
-                        if self.model_name in ["ECRTM", "NeuroMax"]:
+                        if self.model_name in ["ECRTM", "NeuroMax", "FASTopic"]:
                             self.model.lambda_1, self.model.lambda_2, self.model.lambda_3 = lambda_t[:3]
                             if self.model_name == "NeuroMax":
                                 self.model.lambda_4 = lambda_t[3]
@@ -279,7 +279,7 @@ class BasicTrainer:
                                     if grad is not None:
                                         param.grad = grad.clone()
                     else:
-                        # loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
+                        #loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
                         #if (epoch % 10 == 0) and (batch_id == 0):
                         #    loss_values = [value.item() for value in loss_array]
                             #print(f"Loss array = {loss_values}")
@@ -322,7 +322,7 @@ class BasicTrainer:
 
             if self.lr_scheduler:
                 lr_scheduler.step()
-            if epoch_id % 50 == 0:
+            if epoch_id % 5000 == 0:
                 print(f"Loss recon = {loss_aaa[0]}, Loss KL = {loss_aaa[1]}, Loss ECR = {loss_aaa[2]}")
             if verbose and epoch % self.log_interval == 0:
                 output_log = f'Epoch: {epoch:03d}'

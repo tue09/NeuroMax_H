@@ -18,15 +18,16 @@ class FASTopic(nn.Module):
                  TW_alpha: float=2.0,
                  weight_loss_CTR=100.0, sinkhorn_alpha=20.0, sinkhorn_max_iter=1000,
                  coef_=0.5,
-                 use_MOO=1,
+                 use_MOO=1, learn_=0,
                 ):
         super().__init__()
         self.coef_ = coef_
         self.use_MOO = use_MOO
+        self.learn_ = learn_
         self.lambda_1 = self.coef_
         self.lambda_2 = self.coef_
         self.lambda_3 = self.coef_
-        
+
         self.DT_alpha = DT_alpha
         self.TW_alpha = TW_alpha
         self.theta_temp = theta_temp

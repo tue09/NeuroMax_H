@@ -123,7 +123,13 @@ class BasicTrainer:
                 grad_decomposer = Gram_Schmidt(model=self.model, device='cuda', buffer_size=self.task_num)
             elif self.decompose_name == 'SVD':
                 grad_decomposer = SVD(model=self.model, device='cuda', buffer_size=self.task_num)
-        
+        if self.model_name == 'FASTopic':
+            self.task_num = 3
+        elif self.model_name == 'ECRTM':
+            self.task_num = 3
+        elif self.model_name == 'NeuroMax':
+            self.task_num = 4
+            
         if self.use_MOO != 0:
             if self.MOO_name == 'PCGrad':
                 moo_algorithm = PCGrad()

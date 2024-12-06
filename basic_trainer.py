@@ -13,6 +13,7 @@ from Decomposer.SVD import SVD
 from MOO.MGDA import MGDA
 from MOO.CAGrad import CAGrad
 from MOO.PCGrad import PCGrad
+from MOO.IMTL import IMTL
 from MOO.DB_MTL import DB_MTL
 from MOO.ExcessMTL import ExcessMTL
 from MOO.FairGrad import FairGrad
@@ -132,6 +133,8 @@ class BasicTrainer:
                 moo_algorithm = DB_MTL(self.task_num)
             elif self.MOO_name == 'MGDA':
                 moo_algorithm = MGDA()
+            elif self.MOO_name == 'IMTL':
+                moo_algorithm = IMTL(self.task_num)
             elif self.MOO_name == 'ExcessMTL':
                 moo_algorithm = ExcessMTL(self.task_num)
             elif self.MOO_name == 'FairGrad':
@@ -234,9 +237,9 @@ class BasicTrainer:
                                     p.grad = grad_slice.view_as(p).clone()
                                     grad_pointer += num_params
                         elif self.use_MOO == 2:
-                            if self.model_name == 'FASTopic':
-                                print("WRONG config: FASTopic cannot support for traditional MOO !!")
-                                break
+                            # if self.model_name == 'FASTopic':
+                            #     print("WRONG config: FASTopic cannot support for traditional MOO !!")
+                            #     break
                             # Collect losses excluding the total 'loss'
                             # loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
                             # if (epoch % 10 == 0) and (batch_id == 0):
@@ -249,7 +252,10 @@ class BasicTrainer:
                                 #print(f"Loss array = {loss_values}")
                             grad_array = []
                             for loss_ in loss_array:
-                                grads = torch.autograd.grad(loss_, self.model.encoder1.parameters(), retain_graph=True, allow_unused=True)
+                                if self.model_name == 'FASTopic':
+                                    grads = torch.autograd.grad(loss_, self.model.ETP.parameters(), retain_graph=True, allow_unused=True)
+                                else:
+                                    grads = torch.autograd.grad(loss_, self.model.encoder1.parameters(), retain_graph=True, allow_unused=True)
                                 valid_grads = [g for g in grads if g is not None]
                                 if len(valid_grads) > 0:
                                     grad_vector = torch.cat([g.contiguous().view(-1) for g in valid_grads])

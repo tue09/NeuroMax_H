@@ -236,7 +236,7 @@ class BasicTrainer:
                                 if len(valid_grads) > 0:
                                     grad_vector = torch.cat([g.contiguous().view(-1) for g in valid_grads])
                                     grad_array.append(grad_vector)
-
+                            print(f"Shapee = {len(grad_array)}")
                             if grad_array:
                                 endphase1_time = time.time()
                                 if self.MOO_name == 'MoCo':

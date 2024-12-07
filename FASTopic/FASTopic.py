@@ -40,9 +40,11 @@ class FASTopic(nn.Module):
         self.word_embeddings = nn.Parameter(F.normalize(self.word_embeddings))
 
         
-        self.topic_embeddings = torch.empty((self.num_topics, embed_size))
-        nn.init.trunc_normal_(self.topic_embeddings, std=0.1)
-        self.topic_embeddings = nn.Parameter(F.normalize(self.topic_embeddings))
+        # self.topic_embeddings = torch.empty((self.num_topics, embed_size))
+        # nn.init.trunc_normal_(self.topic_embeddings, std=0.1)
+        # self.topic_embeddings = nn.Parameter(F.normalize(self.topic_embeddings))
+        self.topic_embeddings = nn.Module()
+        self.topic_embeddings.param = nn.Parameter(F.normalize(torch.empty((self.num_topics, embed_size))))
 
         self.word_weights = nn.Parameter((torch.ones(vocab_size) / vocab_size).unsqueeze(1))
         self.topic_weights = nn.Parameter((torch.ones(self.num_topics) / self.num_topics).unsqueeze(1))

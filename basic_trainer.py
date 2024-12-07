@@ -167,7 +167,8 @@ class BasicTrainer:
         T_ = 2
         itee = 0
         print(f"Learn = {self.learn}")
-        rr = sum(p.numel() for p in self.model.topic_embeddings if p.requires_grad)
+        rr = sum(p.numel() for p in self.model.encoder1.parameters() if p.requires_grad)
+        print(f"Number of trainable parameters encoder1: {rr}")
         for epoch_id, epoch in enumerate(tqdm(range(1, self.epochs + 1))):
             self.model.train()
             loss_rst_dict = defaultdict(float)

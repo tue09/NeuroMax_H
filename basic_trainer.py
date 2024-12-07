@@ -167,8 +167,6 @@ class BasicTrainer:
         T_ = 2
         itee = 0
         print(f"Learn = {self.learn}")
-        rr = sum(p.numel() for p in self.model.encoder1.parameters() if p.requires_grad)
-        print(f"Number of trainable parameters encoder1: {rr}")
         for epoch_id, epoch in enumerate(tqdm(range(1, self.epochs + 1))):
             self.model.train()
             loss_rst_dict = defaultdict(float)
@@ -234,19 +232,14 @@ class BasicTrainer:
                                 else:
                                     grads = torch.autograd.grad(loss_, self.model.encoder1.parameters(), retain_graph=True, allow_unused=True)
                                 valid_grads = [g for g in grads if g is not None]
-                                valid_grads1 = [g for g in grads]
-                                #print(f'len = {len(valid_grads1)}; {len(valid_grads)}, {grads[0].shape}')
                                 if len(valid_grads) > 0:
                                     grad_vector = torch.cat([g.contiguous().view(-1) for g in valid_grads])
                                     grad_array.append(grad_vector)
                             if grad_array:
-                                endphase1_time = time.time()
                                 if self.MOO_name == 'MoCo':
                                     adjusted_grad, alpha = moo_algorithm.apply(grad_array, loss_array)
                                 else:
                                     adjusted_grad, alpha = moo_algorithm.apply(grad_array)
-                                endphase2_time = time.time()
-                                print(f"Average time: {endphase2_time - endphase1_time} || Grad dim = {grad_array[0].shape}")
                                 
                                 start_idx = 0
                                 if self.model_name == 'FASTopic':

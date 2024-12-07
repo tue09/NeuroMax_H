@@ -168,13 +168,9 @@ class BasicTrainer:
         itee = 0
         print(f"Learn = {self.learn}")
         rr = sum(p.numel() for p in self.model.topic_embeddings if p.requires_grad)
-        print(f"Number of trainable parameters in topic embedding: {rr}")
         for epoch_id, epoch in enumerate(tqdm(range(1, self.epochs + 1))):
             self.model.train()
             loss_rst_dict = defaultdict(float)
-            # if epoch > self.threshold: is_CTR = True
-            # else: is_CTR = False
-            loss_aaa = [0, 0, 0]
             for batch_id, batch in enumerate(dataset_handler.train_dataloader): 
                 itee += 1
                 # if epoch == self.epoch_threshold:
@@ -183,9 +179,6 @@ class BasicTrainer:
                 batch_data = inputs
                 rst_dict = self.model(indices, batch_data, epoch_id=epoch)
                 batch_loss = rst_dict['loss_']
-                # loss_aaa[0] = rst_dict['loss_recon']
-                # loss_aaa[1] = rst_dict['loss_KL']
-                # loss_aaa[2] = rst_dict['lossECR']
                 if self.learn == 1:
                     loss_array2 = [value.item() for key, value in rst_dict.items() if 'losss' in key]
                     Loss_warehouse_t_2 = Loss_warehouse_t_1
@@ -245,11 +238,14 @@ class BasicTrainer:
                                     grad_array.append(grad_vector)
 
                             if grad_array:
+                                endphase1_time = time.time()
                                 if self.MOO_name == 'MoCo':
                                     adjusted_grad, alpha = moo_algorithm.apply(grad_array, loss_array)
                                 else:
                                     adjusted_grad, alpha = moo_algorithm.apply(grad_array)
-
+                                endphase2_time = time.time()
+                                print(f"Average time: {endphase2_time - endphase1_time}")
+                                
                                 start_idx = 0
                                 if self.model_name == 'FASTopic':
                                     for param in self.model.topic_embeddings:
@@ -308,8 +304,6 @@ class BasicTrainer:
                         adam_optimizer.zero_grad()
                         batch_loss.backward()
                         adam_optimizer.step()
-                    
-
 
                 for key in rst_dict:
                     try:
@@ -320,8 +314,6 @@ class BasicTrainer:
 
             if self.lr_scheduler:
                 lr_scheduler.step()
-            if epoch_id % 5000 == 1000:
-                print(f"Loss recon = {loss_aaa[0]}, Loss KL = {loss_aaa[1]}, Loss ECR = {loss_aaa[2]}")
             if verbose and epoch % self.log_interval == 0:
                 output_log = f'Epoch: {epoch:03d}'
                 for key in loss_rst_dict:

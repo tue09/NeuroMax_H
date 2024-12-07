@@ -233,11 +233,13 @@ class BasicTrainer:
                                     grads = torch.autograd.grad(loss_, self.model.topic_embeddings, retain_graph=True, allow_unused=True)
                                 else:
                                     grads = torch.autograd.grad(loss_, self.model.encoder1.parameters(), retain_graph=True, allow_unused=True)
-                                valid_grads = [g for g in grads if g is not None]
+                                valid_grads1 = [g for g in grads if g is not None]
+                                print(f'len = {len(valid_grads1)}')
+                                valid_grads = [g for g in grads if g]
+
                                 if len(valid_grads) > 0:
                                     grad_vector = torch.cat([g.contiguous().view(-1) for g in valid_grads])
                                     grad_array.append(grad_vector)
-                            print(f"Shapee = {len(grad_array)}")
                             if grad_array:
                                 endphase1_time = time.time()
                                 if self.MOO_name == 'MoCo':

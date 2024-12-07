@@ -274,13 +274,22 @@ class BasicTrainer:
                                     adjusted_grad, alpha = moo_algorithm.apply(grad_array)
 
                                 start_idx = 0
-                                for param in self.model.encoder1.parameters():
-                                    param_size = param.numel()
-                                    param_grad = adjusted_grad[start_idx:start_idx + param_size].view_as(param)
-                                    param.grad = param_grad.clone()
-                                    start_idx += param_size
-
-                            encoder_params = list(self.model.encoder1.parameters())
+                                if self.model_name == 'FASTopic':
+                                    for param in self.model.topic_embeddings:
+                                        param_size = param.numel()
+                                        param_grad = adjusted_grad[start_idx:start_idx + param_size].view_as(param)
+                                        param.grad = param_grad.clone()
+                                        start_idx += param_size
+                                else:
+                                    for param in self.model.encoder1.parameters():
+                                        param_size = param.numel()
+                                        param_grad = adjusted_grad[start_idx:start_idx + param_size].view_as(param)
+                                        param.grad = param_grad.clone()
+                                        start_idx += param_size
+                            if self.model_name == 'FASTopic':
+                                encoder_params = list(self.model.topic_embeddings)
+                            else:
+                                encoder_params = list(self.model.encoder1.parameters())
                             encoder_param_ids = set(id(p) for p in encoder_params)
 
                             #other_params = [param for param in self.model.parameters() if id(param) not in encoder_param_ids]

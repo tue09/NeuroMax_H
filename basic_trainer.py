@@ -236,8 +236,8 @@ class BasicTrainer:
                                     grad_vector = torch.cat([g.contiguous().view(-1) for g in valid_grads])
                                     grad_array.append(grad_vector)
                             if grad_array:
+                                print(f'len == {len(grad_array)}')
                                 if self.MOO_name == 'MoCo':
-                                    print(f'len == {len(grad_array)}')
                                     adjusted_grad, alpha = moo_algorithm.apply(grad_array, loss_array)
                                 else:
                                     adjusted_grad, alpha = moo_algorithm.apply(grad_array)

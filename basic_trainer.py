@@ -224,7 +224,6 @@ class BasicTrainer:
                                     p.grad = grad_slice.view_as(p).clone()
                                     grad_pointer += num_params
                         elif self.use_MOO == 2:
-                            batch_loss.backward()
                             loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
                             grad_array = []
                             for loss_ in loss_array:

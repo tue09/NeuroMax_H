@@ -55,6 +55,13 @@ class ECRTM(nn.Module):
             self.word_embeddings = nn.init.trunc_normal_(torch.empty(vocab_size, embed_size))
         self.word_embeddings = nn.Parameter(F.normalize(self.word_embeddings))
 
+        if init_2 == 1:
+            self.topic_embeddings = nn.Parameter(torch.randn((num_topics, self.word_embeddings.shape[1])))
+        else:
+            self.topic_embeddings = torch.empty((num_topics, self.word_embeddings.shape[1]))
+            nn.init.trunc_normal_(self.topic_embeddings, std=0.1)
+            self.topic_embeddings = nn.Parameter(F.normalize(self.topic_embeddings))
+
         self.encoder1 = nn.Sequential(
             nn.Linear(vocab_size, en_units),
             nn.Softplus(),
@@ -74,15 +81,7 @@ class ECRTM(nn.Module):
         
         self.map_t2c = nn.Linear(self.word_embeddings.shape[1], self.cluster_mean.shape[1], bias=False)
         self.CTR = CTR(weight_CTR, sinkhorn_alpha, sinkhorn_max_iter)
-        # # 
-
-        if init_2 == 1:
-            self.topic_embeddings = nn.Parameter(torch.randn((num_topics, self.word_embeddings.shape[1])))
-        else:
-            self.topic_embeddings = torch.empty((num_topics, self.word_embeddings.shape[1]))
-            nn.init.trunc_normal_(self.topic_embeddings, std=0.1)
-            self.topic_embeddings = nn.Parameter(F.normalize(self.topic_embeddings))
-
+        # #
 
         self.ECR = ECR(weight_loss_ECR, alpha_ECR, sinkhorn_max_iter)
 
@@ -103,10 +102,10 @@ class ECRTM(nn.Module):
 
     # Same
     def encode(self, input):
-        e1 = F.softplus(self.fc11(input))
-        e1 = F.softplus(self.fc12(e1))
-        e1 = self.fc1_dropout(e1)
-        #e1 = self.encoder1(input)
+        # e1 = F.softplus(self.fc11(input))
+        # e1 = F.softplus(self.fc12(e1))
+        # e1 = self.fc1_dropout(e1)
+        e1 = self.encoder1(input)
         mu = self.mean_bn(self.fc21(e1))
         logvar = self.logvar_bn(self.fc22(e1))
         z = self.reparameterize(mu, logvar)

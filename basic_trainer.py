@@ -259,7 +259,7 @@ class BasicTrainer:
                             grad_array = []
                             for loss_ in loss_array:
                                 if self.model_name == 'FASTopic':
-                                    grads = torch.autograd.grad(loss_, self.model.ETP.parameters(), retain_graph=True, allow_unused=True)
+                                    grads = torch.autograd.grad(loss_, self.model.topic_embeddings.parameters(), retain_graph=True, allow_unused=True)
                                 else:
                                     grads = torch.autograd.grad(loss_, self.model.encoder1.parameters(), retain_graph=True, allow_unused=True)
                                 valid_grads = [g for g in grads if g is not None]

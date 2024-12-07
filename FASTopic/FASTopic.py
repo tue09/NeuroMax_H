@@ -47,10 +47,8 @@ class FASTopic(nn.Module):
         self.word_weights = nn.Parameter((torch.ones(vocab_size) / vocab_size).unsqueeze(1))
         self.topic_weights = nn.Parameter((torch.ones(self.num_topics) / self.num_topics).unsqueeze(1))
 
-        self.ETP_ = ETP(sinkhorn_alpha, init_b_dist=self.topic_weights)
-
-        self.DT_ETP = self.ETP_(self.DT_alpha, init_b_dist=self.topic_weights)
-        self.TW_ETP = self.ETP_(self.TW_alpha, init_b_dist=self.word_weights)
+        self.DT_ETP = ETP(self.DT_alpha, init_b_dist=self.topic_weights)
+        self.TW_ETP = ETP(self.TW_alpha, init_b_dist=self.word_weights)
 
         #OT Distance between topic proportion and cluster proportion
         self.weight_loss_CTR = weight_loss_CTR

@@ -129,7 +129,7 @@ class BasicTrainer:
             self.task_num = 3
         elif self.model_name == 'NeuroMax':
             self.task_num = 4
-            
+        if self.use_MOO == 2: self.task_num = 2
         if self.use_MOO != 0:
             if self.MOO_name == 'PCGrad':
                 moo_algorithm = PCGrad()
@@ -224,7 +224,6 @@ class BasicTrainer:
                                     p.grad = grad_slice.view_as(p).clone()
                                     grad_pointer += num_params
                         elif self.use_MOO == 2:
-                            moo_algorithm.task_num = 2
                             loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
                             grad_array = []
                             for loss_ in loss_array:

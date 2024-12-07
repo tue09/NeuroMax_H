@@ -234,9 +234,8 @@ class BasicTrainer:
                                 else:
                                     grads = torch.autograd.grad(loss_, self.model.encoder1.parameters(), retain_graph=True, allow_unused=True)
                                 valid_grads1 = [g for g in grads if g is not None]
-                                print(f'len = {len(valid_grads1)}')
-                                valid_grads = [g for g in grads if g]
-
+                                valid_grads = [g for g in grads]
+                                print(f'len = {len(valid_grads1)}'; {len(valid_grads)})
                                 if len(valid_grads) > 0:
                                     grad_vector = torch.cat([g.contiguous().view(-1) for g in valid_grads])
                                     grad_array.append(grad_vector)

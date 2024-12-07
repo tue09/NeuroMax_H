@@ -222,8 +222,8 @@ class ECRTM(nn.Module):
         else:
             rst_dict = {
                     'loss_': loss,
-                    'loss_recon': recon_loss,
-                    'loss_KL': loss_KL,
+                    'lossrecon': recon_loss,
+                    'lossKL': loss_KL,
                     'lossECR': loss_ECR,
                     #'lossCTR': loss_CTR
                 }

@@ -224,6 +224,7 @@ class BasicTrainer:
                                     p.grad = grad_slice.view_as(p).clone()
                                     grad_pointer += num_params
                         elif self.use_MOO == 2:
+                            moo_algorithm.task_num = 2
                             loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
                             grad_array = []
                             for loss_ in loss_array:
@@ -236,7 +237,6 @@ class BasicTrainer:
                                     grad_vector = torch.cat([g.contiguous().view(-1) for g in valid_grads])
                                     grad_array.append(grad_vector)
                             if grad_array:
-                                print(f'len == {len(grad_array)}')
                                 if self.MOO_name == 'MoCo':
                                     adjusted_grad, alpha = moo_algorithm.apply(grad_array, loss_array)
                                 else:

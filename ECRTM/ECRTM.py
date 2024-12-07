@@ -178,13 +178,6 @@ class ECRTM(nn.Module):
         #loss = loss_TM + loss_ECR + loss_CTR
         loss = loss_TM + loss_ECR
 
-        # rst_dict = {
-        #     'loss': loss,
-        #     'loss_TM': loss_TM,
-        #     'loss_ECR': loss_ECR,
-        #     'loss_CTR': loss_CTR
-        # }
-
         if self.use_MOO == 1:
             if self.weight_CTR != 0:
                 rst_dict = {

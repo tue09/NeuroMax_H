@@ -129,7 +129,7 @@ class BasicTrainer:
             self.task_num = 3
         elif self.model_name == 'NeuroMax':
             self.task_num = 4
-        if self.use_MOO == 2: self.task_num = 2
+        if (self.use_MOO == 2) and (self.model_name != 'FASTopic'): self.task_num = 2
         if self.use_MOO != 0:
             if self.MOO_name == 'PCGrad':
                 moo_algorithm = PCGrad()

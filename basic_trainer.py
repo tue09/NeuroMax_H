@@ -167,6 +167,8 @@ class BasicTrainer:
         T_ = 2
         itee = 0
         print(f"Learn = {self.learn}")
+        rr = sum(p.numel() for p in self.model.topic_embeddings if p.requires_grad)
+        print(f"Number of trainable parameters in topic embedding: {rr}")
         for epoch_id, epoch in enumerate(tqdm(range(1, self.epochs + 1))):
             self.model.train()
             loss_rst_dict = defaultdict(float)
@@ -198,8 +200,6 @@ class BasicTrainer:
                         w_t_1 = np.divide(Loss_warehouse_t_2, np.multiply(T_, Loss_warehouse_t_1) + 1e-8)
                         e_w_t_1 = np.exp(w_t_1 - np.max(w_t_1)) 
                         lambda_t = len(loss_array2) * e_w_t_1 / np.sum(e_w_t_1)  
-                        # if (epoch % 10 == 0) and (batch_id == 0):
-                        #     print(f"ite {itee}: {lambda_t}")
                 
                         if self.model_name in ["ECRTM", "NeuroMax", "FASTopic"]:
                             self.model.lambda_1, self.model.lambda_2, self.model.lambda_3 = lambda_t[:3]
@@ -217,23 +217,12 @@ class BasicTrainer:
                 if self.use_SAM == 0:
                     if epoch > self.epoch_threshold:
                         if self.use_MOO == 1:
-                            # loss_array2 = [value for key, value in rst_dict.items() if 'loss_' not in key]
                             loss_array = [value for key, value in rst_dict.items() if 'loss_x' in key]
-                            # if (epoch % 10 == 0) and (batch_id == 0):
-                            #     loss_values = [value.item() for value in loss_array2]
-                            #     print(f"Loss array = {loss_values}")
                             grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
                             if self.MOO_name == 'MoCo':
                                 adjusted_grad, alpha = moo_algorithm.apply(grad_array, loss_array)
                             else:
                                 adjusted_grad, alpha = moo_algorithm.apply(grad_array)
-                            '''if self.use_MOO:
-                                adjusted_grad, alpha = moo_algorithm.apply(grad_array)
-                            else:
-                                total_grad = torch.stack(grad_array, dim=0)  # Shape: (N, x)
-                                grad_decomposer.update_grad_buffer(total_grad)
-                                components = grad_decomposer.decompose_grad(total_grad)
-                                adjusted_grad = sum(components)'''
                             
                             grad_pointer = 0
                             for p in self.model.parameters():
@@ -243,19 +232,7 @@ class BasicTrainer:
                                     p.grad = grad_slice.view_as(p).clone()
                                     grad_pointer += num_params
                         elif self.use_MOO == 2:
-                            # if self.model_name == 'FASTopic':
-                            #     print("WRONG config: FASTopic cannot support for traditional MOO !!")
-                            #     break
-                            # Collect losses excluding the total 'loss'
-                            # loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
-                            # if (epoch % 10 == 0) and (batch_id == 0):
-                            #     loss_values = [value.item() for value in loss_array]
-                            #     print(f"Loss array = {loss_values}")
                             loss_array = [value for key, value in rst_dict.items() if 'loss_' not in key and value.requires_grad]
-                            if (epoch % 10 == 0) and (batch_id == 0):
-                                rr = 1
-                                #loss_values = [value.item() for value in loss_array]
-                                #print(f"Loss array = {loss_values}")
                             grad_array = []
                             for loss_ in loss_array:
                                 if self.model_name == 'FASTopic':

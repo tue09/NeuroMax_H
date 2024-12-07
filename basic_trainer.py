@@ -237,6 +237,7 @@ class BasicTrainer:
                                     grad_array.append(grad_vector)
                             if grad_array:
                                 if self.MOO_name == 'MoCo':
+                                    print(f'len == {len(grad_array)}')
                                     adjusted_grad, alpha = moo_algorithm.apply(grad_array, loss_array)
                                 else:
                                     adjusted_grad, alpha = moo_algorithm.apply(grad_array)

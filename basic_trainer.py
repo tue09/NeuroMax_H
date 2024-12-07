@@ -244,7 +244,7 @@ class BasicTrainer:
                                 else:
                                     adjusted_grad, alpha = moo_algorithm.apply(grad_array)
                                 endphase2_time = time.time()
-                                print(f"Average time: {endphase2_time - endphase1_time}")
+                                print(f"Average time: {endphase2_time - endphase1_time} || Grad dim = {grad_array[0].shape}")
                                 
                                 start_idx = 0
                                 if self.model_name == 'FASTopic':

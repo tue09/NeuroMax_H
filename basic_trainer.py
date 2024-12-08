@@ -331,8 +331,8 @@ class BasicTrainer:
             for j in range(len(cosine_)):
                 ss += cosine_[j][i]
             rr.append(ss)
-        avg_rr = [x / len(cosine_[0]) for x in rr]  
-        print(f"With len = {len(cosine_[0])}: Final Cosine Similarity: {avg_rr}")
+        avg_rr = [x / len(cosine_) for x in rr]  
+        print(f"With len = {len(cosine_)}: Final Cosine Similarity: {avg_rr}")
         # endphase2_time = time.time()
         # total_time = (endphase2_time - start_time) / self.epochs
         # phase1_time = (endphase1_time - start_time) / self.epoch_threshold

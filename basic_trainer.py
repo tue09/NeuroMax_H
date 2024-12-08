@@ -212,14 +212,14 @@ class BasicTrainer:
                     if epoch > self.epoch_threshold:
                         if self.use_MOO == 1:
                             loss_array = [value for key, value in rst_dict.items() if 'loss_x' in key]
-                            batch_grad = grad_decomposer._get_total_grad(batch_loss)
+                            #batch_grad = grad_decomposer._get_total_grad(batch_loss)
                             grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
-                            batch_grad_flat = batch_grad.view(-1).detach()
-                            cosine_similarity = [F.cosine_similarity(batch_grad_flat, gradd.view(-1).detach(), dim=0).cpu() for gradd in grad_array]
-                            if epoch_id % 10 == 1:
-                                if batch_id == 0:
-                                    print(f"Cosine similarity: {cosine_similarity}")
-                            cosine_.append(cosine_similarity)
+                            #batch_grad_flat = batch_grad.view(-1).detach()
+                            #cosine_similarity = [F.cosine_similarity(batch_grad_flat, gradd.view(-1).detach(), dim=0).cpu() for gradd in grad_array]
+                            # if epoch_id % 10 == 1:
+                            #     if batch_id == 0:
+                            #         print(f"Cosine similarity: {cosine_similarity}")
+                            # cosine_.append(cosine_similarity)
                             if self.MOO_name == 'MoCo':
                                 adjusted_grad, alpha = moo_algorithm.apply(grad_array, loss_array)
                             else:
@@ -325,14 +325,14 @@ class BasicTrainer:
 
                 #print(output_log)
                 self.logger.info(output_log)
-        rr = []
-        for i in range(len(cosine_[0])):
-            ss = 0
-            for j in range(len(cosine_)):
-                ss += cosine_[j][i]
-            rr.append(ss)
-        avg_rr = [x / len(cosine_[0]) for x in rr]  
-        print(f"Final Cosine Similarity: {avg_rr}")
+        # rr = []
+        # for i in range(len(cosine_[0])):
+        #     ss = 0
+        #     for j in range(len(cosine_)):
+        #         ss += cosine_[j][i]
+        #     rr.append(ss)
+        # avg_rr = [x / len(cosine_[0]) for x in rr]  
+        # print(f"Final Cosine Similarity: {avg_rr}")
         # endphase2_time = time.time()
         # total_time = (endphase2_time - start_time) / self.epochs
         # phase1_time = (endphase1_time - start_time) / self.epoch_threshold

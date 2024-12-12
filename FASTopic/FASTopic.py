@@ -128,8 +128,8 @@ class FASTopic(nn.Module):
         else:
             loss_CTR = 0.0
 
-        loss = loss_DSR + loss_ETP + loss_CTR
-
+        # loss = loss_DSR + loss_ETP + loss_CTR
+        loss = loss_DSR + loss_ETP
         # rst_dict = {
         #     'loss': loss,
         #     'loss_CTR': loss_CTR
@@ -175,8 +175,7 @@ class FASTopic(nn.Module):
             rst_dict = {
                 'loss_': loss,
                 'lossDSR': loss_DSR,
-                'lossDT': loss_DT,
-                'lossTW': loss_TW,
+                'lossETP': loss_ETP,
             }
 
         return rst_dict

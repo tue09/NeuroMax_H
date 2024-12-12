@@ -125,7 +125,7 @@ class BasicTrainer:
             elif self.decompose_name == 'SVD':
                 grad_decomposer = SVD(model=self.model, device='cuda', buffer_size=self.task_num)
         if self.model_name == 'FASTopic':
-            self.task_num = 3
+            self.task_num = 2
         elif self.model_name == 'ECRTM':
             self.task_num = 3
         elif self.model_name == 'NeuroMax':
@@ -212,8 +212,8 @@ class BasicTrainer:
                     if epoch > self.epoch_threshold:
                         if self.use_MOO == 1:
                             loss_array = [value for key, value in rst_dict.items() if 'loss_x' in key]
-                            #batch_grad = grad_decomposer._get_total_grad(batch_loss)
                             grad_array = [grad_decomposer._get_total_grad(loss_) for loss_ in loss_array]
+                            # batch_grad = grad_decomposer._get_total_grad(batch_loss)
                             # batch_grad_flat = batch_grad.view(-1).detach()
                             # cosine_similarity = [F.cosine_similarity(batch_grad_flat, gradd.view(-1).detach(), dim=0).cpu() for gradd in grad_array]
                             # if epoch_id % 10 == 1:
@@ -237,7 +237,7 @@ class BasicTrainer:
                             grad_array = []
                             for loss_ in loss_array:
                                 if self.model_name == 'FASTopic':
-                                    grads = torch.autograd.grad(loss_, self.model.topic_embeddings, retain_graph=True, allow_unused=True)
+                                    grads = torch.autograd.grad(loss_, self.model.word_embedding, retain_graph=True, allow_unused=True)
                                 else:
                                     grads = torch.autograd.grad(loss_, self.model.encoder1.parameters(), retain_graph=True, allow_unused=True)
                                 valid_grads = [g for g in grads if g is not None]
@@ -281,6 +281,13 @@ class BasicTrainer:
                         #if (epoch % 10 == 0) and (batch_id == 0):
                         #    loss_values = [value.item() for value in loss_array]
                             #print(f"Loss array = {loss_values}")
+                        
+                        # batch_grad = grad_decomposer._get_total_grad(batch_loss)
+                        # batch_grad_flat = batch_grad.view(-1).detach()
+                        # cosine_similarity = [F.cosine_similarity(batch_grad_flat, gradd.view(-1).detach(), dim=0).cpu() for gradd in grad_array]
+                        # if epoch_id % 10 == 1:
+                        #     if batch_id == 0:
+                        #         print(f"Cosine similarity: {cosine_similarity}")
                         batch_loss.backward()
                     adam_optimizer.step()
                     adam_optimizer.zero_grad()
